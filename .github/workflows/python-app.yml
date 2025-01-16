@@ -1,0 +1,35 @@
+ 1 # This workflow will install Python dependencies, run tests and lint with a single version of Python
+ 2 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+ 3 
+ 4 name: Python application
+ 5 
+ 6 on: [push, pull_request]
+ 7 
+ 8 permissions:
+ 9   contents: read
+10 
+11 jobs:
+12   build:
+13 
+14     runs-on: ubuntu-latest
+15 
+16     steps:
+17     - uses: actions/checkout@v3
+18     - name: Set up Python 3.10
+19       uses: actions/setup-python@v3
+20       with:
+21         python-version: "3.10"
+22     - name: Install dependencies
+23       run: |
+24         python -m pip install --upgrade pip
+25         pip install flake8
+26         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+27     - name: Lint with flake8
+28       run: |
+29         # stop the build if there are Python syntax errors or undefined names
+30         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+31         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+32         flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+33     - name: Test with Unittest
+34       run: |
+35         python tests.py
