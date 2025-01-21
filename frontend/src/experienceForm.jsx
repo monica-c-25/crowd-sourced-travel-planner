@@ -4,14 +4,9 @@ function ExperienceForm() {
     const [formData, setFormData] = useState({
         title: '',
         eventDate: '', // New field for event date
-        NumberComments: 0,
-        avgRating: 0,
-        NumberOfRatings: 0,
         Description: '',
         Location_lat: '',
         Location_lon: '',
-        Users_idUsers: '',
-        Trips_idTrips: '',
     });
 
     const handleChange = (e) => {
@@ -37,13 +32,8 @@ function ExperienceForm() {
                 body: JSON.stringify({
                     title: formData.title,
                     eventDate: formData.eventDate, // Send the event date
-                    NumberComments: formData.NumberComments,
-                    avgRating: parseFloat(formData.avgRating),
-                    NumberOfRatings: formData.NumberOfRatings,
                     Description: formData.Description,
                     Location: location, // Send as a string "latitude,longitude"
-                    Users_idUsers: parseInt(formData.Users_idUsers, 10),
-                    Trips_idTrips: formData.Trips_idTrips ? parseInt(formData.Trips_idTrips, 10) : null, // Handle optional Trips_id
                 }),
             });
 
@@ -53,14 +43,9 @@ function ExperienceForm() {
                 setFormData({
                     title: '',
                     eventDate: '',
-                    NumberComments: 0,
-                    avgRating: 0,
-                    NumberOfRatings: 0,
                     Description: '',
                     Location_lat: '',
                     Location_lon: '',
-                    Users_idUsers: '',
-                    Trips_idTrips: '',
                 });
             } else {
                 const errorData = await response.json();

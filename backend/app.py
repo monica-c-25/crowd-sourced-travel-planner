@@ -1,6 +1,6 @@
 from flask import Flask, g
 from flask_cors import CORS
-from routes.experience import exp_bp
+from routes import register_blueprints
 import mysql.connector
 from config import Config
 import os
@@ -12,8 +12,6 @@ app.config.from_object(Config)
 CORS(app, origins=["http://localhost:3000"])
 
 # Function to create and return the database connection
-
-
 def get_db():
     """Returns a database connection if one doesn't exist."""
     if 'db' not in g:
@@ -26,17 +24,13 @@ def get_db():
     return g.db
 
 # Teardown function to close the connection after each request
-
-
 @app.teardown_appcontext
 def close_db():
     db = g.pop('db', None)
     if db is not None:
         db.close()
 
-
-app.register_blueprint(exp_bp, url_prefix='/experience')
-
+register_blueprints(app)
 
 @app.route('/')
 def index():
