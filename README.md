@@ -1,6 +1,7 @@
 # crowd-sourced-travel-planner
 OSU Capstone Project
 
+<pre>
 |-- backend/
     |-- routes/
         |-- __init__.py
@@ -20,3 +21,4 @@ OSU Capstone Project
 |-- .env
 |-- README.md
 |-- tests.py
+</pre>
