@@ -1,0 +1,6 @@
+.header {
+    display: flex;
+    justify-content: center;
+    font-family: "Inter";
+    font-size: 2rem;
+}
