@@ -6,8 +6,10 @@ const NavBar = () => {
     return (
         <nav className="navigation">
             <h1 className="brand">
+            <Link to="/" className="brand-link">
                 <img src="/images/logo.jpg" alt="an owl logo"/>
                 OwlWays Travel
+            </Link>
             </h1>
             <ul className="navLinks">
             <li>

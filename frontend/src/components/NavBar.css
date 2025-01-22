@@ -42,3 +42,10 @@ img {
     color: white;
     border-radius: .5rem;
 }
+
+.brand-link {
+    text-decoration: none; 
+    color: inherit;
+    display: flex;
+    align-items: center;
+  }
