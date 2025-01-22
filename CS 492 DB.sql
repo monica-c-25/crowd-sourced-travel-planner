@@ -12,11 +12,12 @@ SET AUTOCOMMIT = 0;
 CREATE OR REPLACE TABLE `Comments` (
   `idComments` INT NOT NULL AUTO_INCREMENT,
   `Comment` VARCHAR(120) NOT NULL,
-  `idExperiences` INT NOT NULL,
+  `idExperience` INT NOT NULL,
+  `idUser` INT NOT NULL,
   PRIMARY KEY (`idComments`),
   CONSTRAINT `fk_comment_experience`
-    FOREIGN KEY (`idExperiences`)
-    REFERENCES `Experiences` (`idExperiences`)
+    FOREIGN KEY (`idExperience`)
+    REFERENCES `Experiences` (`idExperience`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 
@@ -25,7 +26,7 @@ CREATE OR REPLACE TABLE `Comments` (
 -- -----------------------------------------------------
 
 CREATE OR REPLACE TABLE `Experiences` (
-  `idExperiences` INT NOT NULL AUTO_INCREMENT,
+  `idExperience` INT NOT NULL AUTO_INCREMENT,
   `NumberComments` INT NOT NULL DEFAULT 0,
   `userRating` DECIMAL(3,2) NOT NULL DEFAULT 0,
   `Description` VARCHAR(1200) NOT NULL,
@@ -34,7 +35,7 @@ CREATE OR REPLACE TABLE `Experiences` (
   `CreationDate` DATE NOT NULL,
   `idUsers` INT,
   `idPhoto` INT NOT NULL,
-  PRIMARY KEY (`idExperiences`),
+  PRIMARY KEY (`idExperience`),
   CONSTRAINT `fk_experience_user`
     FOREIGN KEY ('idUsers')
     REFERENCES `Users` (`idUsers`)
@@ -55,11 +56,11 @@ CREATE OR REPLACE TABLE `PhotoIds` (
 -- -----------------------------------------------------
 
 CREATE OR REPLACE TABLE `TripExperienceDetail` (
-  `idExperiences` INT NOT NULL,
+  `idExperience` INT NOT NULL,
   `idTrips` INT NOT NULL,
   CONSTRAINT `fk_TripExperienceDetail_Experiences1`
-    FOREIGN KEY (`Experiences_idExperiences`)
-    REFERENCES `Experiences` (`idExperiences`)
+    FOREIGN KEY (`Experiences_idExperience`)
+    REFERENCES `Experiences` (`idExperience`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_TripExperienceDetail_Trips`
