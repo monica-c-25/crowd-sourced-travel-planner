@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, render_template, url_for, redirect
+from flask import Flask, request, send_file, render_template
 from google.cloud import storage, datastore
 import io
 
@@ -30,8 +30,8 @@ def store_image():
     # Note we are not doing anything with the variable 'tag' in this
     # example, however this illustrates how we can extract data from the
     # multipart form data in addition to the files.
-    if 'tag' in request.form:
-        tag = request.form['tag']
+    # if 'tag' in request.form:
+    #     tag = request.form['tag']
     # Create a storage client
     storage_client = storage.Client()
     # Get a handle on the bucket
