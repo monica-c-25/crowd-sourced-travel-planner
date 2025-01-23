@@ -3,4 +3,14 @@
     justify-content: center;
     font-family: "Inter";
     font-size: 2rem;
+    color: rgba(11, 72, 11, 0.808);
 }
+
+.background-img {
+    margin-top: 1rem;
+    width: 100%;
+    height: auto;
+    opacity: .6;
+    border-radius: 10px;
+}
+
