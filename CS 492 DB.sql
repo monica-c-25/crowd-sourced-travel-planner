@@ -35,6 +35,7 @@ CREATE OR REPLACE TABLE `Experiences` (
   `CreationDate` DATE NOT NULL,
   `idUsers` INT,
   `idPhoto` INT NOT NULL,
+  `Location` VARCHAR(200) NOT NULL,
   PRIMARY KEY (`idExperience`),
   CONSTRAINT `fk_experience_user`
     FOREIGN KEY ('idUsers')
@@ -75,7 +76,6 @@ CREATE OR REPLACE TABLE `TripExperienceDetail` (
 
 CREATE OR REPLACE TABLE `Trips` (
   `idTrips` INT NOT NULL AUTO_INCREMENT,
-  `Location` VARCHAR(200) NOT NULL,
   `idUsers` INT NOT NULL,
   PRIMARY KEY (`idTrips`),
   CONSTRAINT `fk_Trips_Users`
