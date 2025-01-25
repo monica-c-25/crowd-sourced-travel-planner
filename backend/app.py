@@ -19,7 +19,8 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-default-secret-key")
 app.config.from_object(Config)
 
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
-CORS(app, origins=["http://localhost:3000"])
+# Enable CORS for requests from localhost:3000
+CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
 # Initialize OAuth for Auth0
 oauth = OAuth(app)
@@ -81,20 +82,38 @@ def login():
 @app.route("/callback")
 def callback():
     """Handles Auth0's callback after login."""
-    token = oauth.auth0.authorize_access_token()
-    nonce = session.get('nonce')
-    user = oauth.auth0.parse_id_token(token, nonce=nonce)
-    session["user"] = user
-    return redirect(url_for("home"))
+    try:
+        # Exchange the authorization code for tokens
+        token = oauth.auth0.authorize_access_token()
+        print("Access token:", token)  # Debug the token
+
+        # Extract and validate the user info
+        nonce = session.get('nonce')
+        user = oauth.auth0.parse_id_token(token, nonce=nonce)
+        session["user"] = user
+        print("Logged in user:", user)  # Debug the user info
+
+        # Redirect to the frontend home page
+        frontend_home_url = "http://localhost:3000"
+        return redirect(frontend_home_url)
+
+    except Exception as e:
+        print("Login failed:", e)  # Debug login failure
+        return jsonify({"error": "Login failed", "details": str(e)}), 400
 
 
 @app.route("/logout")
 def logout():
     """Logs out the user and clears session."""
-    session.clear()  # Clear the session
-    return redirect(
-        f"https://{os.environ.get('AUTH0_DOMAIN')}/v2/logout?client_id={os.environ.get('AUTH0_CLIENT_ID')}&returnTo={url_for('home', _external=True)}"
+    session.clear() 
+    print("Logging out from backend.")
+    frontend_home_url = "http://127.0.0.1:3000"
+    auth0_logout_url = (
+        f"https://{os.environ.get('AUTH0_DOMAIN')}/v2/logout"
+        f"?client_id={os.environ.get('AUTH0_CLIENT_ID')}"
+        f"&returnTo={frontend_home_url}"
     )
+    return redirect(auth0_logout_url)
 
 
 @app.route("/home")

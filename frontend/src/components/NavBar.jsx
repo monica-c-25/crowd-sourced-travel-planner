@@ -16,20 +16,38 @@ const NavBar = () => {
         .then((data) => {
             if (data.user) {
                 setUser(data.user);  // Set user data if logged in
+            } else {
+                setUser(null);  // Reset user context if no user data
             }
         })
-        .catch((error) => console.error("Error fetching user data:", error));
-    }, [setUser]);
+        .catch((error) => {
+            console.error("Error fetching user data:", error);
+            setUser(null);  // Reset user context if error occurs
+        });
+    }, []);
 
-    const handleLogout = () => {
-        fetch("http://localhost:46725/logout", {
-            method: "GET",
-            credentials: "include", // Include cookies for session
-        })
-        .then(() => {
-            setUser(null); 
-        })
-        .catch((err) => console.error("Logout failed", err));
+    const handleLogout = async () => {
+        try {
+
+        localStorage.removeItem("auth_token");
+        sessionStorage.removeItem("auth_token");
+        document.cookie = "auth_token=; max-age=0; path=/"; // Clear cookies
+        document.cookie = "auth0-tenant-name=; max-age=0; path=/";
+
+
+        setUser(null);
+
+        const response = await fetch("/logout", { method: "GET" });
+
+        if (response.ok) {
+            console.log("Logout successful on the backend.");
+        } else {
+            console.error("Logout failed on the backend.");
+        }
+
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
     };
 
     return (
