@@ -3,6 +3,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
+from HTTP_funcs import _get, _put, _post, _delete, _set_payload
 
 
 load_dotenv()
@@ -22,51 +23,75 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 def request_handler():
 
     # Grabs collection DB
-    db_experience = client["Experience"]
-    collection_experience = db_experience["Experience"]
+    db = client["Experience"]
+    collection = db["Experience"]
 
     if request.method == 'POST':
         # Add Data
-        data = request.get_json()['Test']
-        print(data)
-        # collection_experience.insert_one(jsonify(dummy_data))
-        response = {
-            "Message": "Successfully Created"
-        }
+        try:
+            response = {
+                "Message": "Success",
+                "ID": _post(collection, request.get_json())
+            }
+        except Exception as exception:
+            response = {
+                'Message': f"Failed: {exception} raised"
+            }
         return jsonify(response)
 
     if request.method == 'GET':
         # Get Data
-        response_data = [data for data in collection_experience.find()]
-        _strip_id(response_data)
-        response = {
-            'Message': "Successfully Retrieved",
-            'data': response_data
-        }
+        try:
+            response = _get(request.get_json(), collection)
+            response = {
+                "Message": "Success",
+                "data": response
+            }
+        except Exception as exception:
+            response = {
+                'Message': f"Failed: {exception} raised"
+            }
         return jsonify(response)
 
-    if request.method == 'Delete':
+    if request.method == 'DELETE':
         # Update Data
-        collection_experience.delete_one({'Experience': 'Bahamas'})
-        response = {
-            "Successfully Updated"
-        }
+        try:
+            query_name = request.get_json()['Query']
+            _delete(collection, query_name)
+            response = {
+                "Message": "Success"
+            }
+        except Exception as exception:
+            response = {
+                'Message': f"Failed: {exception} raised"
+            }
         return jsonify(response)
 
-    if request.method == 'Update':
-        collection_experience.update_one(
-            {'Experience': 'Bahamas'},
-            {"$set": {'Experience': 'Hawaii'}}
-        )
-        response = {
-            "Successfully Updated"
-        }
+    if request.method == 'PUT':
+        data = request.get_json()
+        update_payload = dict()
+
+        if "Previous_Title" in data:
+            query_name = data["Previous_Title"]
+            del data["Previous_Title"]
+        else:
+            query_name = data["Experience"]
+
+        _set_payload(data, update_payload)
+
+        try:
+            _put(collection, "Experience", update_payload,
+                 query_name)
+            response = {
+                "Message": "Success"
+            }
+
+        except Exception as exception:
+            response = {
+                "Message": f"Failed: {exception} occured"
+            }
+
         return jsonify(response)
-
-
-def _strip_id(input_data: object) -> None:
-    for data in input_data:
-        del data['_id']
 
 
 if __name__ == '__main__':
