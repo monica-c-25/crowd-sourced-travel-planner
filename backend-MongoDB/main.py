@@ -19,8 +19,8 @@ uri = (
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
-@app.route('/api/data/experience', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def request_handler():
+@app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def experience_request_handler():
 
     # Grabs collection DB
     db = client["Experience"]
@@ -91,6 +91,28 @@ def request_handler():
                 "Message": f"Failed: {exception} occured"
             }
 
+        return jsonify(response)
+
+
+@app.route('/api/user-data', methods=['GET'])
+def user_request_handler():
+  
+    # Grabs collection DB
+    db = client["User"]
+    collection = db["User"]
+
+    if request.method == 'GET':
+        # Get Data
+        try:
+            response = _get(request.get_json(), collection)
+            response = {
+                "Message": "Success",
+                "data": response
+            }
+        except Exception as exception:
+            response = {
+                'Message': f"Failed: {exception} raised"
+            }
         return jsonify(response)
 
 
