@@ -41,8 +41,8 @@ def reverse_geocode(lat, lon):
         zip_code = address_data.get("postcode", "")
 
         # Format the address
-        formatted_address = f"{house_number} {road}, {city}, {
-            state}, {zip_code}".strip().replace(" ,", ",")
+        formatted_address = f"""{house_number} {road}, {city}, {
+            state}, {zip_code}""".strip().replace(" ,", ",")
 
         return {"address": formatted_address} if formatted_address else None
     return None
