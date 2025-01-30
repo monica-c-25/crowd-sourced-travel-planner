@@ -104,10 +104,22 @@ def user_request_handler():
     if request.method == 'GET':
         # Get Data
         try:
-            response = _get(request.get_json(), collection)
+            data = _get(request.get_json(), collection)
             response = {
                 "Message": "Success",
-                "data": response
+                "data": data
+            }
+        except Exception as exception:
+            response = {
+                'Message': f"Failed: {exception} raised"
+            }
+        return jsonify(response)
+
+    if request.method == 'POST':
+        try:
+            response = {
+                "Message": "Success",
+                "ID": _post(collection, request.get_json())
             }
         except Exception as exception:
             response = {
