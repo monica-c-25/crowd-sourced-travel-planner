@@ -96,7 +96,7 @@ def experience_request_handler():
 
 @app.route('/api/user-data', methods=['GET'])
 def user_request_handler():
-  
+
     # Grabs collection DB
     db = client["User"]
     collection = db["User"]
