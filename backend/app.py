@@ -21,7 +21,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-default-secret-key")
 app.config.from_object(Config)
 
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
-CORS(app, origins=["http://localhost:3000"])
+CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
 # Initialize OAuth for Auth0
 oauth = OAuth(app)

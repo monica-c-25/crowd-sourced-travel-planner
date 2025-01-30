@@ -6,8 +6,7 @@ function ExperienceForm() {
     title: "",
     eventDate: "",
     Description: "",
-    Location_lat: "",
-    Location_lon: "",
+    Location: ""
   });
 
   const handleChange = (e) => {
@@ -21,10 +20,8 @@ function ExperienceForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const location = `${formData.Location_lat},${formData.Location_lon}`;
-
     try {
-      const response = await fetch("http://127.0.0.1:46725/api/experience", {
+      const response = await fetch("http://127.0.0.1:8001/api/experience-data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +30,7 @@ function ExperienceForm() {
           title: formData.title,
           eventDate: formData.eventDate,
           Description: formData.Description,
-          Location: location,
+          Location: formData.Location, // Send lat/lon string
         }),
       });
 
@@ -44,8 +41,7 @@ function ExperienceForm() {
           title: "",
           eventDate: "",
           Description: "",
-          Location_lat: "",
-          Location_lon: "",
+          Location: "",
         });
       } else {
         const errorData = await response.json();
@@ -97,34 +93,16 @@ function ExperienceForm() {
         />
       </div>
       <div className="form-group location">
-        <div>
-          <label htmlFor="Location_lat">Latitude:</label>
-          <input
-            type="number"
-            id="Location_lat"
-            name="Location_lat"
-            value={formData.Location_lat}
-            onChange={handleChange}
-            step="0.0001"
-            min="-90"
-            max="90"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="Location_lon">Longitude:</label>
-          <input
-            type="number"
-            id="Location_lon"
-            name="Location_lon"
-            value={formData.Location_lon}
-            onChange={handleChange}
-            step="0.0001"
-            min="-180"
-            max="180"
-            required
-          />
-        </div>
+        <label htmlFor="Location">Location:</label>
+        <input
+          type="text"
+          id="Location"
+          name="Location"
+          value={formData.Location}
+          onChange={handleChange}
+          placeholder="Add a location or Address"
+          required
+        />
       </div>
       <div className="form-actions">
         <button type="submit" className="submit-button">
@@ -138,8 +116,7 @@ function ExperienceForm() {
               title: "",
               eventDate: "",
               Description: "",
-              Location_lat: "",
-              Location_lon: "",
+              Location: "",
             })
           }
         >
