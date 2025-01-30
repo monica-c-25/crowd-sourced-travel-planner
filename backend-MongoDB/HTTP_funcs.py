@@ -2,22 +2,23 @@ from locationApi.locApi import geocode, reverse_geocode
 from flask import jsonify
 import pprint
 
+
 def _get(request_body: dict, collection: object) -> object:
 
     if request_body["Query"] == "All":
         result = list(collection.find())
     else:
         result = collection.find_one({collection.name: request_body["Query"]})
-        
+
     _strip_id(result)
     pprint.pprint(result)
     for res in result:
         if res and "Location" in res:
-            
+
             location = res["Location"]
             lat = location.get("lat")
             lon = location.get("lon")
-            
+
             # Ensure lat/lon are valid and convert them
             if lat and lon:
                 try:
@@ -32,8 +33,9 @@ def _get(request_body: dict, collection: object) -> object:
                         res["Location"] = "Address not found"
                 except ValueError:
                     res["Location"] = "Invalid lat/lon"
-    
+
     return result
+
 
 def _put(collection: object, payload: dict, prev_name: str) -> None:
 
@@ -49,7 +51,7 @@ def _delete(collection: object, query: str) -> None:
 
 
 def _post(collection: object, request: object) -> str:
-    data=request["Location"]
+    data = request["Location"]
     geoloc = geocode(data)
     if geoloc is None:
         raise ValueError("Invalid location entered")
