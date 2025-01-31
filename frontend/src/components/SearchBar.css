@@ -1,0 +1,38 @@
+.search-container {
+    width: 70%;
+    margin: 0 auto;
+  }
+
+  .search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .filter-icon {
+    position: absolute;
+    left: 10px;
+    padding-left: 10px;
+    color:#3398B2;
+    font-size: 20px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 30px 10px 30px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    padding-left: 50px;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3398B2;
+    font-size: 18px;
+    padding-right: 10px;
+  }

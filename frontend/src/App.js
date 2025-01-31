@@ -1,13 +1,33 @@
-import React from 'react';
-import ExperienceForm from './experienceForm';
+import React, { useState, createContext } from 'react';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import NavBar from './components/NavBar.jsx';
+import Footer from './components/Footer.jsx';
+import Home from './pages/Home.jsx';
+import About from './pages/About.jsx';
 
-function App() {
+// Create a UserContext to manage user state
+export const UserContext = createContext(null);
+
+const App = () => {
+    const [user, setUser] = useState(null); // Manage the user's login state
+
     return (
-        <div>
-            <h1>Experience Form</h1>
-            <ExperienceForm />
-        </div>
+        <UserContext.Provider value={{ user, setUser }}>
+            <Router>
+                <main>
+                    <div className="container">
+                        <NavBar />
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/about" element={<About />} />
+                        </Routes>
+                    </div>
+                </main>
+                <Footer />
+            </Router>
+        </UserContext.Provider>
     );
-}
+};
 
 export default App;
+
