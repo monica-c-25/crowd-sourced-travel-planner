@@ -1,4 +1,6 @@
-from flask import Flask, g, session, jsonify, redirect, url_for, render_template, json
+from flask import (
+    Flask, g, session, jsonify, redirect, url_for, render_template
+)
 from flask_cors import CORS
 from routes import register_blueprints
 from authlib.integrations.flask_client import OAuth
@@ -31,7 +33,10 @@ oauth.register(
     client_kwargs={
         "scope": "openid profile email",
     },
-    server_metadata_url=f'https://{os.environ.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+    server_metadata_url=(
+        f"https://{os.environ.get('AUTH0_DOMAIN')}/.well-known/"
+        "openid-configuration"
+    ),
 )
 
 
@@ -76,7 +81,9 @@ def user():
 @app.route("/login")
 def login():
     """Redirects the user to Auth0's login page."""
-    return oauth.auth0.authorize_redirect(redirect_uri=url_for("callback", _external=True))
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True)
+    )
 
 
 @app.route("/callback")
@@ -105,7 +112,7 @@ def callback():
 @app.route("/logout")
 def logout():
     """Logs out the user and clears session."""
-    session.clear() 
+    session.clear()
     print("Logging out from backend.")
     frontend_home_url = "http://127.0.0.1:3000"
     auth0_logout_url = (
@@ -119,9 +126,13 @@ def logout():
 @app.route("/home")
 def home():
     """Renders the home page with the logged-in user."""
-    user_info = session.get("user")  # Access user information directly
+    # Access user information directly
+    user_info = session.get("user")
+
+    # Redirect to login if no user info in session
     if not user_info:
-        return redirect(url_for("login"))  # Redirect to login if no user info in session
+        return redirect(url_for("login"))
+
     return render_template("home.html", user=user_info)
 
 
