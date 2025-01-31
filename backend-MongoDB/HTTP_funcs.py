@@ -1,5 +1,4 @@
 from locationApi.locApi import geocode, reverse_geocode
-from flask import jsonify
 import pprint
 
 

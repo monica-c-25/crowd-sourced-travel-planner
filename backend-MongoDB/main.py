@@ -15,15 +15,12 @@ uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
     "retryWrites=true&w=majority&appName=Capstone"
 )
-
-# Create a new client and connect to the server
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def experience_request_handler():
 
-    # Grabs collection DB
     db = client["Experience"]
     collection = db["Experience"]
 
