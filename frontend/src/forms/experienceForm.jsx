@@ -24,7 +24,7 @@ function ExperienceForm() {
     const location = `${formData.Location_lat},${formData.Location_lon}`;
 
     try {
-      const response = await fetch("http://127.0.0.1:46725/api/experience", {
+      const response = await fetch("http://127.0.0.1:8001/api/experience-data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

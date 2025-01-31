@@ -4,10 +4,11 @@ from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
 from HTTP_funcs import _get, _put, _post, _delete, _set_payload
-
+from flask_cors import CORS
 
 load_dotenv()
 app = Flask(__name__)
+CORS(app)
 USER = getenv('USER')
 PASSWORD = getenv('PASSWORD')
 uri = (
@@ -29,6 +30,7 @@ def experience_request_handler():
     if request.method == 'POST':
         # Add Data
         try:
+            print(request.get_json())
             response = {
                 "Message": "Success",
                 "ID": _post(collection, request.get_json())
