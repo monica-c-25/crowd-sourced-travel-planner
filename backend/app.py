@@ -78,13 +78,6 @@ def user():
     return jsonify({"user": None})
 
 
-@app.route("/login")
-def login():
-    """Redirects the user to Auth0's login page."""
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
-
 
 @app.route("/callback")
 def callback():
@@ -92,13 +85,10 @@ def callback():
     try:
         # Exchange the authorization code for tokens
         token = oauth.auth0.authorize_access_token()
-        print("Access token:", token)  # Debug the token
 
         # Extract and validate the user info
-        nonce = session.get('nonce')
-        user = oauth.auth0.parse_id_token(token, nonce=nonce)
+        user = oauth.auth0.parse_id_token(token)
         session["user"] = user
-        print("Logged in user:", user)  # Debug the user info
 
         # Redirect to the frontend home page
         frontend_home_url = "http://localhost:3000"
@@ -107,7 +97,6 @@ def callback():
     except Exception as e:
         print("Login failed:", e)  # Debug login failure
         return jsonify({"error": "Login failed", "details": str(e)}), 400
-
 
 @app.route("/logout")
 def logout():

@@ -1,54 +1,39 @@
 import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import { UserContext } from "../App";
 import "../components/NavBar.css";
 
 const NavBar = () => {
-    const { user, setUser } = useContext(UserContext);  // Get user and setUser from context
+    const { loginWithRedirect, logout, user, isAuthenticated, isLoading } = useAuth0();
+    const { setUser } = useContext(UserContext); // Get setUser from UserContext
 
+    // Update user context when authentication state changes
     useEffect(() => {
-        // Fetch user data from backend to check if logged in
-        fetch("http://localhost:46725/user", {
-            method: "GET",
-            credentials: "include",  // Include cookies for session
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.user) {
-                setUser(data.user);  // Set user data if logged in
-            } else {
-                setUser(null);  // Reset user context if no user data
-            }
-        })
-        .catch((error) => {
-            console.error("Error fetching user data:", error);
-            setUser(null);  // Reset user context if error occurs
-        });
-    }, []);
-
-    const handleLogout = async () => {
-        try {
-
-        localStorage.removeItem("auth_token");
-        sessionStorage.removeItem("auth_token");
-        document.cookie = "auth_token=; max-age=0; path=/"; // Clear cookies
-        document.cookie = "auth0-tenant-name=; max-age=0; path=/";
-
-
-        setUser(null);
-
-        const response = await fetch("/logout", { method: "GET" });
-
-        if (response.ok) {
-            console.log("Logout successful on the backend.");
+        if (isAuthenticated) {
+            // If logged in, fetch user data from Auth0 and update context
+            setUser(user);
         } else {
-            console.error("Logout failed on the backend.");
+            setUser(null); // Clear user data when logged out
         }
+    }, [isAuthenticated, user, setUser]);
 
-        } catch (error) {
-            console.error("Error logging out:", error);
-        }
-    };
+    // Show loading state while determining auth status
+    if (isLoading) {
+        return (
+            <nav className="navigation">
+                <h1 className="brand">
+                    <Link to="/" className="brand-link">
+                        <img src="/images/logo.jpg" alt="an owl logo" />
+                        OwlWays Travel
+                    </Link>
+                </h1>
+                <ul className="navLinks">
+                    <li>Loading...</li>
+                </ul>
+            </nav>
+        );
+    }
 
     return (
         <nav className="navigation">
@@ -65,16 +50,33 @@ const NavBar = () => {
                 <li>
                     <Link to="/about" className="link">About Us</Link>
                 </li>
-                {user ? (
+                {isAuthenticated ? (
                     <>
-                        <li className="link">Welcome, {user.name}</li>
+                        <li className="link">Welcome, {user?.name || "Guest"}</li>
                         <li>
-                            <button onClick={handleLogout} className="link logout-btn">Log Out</button>
+                            <button
+                                onClick={() => logout({ returnTo: window.location.origin })}
+                                className="link logout-btn"
+                            >
+                                Log Out
+                            </button>
                         </li>
                     </>
                 ) : (
                     <li>
-                        <button onClick={() => window.location.href = "http://localhost:46725/login"} className="link login-btn">Sign-In</button>
+                        <button
+                            onClick={() => {
+                                console.log("Redirecting to Auth0 login...");
+                                try {
+                                    loginWithRedirect();
+                                } catch (error) {
+                                    console.error("Login redirect failed:", error);
+                                }
+                            }}
+                            className="link login-btn"
+                        >
+                            Sign-In
+                        </button>
                     </li>
                 )}
             </ul>
