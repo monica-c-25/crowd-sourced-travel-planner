@@ -4,6 +4,7 @@ import NavBar from './components/NavBar.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
+import Explore from './pages/Experiences.jsx';
 
 // Create a UserContext to manage user state
 export const UserContext = createContext(null);
@@ -20,6 +21,7 @@ const App = () => {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/about" element={<About />} />
+                            <Route path="/explore" element={<Explore />} />
                         </Routes>
                     </div>
                 </main>

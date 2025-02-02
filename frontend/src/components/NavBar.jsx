@@ -8,7 +8,7 @@ const NavBar = () => {
 
     useEffect(() => {
         // Fetch user data from backend to check if logged in
-        fetch("http://localhost:46725/user", {
+        fetch("http://localhost:8001/user", {
             method: "GET",
             credentials: "include",  // Include cookies for session
         })
@@ -22,7 +22,7 @@ const NavBar = () => {
     }, [setUser]);
 
     const handleLogout = () => {
-        fetch("http://localhost:46725/logout", {
+        fetch("http://localhost:8001/logout", {
             method: "GET",
             credentials: "include", // Include cookies for session
         })
@@ -42,7 +42,7 @@ const NavBar = () => {
             </h1>
             <ul className="navLinks">
                 <li>
-                    <Link to="/" className="link">Explore</Link>
+                    <Link to="/explore" className="link">Explore</Link>
                 </li>
                 <li>
                     <Link to="/about" className="link">About Us</Link>
@@ -56,7 +56,7 @@ const NavBar = () => {
                     </>
                 ) : (
                     <li>
-                        <button onClick={() => window.location.href = "http://localhost:46725/login"} className="link login-btn">Sign-In</button>
+                        <button onClick={() => window.location.href = "http://localhost:8001/login"} className="link login-btn">Sign-In</button>
                     </li>
                 )}
             </ul>

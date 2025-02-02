@@ -8,7 +8,8 @@ from flask_cors import CORS
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app)
+# Initialize CORS (Cross-Origin Resource Sharing) for React frontend
+CORS(app, origins="http://localhost:3000", supports_credentials=True)
 USER = getenv('USER')
 PASSWORD = getenv('PASSWORD')
 uri = (
@@ -41,14 +42,17 @@ def experience_request_handler():
     if request.method == 'GET':
         # Get Data
         try:
-            response = _get(request.get_json(), collection)
+            filters = request.args.to_dict()  # Get query parameters as a dictionary
+            response_data = _get(filters, collection)  # Assuming _get handles retrieval
+
+            # response = _get(request.get_json(), collection)
             response = {
                 "Message": "Success",
-                "data": response
+                "data": response_data
             }
-        except Exception as exception:
+        except Exception as e:
             response = {
-                'Message': f"Failed: {exception} raised"
+                'Message': f"Failed: {e} raised"
             }
         return jsonify(response)
 

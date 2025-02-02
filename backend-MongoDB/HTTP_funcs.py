@@ -4,7 +4,7 @@ import pprint
 
 def _get(request_body: dict, collection: object) -> object:
 
-    if request_body["Query"] == "All":
+    if not request_body or request_body["Query"] == "All":
         result = list(collection.find())
     else:
         result = collection.find_one({collection.name: request_body["Query"]})
