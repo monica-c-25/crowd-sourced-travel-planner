@@ -1,16 +1,40 @@
-.header {
+/* Header styling */
+.header h1 {
     display: flex;
     justify-content: center;
     font-family: "Inter";
-    font-size: 2rem;
-    color: rgba(11, 72, 11, 0.808);
+    font-size: 3.5rem;
+    color: rgba(0, 0, 0, 0.808);
+    margin-bottom: 2rem; /* Space below header */
 }
 
+/* Container for the image and search bar */
+.image-container {
+    position: relative; /* Allows child elements to be positioned */
+    margin: 0 auto;
+    width: 80%; /* Adjust as needed */
+    max-width: 1200px;
+}
+
+/* Background image styling */
 .background-img {
-    margin-top: 1rem;
     width: 100%;
-    height: auto;
-    opacity: .6;
+    height: auto; /* Maintain aspect ratio */
     border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow */
+    opacity: 0.8; /* Slight transparency */
 }
 
+/* Search bar wrapper for positioning */
+.search-bar-wrapper {
+    position: absolute; /* Position relative to the .image-container */
+    top: 12%; /* Center vertically within the image */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for exact centering */
+    width: 90%; /* Adjust width of search bar */
+    max-width: 1200px;
+    /* padding: 0.5rem; */
+    background-color: rgba(255, 255, 255, 0.9); /* Subtle background for contrast */
+    border-radius: 20px; /* Round the corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the bar */
+}

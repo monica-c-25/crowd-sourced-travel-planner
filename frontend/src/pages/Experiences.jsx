@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import './Experiences.css';
 import SearchBar from "../components/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 const Explore = () => {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch experiences from the backend API
@@ -33,6 +35,7 @@ const Explore = () => {
 return (
     <div className="explore-container">
       <h1>Explore Experiences</h1>
+      <button className="button" onClick={() => navigate("/experience-form")}>Add New Experience</button>
       <div className="search-bar-container">
         <SearchBar />
       </div>
@@ -44,7 +47,7 @@ return (
             experiences.map((experience, index) => (
               <div key={index} className="experience-card">
                 <h3>{experience.title}</h3>
-                <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Photo Available" />
+                <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
                 <p className="date">{experience.eventDate}</p>
                 <p>{experience.Location}</p>
                 <p>{experience.Description}</p>
