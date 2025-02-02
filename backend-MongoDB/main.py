@@ -42,8 +42,8 @@ def experience_request_handler():
     if request.method == 'GET':
         # Get Data
         try:
-            filters = request.args.to_dict()  # Get query parameters as a dictionary
-            response_data = _get(filters, collection)  # Assuming _get handles retrieval
+            filters = request.args.to_dict()
+            response_data = _get(filters, collection)
 
             # response = _get(request.get_json(), collection)
             response = {
