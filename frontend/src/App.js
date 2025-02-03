@@ -5,7 +5,8 @@ import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
 import Explore from './pages/Experiences.jsx';
-import ExperienceForm from './forms/experienceForm.jsx';
+import ExperienceForm from './forms/ExperienceForm.jsx';
+import ExperienceDetail from './pages/ExperienceDetail.jsx';
 
 // Create a UserContext to manage user state
 export const UserContext = createContext(null);
@@ -23,6 +24,7 @@ const App = () => {
                             <Route path="/" element={<Home />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/explore" element={<Explore />} />
+                            <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
                         </Routes>
                     </div>

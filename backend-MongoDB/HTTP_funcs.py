@@ -1,19 +1,18 @@
 from locationApi.locApi import geocode, reverse_geocode
-import pprint
-
+from bson import ObjectId
 
 def _get(request_body: dict, collection: object) -> object:
-
+    
     if not request_body or request_body["Query"] == "All":
         result = list(collection.find())
     else:
-        result = collection.find_one({collection.name: request_body["Query"]})
+        result = collection.find_one({"_id": ObjectId(request_body["Query"])})
 
-    _strip_id(result)
-    pprint.pprint(result)
+    if result is not None and not isinstance(result, list):
+        result = [result]
+
     for res in result:
         if res and "Location" in res:
-
             location = res["Location"]
             lat = location.get("lat")
             lon = location.get("lon")
