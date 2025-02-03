@@ -1,11 +1,7 @@
-from flask import (
-    Flask, g, session, jsonify, redirect, url_for, render_template
-)
+from flask import Flask, jsonify, request
 from flask_cors import CORS
-from routes import register_blueprints
 from authlib.integrations.flask_client import OAuth
-import mysql.connector
-from config import Config
+from pymongo import MongoClient
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -16,12 +12,10 @@ if ENV_FILE:
 
 # Initialize Flask app
 app = Flask(__name__)
-# Set the secret key for session management
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-default-secret-key")
-app.config.from_object(Config)
+app.config.from_object("config.Config")
 
-# Initialize CORS (Cross-Origin Resource Sharing) for React frontend
-# Enable CORS for requests from localhost:3000
+# Initialize CORS for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
 # Initialize OAuth for Auth0
@@ -30,101 +24,54 @@ oauth.register(
     "auth0",
     client_id=os.environ.get("AUTH0_CLIENT_ID"),
     client_secret=os.environ.get("AUTH0_CLIENT_SECRET"),
-    client_kwargs={
-        "scope": "openid profile email",
-    },
+    client_kwargs={"scope": "openid profile email"},
     server_metadata_url=(
-        f"https://{os.environ.get('AUTH0_DOMAIN')}/.well-known/"
-        "openid-configuration"
+        f"https://{os.environ.get('AUTH0_DOMAIN')}/.well-known/openid-configuration"
     ),
 )
 
-
-# Function to create and return the database connection
-def get_db():
-    """Returns a database connection if one doesn't exist."""
-    if 'db' not in g:
-        g.db = mysql.connector.connect(
-            host=Config.DB_HOST,
-            database=Config.DB_NAME,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD
-        )
-    return g.db
+# Connect to MongoDB
+MONGO_URI = "mongodb://localhost:27017"
+client = MongoClient(MONGO_URI)
+db = client["User"]
+user_collection = db["User"]
 
 
-# Teardown function to close the connection after each request
-@app.teardown_appcontext
-def close_db(exc=None):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
+# Route to store user info in MongoDB upon login
+@app.route("/api/store-user", methods=["POST"])
+def store_user():
+    user_data = request.get_json()
+
+    if not user_data or "email" not in user_data:
+        return jsonify({"message": "Invalid data"}), 400
+
+    existing_user = user_collection.find_one({"email": user_data["email"]})
+
+    if not existing_user:
+        # Insert new user
+        user_collection.insert_one(user_data)
+        return jsonify({"message": "User stored successfully"}), 201
+
+    return jsonify({"message": "User already exists"}), 200
 
 
-register_blueprints(app)
+# Protected API route
+@app.route("/api/protected", methods=["GET"])
+def protected():
+    token = request.headers.get("Authorization")
+    if not token:
+        return jsonify({"message": "Authorization token is missing"}), 401
 
-
-# Routes
-@app.route('/')
-def index():
-    return "This is the flask backend!"
-
-
-@app.route("/user", methods=["GET"])
-def user():
-    """Returns the current logged-in user."""
-    if "user" in session:
-        return jsonify({"user": session["user"]})
-    return jsonify({"user": None})
-
-
-
-@app.route("/callback")
-def callback():
-    """Handles Auth0's callback after login."""
-    try:
-        # Exchange the authorization code for tokens
-        token = oauth.auth0.authorize_access_token()
-
-        # Extract and validate the user info
-        user = oauth.auth0.parse_id_token(token)
-        session["user"] = user
-
-        # Redirect to the frontend home page
-        frontend_home_url = "http://localhost:3000"
-        return redirect(frontend_home_url)
-
-    except Exception as e:
-        print("Login failed:", e)  # Debug login failure
-        return jsonify({"error": "Login failed", "details": str(e)}), 400
-
-@app.route("/logout")
-def logout():
-    """Logs out the user and clears session."""
-    session.clear()
-    print("Logging out from backend.")
-    frontend_home_url = "http://127.0.0.1:3000"
-    auth0_logout_url = (
-        f"https://{os.environ.get('AUTH0_DOMAIN')}/v2/logout"
-        f"?client_id={os.environ.get('AUTH0_CLIENT_ID')}"
-        f"&returnTo={frontend_home_url}"
-    )
-    return redirect(auth0_logout_url)
-
-
-@app.route("/home")
-def home():
-    """Renders the home page with the logged-in user."""
-    # Access user information directly
-    user_info = session.get("user")
-
-    # Redirect to login if no user info in session
+    user_info = validate_jwt(token)
     if not user_info:
-        return redirect(url_for("login"))
+        return jsonify({"message": "Invalid token"}), 401
 
-    return render_template("home.html", user=user_info)
+    return jsonify({"message": "Access granted", "user": user_info})
+
+
+def validate_jwt(token):
+    return True  # Replace with actual JWT validation logic
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 46725))
-    app.run(port=port, debug=True)
+    app.run(port=46725, debug=True)
