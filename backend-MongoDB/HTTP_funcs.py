@@ -1,5 +1,4 @@
 from locationApi.locApi import geocode, reverse_geocode
-import pprint
 
 
 def _get(request_body: dict, collection: object) -> object:
@@ -10,9 +9,10 @@ def _get(request_body: dict, collection: object) -> object:
         result = collection.find_one({collection.name: request_body["Query"]})
 
     _strip_id(result)
-    pprint.pprint(result)
+
     for res in result:
-        if res and "Location" in res:
+
+        if res and collection.name == "Location":
 
             location = res["Location"]
             lat = location.get("lat")
@@ -25,13 +25,15 @@ def _get(request_body: dict, collection: object) -> object:
                     lon = float(lon)
                     # Call reverse geocode API to convert lat/lon to an address
                     address = reverse_geocode(lat, lon)
-                    # If address is found, update the Location field with address
-                    if address:
-                        res["Location"] = address["address"]
-                    else:
-                        res["Location"] = "Address not found"
+                    # If address is found, update the Location field with
+                    # address
+                    # TODO eliminate backwards communication, aka translation
+                    # from lat and long to loco back to lat and long
+                    res["Location"] = (
+                        address["address"] if address else "Address not found"
+                    )
                 except ValueError:
-                    res["Location"] = "Invalid lat/lon"
+                    res["Location"] = "Invalid lat/lon"      
 
     return result
 
@@ -50,13 +52,16 @@ def _delete(collection: object, query: str) -> None:
 
 
 def _post(collection: object, request: object) -> str:
-    data = request["Location"]
-    geoloc = geocode(data)
-    if geoloc is None:
-        raise ValueError("Invalid location entered")
-    request["Location"] = geoloc
-    result = collection.insert_one(request)
-    return str(result.inserted_id)
+
+    if collection.name == "Location":
+        data = request["Location"]
+        geoloc = geocode(data)
+
+        if geoloc is None:
+            raise ValueError("Invalid location entered")
+        request["Location"] = geoloc
+        result = collection.insert_one(request)
+        return str(result.inserted_id)
 
 
 def _strip_id(input_data: object) -> None:
