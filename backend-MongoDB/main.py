@@ -50,9 +50,9 @@ def experience_request_handler():
                 "Message": "Success",
                 "data": response_data
             }
-        except Exception as e:
+        except Exception as exception:
             response = {
-                'Message': f"Failed: {e} raised"
+                'Message': f"Failed: {exception} raised"
             }
         return jsonify(response)
 
