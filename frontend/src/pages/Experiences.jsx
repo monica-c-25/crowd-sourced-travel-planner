@@ -37,6 +37,7 @@ return (
     <div className="explore-container">
       <h1>Explore Experiences</h1>
       <button className="button" onClick={() => navigate("/experience-form")}>Add New Experience</button>
+      <button className="button" onClick={() => navigate("/ai-recommendator")}>Use AI to plan a trip!</button>
       <div className="search-bar-container">
         <SearchBar />
       </div>

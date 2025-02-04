@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from HTTP_funcs import _get, _put, _post, _delete, _set_payload
 from flask_cors import CORS
 from bson.objectid import ObjectId
+from openai import OpenAI
 
 load_dotenv()
 app = Flask(__name__)
@@ -18,8 +19,12 @@ uri = (
     "retryWrites=true&w=majority&appName=Capstone"
 )
 client = MongoClient(uri, server_api=ServerApi('1'))
+openaiclient = OpenAI(
+  api_key=getenv('OPENAI_API_KEY')
+)
 
 
+# API FOR EXPERIENCES PAGE
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def experience_request_handler():
 
@@ -100,7 +105,7 @@ def experience_request_handler():
 
         return jsonify(response)
     
-
+# GETS EXPERIENCE DETAILS
 @app.route('/api/experience-data/<experience_id>', methods=['GET'])
 def get_experience_by_id(experience_id):
     db = client["Experience"]
@@ -171,6 +176,49 @@ def user_request_handler():
                 'Message': f"Failed: {exception} raised"
             }
         return jsonify(response)
+
+
+# AI (OPENAI API) RECOMMENDATIONS
+@app.route("/get_recommendations", methods=["POST"])
+def get_recommendations():
+    data1 = request.json
+    location1 = data1.get("location")
+    trip_date1 = data1.get("trip_date")
+    travel_group1 = data1.get("travel_group")
+    interests1 = data1.get("interests", [])
+    print(f"Location: {location1}, Date: {trip_date1}, Group: {travel_group1}, Interests: {interests1}")
+    try:
+        data = request.json
+        location = data.get("location")
+        trip_date = data.get("trip_date")
+        travel_group = data.get("travel_group")
+        interests = data.get("interests", [])
+
+        # Ensure all required data is present
+        if not location or not trip_date or not travel_group or not interests:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        # Create prompt for ChatGPT
+        prompt = f"""
+        I am planning a trip to {location} on {trip_date} with my {travel_group}.
+        My interests are {', '.join(interests)}. 
+        Can you recommend some must-visit places and attractions?
+        """
+
+        # Call ChatGPT API
+        response = openaiclient.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        # Extract and return response
+        # recommendations = response["choices"][0]["message"]["content"]
+        recommendations = response.choices[0].message.content
+        return jsonify({"recommendations": recommendations})
+
+    except Exception as e:
+        print(f"Error: {str(e)}") 
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

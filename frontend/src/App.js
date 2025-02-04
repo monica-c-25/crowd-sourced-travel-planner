@@ -7,6 +7,7 @@ import About from './pages/About.jsx';
 import Explore from './pages/Experiences.jsx';
 import ExperienceForm from './forms/ExperienceForm.jsx';
 import ExperienceDetail from './pages/ExperienceDetail.jsx';
+import ChatbotForm from './forms/AIRecommendator.jsx';
 
 // Create a UserContext to manage user state
 export const UserContext = createContext(null);
@@ -26,6 +27,7 @@ const App = () => {
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
+                            <Route path="/ai-recommendator" element={<ChatbotForm />} />
                         </Routes>
                     </div>
                 </main>
