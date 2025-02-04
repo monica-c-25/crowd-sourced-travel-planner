@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Import the AuthContext
 import "../components/NavBar.css";
@@ -6,10 +6,17 @@ import "../components/NavBar.css";
 const NavBar = () => {
   const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth();
 
+  // Dropdown state for showing logout button
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const closeDropdown = () => setIsDropdownOpen(false);
+
   // If loading, show loading state
   if (isLoading) {
     return <div>Loading ...</div>;
   }
+
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
   return (
     <nav className="navigation">
@@ -31,24 +38,37 @@ const NavBar = () => {
           <>
             {/* User is authenticated, show their info */}
             <li className="link">
-              <div className="user-info">
+              <div className="dropdown">
+              <div className="user-info" onClick={toggleDropdown}>
                 <img
-                  src={user?.picture}
-                  alt={user?.name}
+                  src="/images/default-pic.jpg"
+                  alt="avatar"
                   className="user-avatar"
                 />
                 <div className="user-details">
-                  <h3>Welcome, {user?.name || "User"}</h3>
+                <div className="user-details">
+                Welcome, {user?.name?.split(" ")[0] || "User"}
+                </div>
                 </div>
               </div>
-            </li>
-            <li>
-              <button
-                onClick={() => logout({ returnTo: window.location.origin })}
-                className="link logout-btn"
-              >
-                Log Out
-              </button>
+
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                   <button
+                    onClick={closeDropdown}
+                    className="close-btn"
+                  >
+                    X
+                  </button>
+                  <button
+                    onClick={() => logout({ returnTo: window.location.origin })}
+                    className="link logout-btn"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              )}
+              </div>
             </li>
           </>
         ) : (
@@ -58,7 +78,7 @@ const NavBar = () => {
               onClick={() => loginWithRedirect()}
               className="link login-btn"
             >
-              Sign-In
+              Login
             </button>
           </li>
         )}
@@ -68,4 +88,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-
