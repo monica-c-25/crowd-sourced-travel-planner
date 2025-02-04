@@ -1,8 +1,8 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
+import os
+from flask import Flask, jsonify, redirect, request
+from flask_cors import CORS, cross_origin
 from authlib.integrations.flask_client import OAuth
 from pymongo import MongoClient
-import os
 from dotenv import load_dotenv, find_dotenv
 
 # Load environment variables
@@ -19,6 +19,7 @@ app.config.from_object("config.Config")
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
 # Initialize OAuth for Auth0
+auth0_domain = os.environ.get("AUTH0_DOMAIN")
 oauth = OAuth(app)
 oauth.register(
     "auth0",
@@ -26,51 +27,69 @@ oauth.register(
     client_secret=os.environ.get("AUTH0_CLIENT_SECRET"),
     client_kwargs={"scope": "openid profile email"},
     server_metadata_url=(
-        f"https://{os.environ.get('AUTH0_DOMAIN')}/.well-known/openid-configuration"
+        f"https://{auth0_domain}/.well-known/openid-configuration"
     ),
 )
 
 # Connect to MongoDB
-MONGO_URI = "mongodb://localhost:27017"
-client = MongoClient(MONGO_URI)
+mongo_uri = os.getenv("MONGO_URI")
+client = MongoClient(mongo_uri)
 db = client["User"]
-user_collection = db["User"]
+users_collection = db["User"]
+
+# ------------------- AUTH0 LOGIN -------------------
 
 
-# Route to store user info in MongoDB upon login
-@app.route("/api/store-user", methods=["POST"])
-def store_user():
-    user_data = request.get_json()
+@app.route("/callback", methods=["GET"])  # Make sure this is a GET request
+def callback():
+    """Handles Auth0 login callback."""
+    token = oauth.auth0.authorize_access_token()
 
-    if not user_data or "email" not in user_data:
-        return jsonify({"message": "Invalid data"}), 400
+    # Get user information
+    user_info = oauth.auth0.parse_id_token(token)
 
-    existing_user = user_collection.find_one({"email": user_data["email"]})
+    # Check if the user exists in the MongoDB
+    existing_user = users_collection.find_one({"auth0_id": user_info["sub"]})
 
     if not existing_user:
-        # Insert new user
-        user_collection.insert_one(user_data)
-        return jsonify({"message": "User stored successfully"}), 201
+        # If user doesn't exist, insert them into the database
+        new_user = {
+            "auth0_id": user_info["sub"],
+            "email": user_info.get("email", ""),
+            "name": user_info.get("name", ""),
+            "picture": user_info.get("picture", ""),
+        }
+        users_collection.insert_one(new_user)
+        print("New user inserted into MongoDB:", new_user)
 
-    return jsonify({"message": "User already exists"}), 200
-
-
-# Protected API route
-@app.route("/api/protected", methods=["GET"])
-def protected():
-    token = request.headers.get("Authorization")
-    if not token:
-        return jsonify({"message": "Authorization token is missing"}), 401
-
-    user_info = validate_jwt(token)
-    if not user_info:
-        return jsonify({"message": "Invalid token"}), 401
-
-    return jsonify({"message": "Access granted", "user": user_info})
+    return redirect("http://localhost:3000")
 
 
-def validate_jwt(token):
-    return True  # Replace with actual JWT validation logic
+# New API route to sync user data (POST)
+@app.route("/api/sync-user", methods=["POST"])
+@cross_origin(origins="http://localhost:3000", supports_credentials=True)
+def sync_user():
+    """Syncs user data from frontend to MongoDB."""
+    data = request.json
+    auth0_id = data.get("auth0_id")
+    email = data.get("email")
+    name = data.get("name")
+    picture = data.get("picture")
+
+    # Check if the user already exists
+    existing_user = users_collection.find_one({"auth0_id": auth0_id})
+
+    if not existing_user:
+        # If the user doesn't exist, insert them into the database
+        new_user = {
+            "auth0_id": auth0_id,
+            "email": email,
+            "name": name,
+            "picture": picture,
+        }
+        users_collection.insert_one(new_user)
+
+    return jsonify({"message": "User synced successfully"}), 200
 
 
 if __name__ == '__main__':

@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth } from "../context/AuthContext"; // Import the AuthContext
 import "../components/NavBar.css";
 
 const NavBar = () => {
-  const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth0();
+  const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth();
 
   // If loading, show loading state
   if (isLoading) {
