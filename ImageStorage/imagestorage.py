@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file, render_template, jsonify
 from google.cloud import storage, datastore
 import io
 
@@ -8,7 +8,8 @@ app = Flask(__name__)
 client = datastore.Client()
 
 # PHOTO_BUCKET = 'crowd-sourced-travel-planner-experience-photos'
-PHOTO_BUCKET = 'cs467-capstone-test-image-storage'
+# PHOTO_BUCKET = 'cs467-capstone-test-image-storage'
+PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
 
 
 @app.route('/images', methods=['GET'])
@@ -41,9 +42,11 @@ def store_image():
     # Position the file_obj to its beginning
     file_obj.seek(0)
     # Upload the file into Cloud Storage
-    blob.upload_from_file(file_obj)
-    return ({'file_name': file_obj.filename}, 201)
+    # blob.upload_from_file(file_obj)
+    # return ({'file_name': file_obj.filename}, 201)
     # return redirect(url_for('upload_page', file_name=file_obj.filename))
+    image_url = blob.public_url
+    return jsonify({'image_url': image_url}, 201)
 
 
 @app.route('/images/<file_name>', methods=['GET'])
@@ -59,7 +62,10 @@ def get_image(file_name):
     # Position the file_obj to its beginning
     file_obj.seek(0)
     # Send the object as a file in the response with the correct MIME type and file name
-    return send_file(file_obj, mimetype=None, download_name=file_name)
+    image_url = blob.public_url
+    return jsonify({'image_url': image_url})
+    # return send_file(file_obj, mimetype=None, download_name=file_name)
+    # return image_url  #Returns the url of the image instead of download
 
 
 @app.route('/images/<file_name>', methods=['DELETE'])
