@@ -12,25 +12,14 @@ load_dotenv()
 app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
-USER = getenv('USER')
-PASSWORD = getenv('PASSWORD')
-uri = (
-    f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
-    "retryWrites=true&w=majority&appName=Capstone"
-)
+uri = getenv("MONGO_URI")
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
   api_key=getenv('OPENAI_API_KEY')
 )
 
 
-# API FOR EXPERIENCES PAGE
-@app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
-def experience_request_handler():
-
-    db = client["Experience"]
-    collection = db["Experience"]
-
+def general_request(request: object, collection: object) -> None:
     if request.method == 'POST':
         # Add Data
         try:
@@ -59,9 +48,9 @@ def experience_request_handler():
                 "Message": "Success",
                 "data": response_data
             }
-        except Exception as e:
+        except Exception as exception:
             response = {
-                'Message': f"Failed: {e} raised"
+                'Message': f"Failed: {exception} raised"
             }
         return jsonify(response)
 
@@ -144,38 +133,41 @@ def get_experience_by_id(experience_id):
 
 
 
-@app.route('/api/user-data', methods=['GET'])
+@app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
+def experience_request_handler():
+
+    db = client["Experience"]
+    collection = db["Experience"]
+
+    return general_request(request, collection)
+
+
+@app.route('/api/user-data', methods=['GET', 'POST'])
 def user_request_handler():
 
     # Grabs collection DB
     db = client["User"]
     collection = db["User"]
 
-    if request.method == 'GET':
-        # Get Data
-        try:
-            data = _get(request.get_json(), collection)
-            response = {
-                "Message": "Success",
-                "data": data
-            }
-        except Exception as exception:
-            response = {
-                'Message': f"Failed: {exception} raised"
-            }
-        return jsonify(response)
+    return general_request(request, collection)
 
-    if request.method == 'POST':
-        try:
-            response = {
-                "Message": "Success",
-                "ID": _post(collection, request.get_json())
-            }
-        except Exception as exception:
-            response = {
-                'Message': f"Failed: {exception} raised"
-            }
-        return jsonify(response)
+
+@app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def trip_request_handler():
+
+    db = client["Trip"]
+    collection = db["Trip"]
+
+    return general_request(request, collection)
+
+
+@app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def comment_request_handler():
+
+    db = client["Comment"]
+    collection = db["Comment"]
+
+    return general_request(request, collection)
 
 
 # AI (OPENAI API) RECOMMENDATIONS
