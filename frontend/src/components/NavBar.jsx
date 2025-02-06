@@ -1,67 +1,90 @@
-import React, { useContext, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../App";
+import { useAuth } from "../context/AuthContext"; // Import the AuthContext
 import "../components/NavBar.css";
 
 const NavBar = () => {
-    const { user, setUser } = useContext(UserContext);  // Get user and setUser from context
+  const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth();
 
-    useEffect(() => {
-        // Fetch user data from backend to check if logged in
-        fetch("http://localhost:46725/user", {
-            method: "GET",
-            credentials: "include",  // Include cookies for session
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.user) {
-                setUser(data.user);  // Set user data if logged in
-            }
-        })
-        .catch((error) => console.error("Error fetching user data:", error));
-    }, [setUser]);
+  // Dropdown state for showing logout button
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const handleLogout = () => {
-        fetch("http://localhost:46725/logout", {
-            method: "GET",
-            credentials: "include", // Include cookies for session
-        })
-        .then(() => {
-            setUser(null); 
-        })
-        .catch((err) => console.error("Logout failed", err));
-    };
+  const closeDropdown = () => setIsDropdownOpen(false);
 
-    return (
-        <nav className="navigation">
-            <h1 className="brand">
-                <Link to="/" className="brand-link">
-                    <img src="/images/logo.jpg" alt="an owl logo" />
-                    OwlWays Travel
-                </Link>
-            </h1>
-            <ul className="navLinks">
-                <li>
-                    <Link to="/" className="link">Explore</Link>
-                </li>
-                <li>
-                    <Link to="/about" className="link">About Us</Link>
-                </li>
-                {user ? (
-                    <>
-                        <li className="link">Welcome, {user.name}</li>
-                        <li>
-                            <button onClick={handleLogout} className="link logout-btn">Log Out</button>
-                        </li>
-                    </>
-                ) : (
-                    <li>
-                        <button onClick={() => window.location.href = "http://localhost:46725/login"} className="link login-btn">Sign-In</button>
-                    </li>
-                )}
-            </ul>
-        </nav>
-    );
+  // If loading, show loading state
+  if (isLoading) {
+    return <div>Loading ...</div>;
+  }
+
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+
+  return (
+    <nav className="navigation">
+      <h1 className="brand">
+        <Link to="/" className="brand-link">
+          <img src="/images/logo.jpg" alt="An owl logo" />
+          OwlWays Travel
+        </Link>
+      </h1>
+      <ul className="navLinks">
+        <li>
+          <Link to="/explore" className="link">Explore</Link>
+        </li>
+        <li>
+          <Link to="/about" className="link">About Us</Link>
+        </li>
+
+        {isAuthenticated ? (
+          <>
+            {/* User is authenticated, show their info */}
+            <li className="link">
+              <div className="dropdown">
+              <div className="user-info" onClick={toggleDropdown}>
+                <img
+                  src="/images/default-pic.jpg"
+                  alt="avatar"
+                  className="user-avatar"
+                />
+                <div className="user-details">
+                <div className="user-details">
+                Welcome, {user?.name?.split(" ")[0] || "User"}
+                </div>
+                </div>
+              </div>
+
+              {isDropdownOpen && (
+                <div className="dropdown-menu">
+                   <button
+                    onClick={closeDropdown}
+                    className="close-btn"
+                  >
+                    X
+                  </button>
+                  <button
+                    onClick={() => logout({ returnTo: window.location.origin })}
+                    className="link logout-btn"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              )}
+              </div>
+            </li>
+          </>
+        ) : (
+          // Show login button when not authenticated
+          <li>
+            <button
+              onClick={() => loginWithRedirect()}
+              className="link login-btn"
+            >
+              Login
+            </button>
+          </li>
+        )}
+      </ul>
+    </nav>
+  );
 };
 
 export default NavBar;

@@ -16,31 +16,42 @@ img {
     align-items: center;
     font-size: 2rem;
     font-family: "Inter";
+    margin: 10px;
 }
 
 .navLinks {
+    align-items: center;
     list-style: none;
     display: flex;
     gap: 4.5rem;
     margin: 0;
     font-family: "Newsreader";
+    align-items: center;
 }
 
 .link {
-    color: black;
+    color: #3398B2;
     text-decoration: none;
     font-size: 1.2rem;
+    transition: background-color 0.3s ease-in-out;
+    padding: 10px 10px;
+    border-radius: 50px;
+    font-weight: bold;
 }
 
 .link:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    background-color: #e6f0f2;
+    cursor: pointer;
 }
+
 
 .login-btn, .logout-btn {
     background-color: #3398B2;
-    padding: .5rem 1.5rem;
+    padding: .4rem 1.5rem;
     color: white;
-    border-radius: .5rem;
+    border-radius: 50px;
+    border: none;
 }
 
 .brand-link {
@@ -49,3 +60,71 @@ img {
     display: flex;
     align-items: center;
   }
+
+.user-info {
+    display: flex;
+    cursor: pointer;
+    gap: .5rem;
+    color: #3398B2;
+
+    img {
+        width: 1.6rem;
+        height: auto;
+    }
+}
+
+.user-avatar {
+    height:2rem;
+    width: auto;
+}
+
+.dropdown {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    background-color: #e6f0f2;
+    padding: 10px;
+    top: 20px;
+    right: 0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 10;
+    height: 6.5rem;
+    width: 8rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+.logout-btn {
+    height: 1.5rem;
+    width: auto;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.login-btn:hover, .logout-btn:hover, .close-btn:hover {
+    background-color: #80ccdf;
+    text-decoration: none;
+}
+
+.close-btn {
+    width: 1.5rem;
+    border: none;
+    background-color: #e6f0f2;
+    color: #3398B2;
+    font-weight: bold;
+    border-radius: 50px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 0;
+    margin: 0;
+    z-index: 20;
+}

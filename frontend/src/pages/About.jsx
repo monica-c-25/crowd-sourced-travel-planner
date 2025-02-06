@@ -1,10 +1,9 @@
 import React from 'react';
 import './About.css';
-import ExperienceForm from '../forms/experienceForm.jsx'
 
 const About = () => {
   return (
-    <ExperienceForm></ExperienceForm>
+    <h1>About Us Page</h1>
   );
 };
 

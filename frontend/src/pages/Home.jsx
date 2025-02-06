@@ -8,7 +8,16 @@ const Home = () => {
         <div className="header">
             <h1>Your destination awaits.</h1>
         </div>
-        <SearchBar />
+        <div className="image-container">
+            <img 
+                src="images/travel-background.jpg" 
+                alt="Travel Background" 
+                className="background-img" 
+            />
+            <div className="search-bar-wrapper">
+                <SearchBar />
+            </div>
+        </div>
         </>
     );
 };

@@ -2,8 +2,7 @@ from locationApi.locApi import geocode, reverse_geocode
 
 
 def _get(request_body: dict, collection: object) -> object:
-
-    if request_body["Query"] == "All":
+    if not request_body:
         result = list(collection.find())
     else:
         result = collection.find_one({collection.name: request_body["Query"]})

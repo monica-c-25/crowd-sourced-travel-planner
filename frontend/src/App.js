@@ -1,18 +1,17 @@
-import React, { useState, createContext } from 'react';
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import NavBar from './components/NavBar.jsx';
-import Footer from './components/Footer.jsx';
-import Home from './pages/Home.jsx';
-import About from './pages/About.jsx';
 
-// Create a UserContext to manage user state
-export const UserContext = createContext(null);
+import NavBar from "./components/NavBar.jsx";
+import Footer from "./components/Footer.jsx";
+import Home from "./pages/Home.jsx";
+import About from "./pages/About.jsx";
+import Explore from './pages/Experiences.jsx';
+import ExperienceForm from './forms/ExperienceForm.jsx';
+import { AuthProvider } from "./context/AuthContext";
 
 const App = () => {
-    const [user, setUser] = useState(null); // Manage the user's login state
-
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <AuthProvider>
             <Router>
                 <main>
                     <div className="container">
@@ -20,14 +19,15 @@ const App = () => {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/about" element={<About />} />
+                            <Route path="/explore" element={<Explore />} />
+                            <Route path="/experience-form" element={<ExperienceForm />} />
                         </Routes>
                     </div>
                 </main>
                 <Footer />
             </Router>
-        </UserContext.Provider>
+        </AuthProvider>
     );
 };
 
 export default App;
-
