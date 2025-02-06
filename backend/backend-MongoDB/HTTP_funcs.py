@@ -32,7 +32,7 @@ def _get(request_body: dict, collection: object) -> object:
                         address["address"] if address else "Address not found"
                     )
                 except ValueError:
-                    res["Location"] = "Invalid lat/lon"      
+                    res["Location"] = "Invalid lat/lon"
 
     return result
 
