@@ -3,8 +3,7 @@ import pprint
 
 
 def _get(request_body: dict, collection: object) -> object:
-
-    if request_body["Query"] == "All":
+    if not request_body:
         result = list(collection.find())
     else:
         result = collection.find_one({collection.name: request_body["Query"]})
@@ -25,7 +24,7 @@ def _get(request_body: dict, collection: object) -> object:
                     lon = float(lon)
                     # Call reverse geocode API to convert lat/lon to an address
                     address = reverse_geocode(lat, lon)
-                    # If address is found, update the Location field with address
+                    # If address found, update Location field with address
                     if address:
                         res["Location"] = address["address"]
                     else:

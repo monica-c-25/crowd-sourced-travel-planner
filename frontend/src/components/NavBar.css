@@ -16,9 +16,11 @@ img {
     align-items: center;
     font-size: 2rem;
     font-family: "Inter";
+    margin: 10px;
 }
 
 .navLinks {
+    align-items: center;
     list-style: none;
     display: flex;
     gap: 4.5rem;
@@ -40,6 +42,7 @@ img {
 .link:hover {
     text-decoration: none;
     background-color: #e6f0f2;
+    cursor: pointer;
 }
 
 
