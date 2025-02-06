@@ -59,9 +59,29 @@ def _post(collection: object, request: object) -> str:
 
         if geoloc is None:
             raise ValueError("Invalid location entered")
+        # TODO add long and lat here instead of back translating
         request["Location"] = geoloc
         result = collection.insert_one(request)
         return str(result.inserted_id)
+
+    elif collection.name == "User":
+
+        print(request["username"])
+        username_in_db = (
+            False
+            if collection.find_one(
+                {"username": request["username"]}
+                ) is None
+            else True)
+
+        return (
+            str(collection.insert_one(request).inserted_id)
+            if (not username_in_db)
+            else "Username Not Available"
+        )
+
+    else:
+        return str(collection.insert_one(request).inserted_id)
 
 
 def _strip_id(input_data: object) -> None:
