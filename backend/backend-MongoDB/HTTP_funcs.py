@@ -11,28 +11,26 @@ def _get(request_body: dict, collection: object) -> object:
 
     for res in result:
 
-        if res and collection.name == "Location":
+        location = res["Location"]
+        lat = location.get("lat")
+        lon = location.get("lon")
 
-            location = res["Location"]
-            lat = location.get("lat")
-            lon = location.get("lon")
-
-            # Ensure lat/lon are valid and convert them
-            if lat and lon:
-                try:
-                    lat = float(lat)
-                    lon = float(lon)
-                    # Call reverse geocode API to convert lat/lon to an address
-                    address = reverse_geocode(lat, lon)
-                    # If address is found, update the Location field with
-                    # address
-                    # TODO eliminate backwards communication, aka translation
-                    # from lat and long to loco back to lat and long
-                    res["Location"] = (
-                        address["address"] if address else "Address not found"
-                    )
-                except ValueError:
-                    res["Location"] = "Invalid lat/lon"
+        # Ensure lat/lon are valid and convert them
+        if lat and lon:
+            try:
+                lat = float(lat)
+                lon = float(lon)
+                # Call reverse geocode API to convert lat/lon to an address
+                address = reverse_geocode(lat, lon)
+                # If address is found, update the Location field with
+                # address
+                # TODO eliminate backwards communication, aka translation
+                # from lat and long to loco back to lat and long
+                res["Location"] = (
+                    address["address"] if address else "Address not found"
+                )
+            except ValueError:
+                res["Location"] = "Invalid lat/lon"
 
     return result
 
