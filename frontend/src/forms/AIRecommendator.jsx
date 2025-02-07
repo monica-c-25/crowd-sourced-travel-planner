@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AIRecommendator.css";
+
 
 const ChatbotForm = () => {
   const [step, setStep] = useState(1);
@@ -11,6 +13,8 @@ const ChatbotForm = () => {
   });
   const [customInterest, setCustomInterest] = useState(""); // Stores user-inputted custom interests
   const [recommendations, setRecommendations] = useState("");
+
+  const navigate = useNavigate();  
 
   const interestOptions = [
     "Food",
@@ -71,8 +75,10 @@ const ChatbotForm = () => {
         }
       );
       const data = await response.json();
+
       setRecommendations(data.recommendations);
-      setStep(5);
+
+      navigate("/ai-recommendation", { state: { recommendations: data.recommendations } });
     } catch (error) {
       console.error("Error fetching recommendations:", error);
     }
@@ -99,6 +105,7 @@ const ChatbotForm = () => {
               name="location"
               value={formData.location}
               onChange={handleChange}
+              placeholder="Enter a Location"
               required
             />
             <button type="button" onClick={handleNext}>
@@ -116,7 +123,7 @@ const ChatbotForm = () => {
               name="trip_date"
               value={formData.trip_date}
               onChange={handleChange}
-              travel_group
+              // travel_group
               required
             />
             <button type="button" onClick={handleBack}>
@@ -168,7 +175,7 @@ const ChatbotForm = () => {
                     checked={formData.interests.includes(interest)}
                     onChange={() => handleInterestChange(interest)}
                   />
-                  {interest}
+                  <span>{interest}</span>
                 </label>
               ))}
             </div>
@@ -177,7 +184,7 @@ const ChatbotForm = () => {
             <div className="custom-interest-input">
               <input
                 type="text"
-                placeholder="Enter other interests not listed separated by commas"
+                placeholder="Enter other interests not listed (separated by commas)"
                 value={customInterest}
                 onChange={handleCustomInterestChange}
               />
@@ -205,16 +212,6 @@ const ChatbotForm = () => {
             <button type="submit" disabled={!isFormComplete}>
               Get Recommendations
             </button>
-          </div>
-        )}
-
-        {step === 5 && recommendations && (
-          <div className="form-group">
-            <h3>Recommended Places:</h3>
-            <p>{recommendations}</p>
-            {/* <button type="button" onClick={handleBack}>
-              Back to Interests
-            </button> */}
           </div>
         )}
       </form>

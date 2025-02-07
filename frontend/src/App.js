@@ -9,13 +9,14 @@ import ExperienceForm from './forms/ExperienceForm.jsx';
 import ExperienceDetail from './pages/ExperienceDetail.jsx';
 import ChatbotForm from './forms/AIRecommendator.jsx';
 import { AuthProvider } from "./context/AuthContext";
+import AIRecommendations from "./pages/AIRecommendation.jsx";
 
 const App = () => {
     return (
         <AuthProvider>
             <Router>
                 <main>
-                    <div className="container">
+                    <div className="app-container">
                         <NavBar />
                         <Routes>
                             <Route path="/" element={<Home />} />
@@ -24,6 +25,7 @@ const App = () => {
                             <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
                             <Route path="/ai-recommendator" element={<ChatbotForm />} />
+                            <Route path="/ai-recommendation" element={<AIRecommendations />} />
                         </Routes>
                     </div>
                 </main>

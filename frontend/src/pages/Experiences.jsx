@@ -47,13 +47,6 @@ return (
         <div className="experience-grid">
           {experiences.length > 0 ? (
             experiences.map((experience, index) => (
-              // <div key={index} className="experience-card">
-              //   <h3>{experience.title}</h3>
-              //   <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
-              //   <p className="date">{experience.eventDate}</p>
-              //   <p>{experience.Location}</p>
-              //   <p>{experience.Description}</p>
-              // </div>
               <Link
                 key={index}
                 to={`/experience-detail/${experience._id}`} // Navigate to details page
