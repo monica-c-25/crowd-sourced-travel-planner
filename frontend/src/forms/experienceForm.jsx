@@ -47,6 +47,8 @@ function ExperienceForm() {
               Description: "",
               Location: "",
           });
+
+          window.location.href = "/explore";
         } else {
           alert(result.Message || "Unable to add experience");
           

@@ -50,7 +50,7 @@ def _delete(collection: object, query: str) -> None:
 
 def _post(collection: object, request: object) -> str:
 
-    if collection.name == "Location":
+    if collection.name == "Experience":
         data = request["Location"]
         geoloc = geocode(data)
 
