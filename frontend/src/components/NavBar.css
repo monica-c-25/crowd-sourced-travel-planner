@@ -7,7 +7,7 @@ img {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 20px 0px 20px;
     color: #3398B2;
 }
 
@@ -16,7 +16,7 @@ img {
     align-items: center;
     font-size: 2rem;
     font-family: "Inter";
-    margin: 10px;
+    margin: 0px;
 }
 
 .navLinks {
