@@ -10,6 +10,7 @@ import ExperienceDetail from './pages/ExperienceDetail.jsx';
 import ChatbotForm from './forms/AIRecommendator.jsx';
 import { AuthProvider } from "./context/AuthContext";
 import AIRecommendations from "./pages/AIRecommendation.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 const App = () => {
     return (
@@ -17,6 +18,7 @@ const App = () => {
             <Router>
                 <main>
                     <div className="app-container">
+                        <ScrollToTop />
                         <NavBar />
                         <Routes>
                             <Route path="/" element={<Home />} />
