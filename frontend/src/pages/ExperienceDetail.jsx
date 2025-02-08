@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
+import './ExperienceDetail.css';
+import { FaRegBookmark } from "react-icons/fa";
 
 const ExperienceDetail = () => {
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchExperience = async () => {
@@ -30,13 +35,53 @@ const ExperienceDetail = () => {
   if (!experience) return <p>Experience not found.</p>;
 
   return (
-    <div className="experience-detail">
-      <h1>{experience.title}</h1>
-      <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
-      <p><strong>Event Date:</strong> {experience.eventDate}</p>
-      <p><strong>Location:</strong> {experience.Location}</p>
-      <p><strong>Description:</strong> {experience.Description}</p>
+    <>
+    <div className="search-bar">
+      <div><SearchBar /></div>
     </div>
+    <div className="experience-detail">
+      <div className="header-container">
+        <div className="header-group-left">
+          <h1>{experience.title}</h1>
+          <button className="review-btn">Write a Review</button>
+        </div>
+        <button className="bookmark-btn"><FaRegBookmark />Bookmark</button>
+      </div>
+      <div className="header-detail">
+        <div className="header-detail-left">
+          <p>
+            Created by <a href="">User</a>
+          </p>
+          <p>&#123; Pull Rating from Database Here &#125; <a href="">N Ratings</a></p>
+        </div>
+        <p className="eventdate"><strong>Event Date:</strong> {experience.eventDate}</p>
+      </div>
+      
+      <img className="images" src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
+      
+      <div className="detail-container">
+        <div className="detail-left">
+          <h4>Description</h4> 
+          <p>{experience.Description}</p>
+        </div>
+        <div className="detail-right">
+          <h4>Location</h4> 
+          <p>{experience.Location}</p>
+        </div>
+      </div>
+
+      <div className="review-container">
+        <h4>Latest Reviews</h4>
+        <div className="review-grid">
+          <div className="review-card">Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 Review 1 </div>
+          <div className="review-card">Review 2</div>
+          <div className="review-card">Review 3</div>
+        </div>
+        <a href="">See More Reviews</a>
+      </div>
+      
+    </div>
+    </>
   );
 };
 
