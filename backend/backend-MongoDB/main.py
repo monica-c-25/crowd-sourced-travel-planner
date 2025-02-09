@@ -41,7 +41,7 @@ def general_request(request: object, collection: object) -> None:
             response_data = _get({}, collection)  # Fetch data
             # Convert ObjectId to string
             for experience in response_data:
-                experience["_id"] = str(experience["_id"])  # Convert ObjectId to string
+                experience["_id"] = str(experience["_id"])
 
             # response = _get(request.get_json(), collection)
             response = {
@@ -93,28 +93,29 @@ def general_request(request: object, collection: object) -> None:
             }
 
         return jsonify(response)
-    
+
+
 # GETS EXPERIENCE DETAILS
 @app.route('/api/experience-data/<experience_id>', methods=['GET'])
 def get_experience_by_id(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
-    
+
     try:
-        ObjectId(experience_id)  # This will raise an exception if it's not a valid ObjectId
+        ObjectId(experience_id)  # raise exception if not valid ObjectId
     except Exception as e:
         return jsonify({"Message": f"Invalid ID: {str(e)}"})
-    
+
     try:
         # Pass experience_id as part of the request body to _get
-        
+
         filters = {"Query": experience_id}
         experience_data = _get(filters, collection)
 
         if experience_data:
             # If data is returned, it will be a list with one experience
             experience = experience_data[0]  # Get the first experience
-            experience["_id"] = str(experience["_id"])  # Convert ObjectId to string
+            experience["_id"] = str(experience["_id"])  # ObjectId to string
             response = {
                 "Message": "Success",
                 "data": experience
@@ -130,7 +131,6 @@ def get_experience_by_id(experience_id):
         }
 
     return jsonify(response)
-
 
 
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
@@ -173,12 +173,6 @@ def comment_request_handler():
 # AI (OPENAI API) RECOMMENDATIONS
 @app.route("/get_recommendations", methods=["POST"])
 def get_recommendations():
-    data1 = request.json
-    location1 = data1.get("location")
-    trip_date1 = data1.get("trip_date")
-    travel_group1 = data1.get("travel_group")
-    interests1 = data1.get("interests", [])
-    print(f"Location: {location1}, Date: {trip_date1}, Group: {travel_group1}, Interests: {interests1}")
     try:
         data = request.json
         location = data.get("location")
@@ -191,11 +185,17 @@ def get_recommendations():
             return jsonify({"error": "Missing required fields"}), 400
 
         # Create prompt for ChatGPT
-        prompt = f"""
-        I am planning a trip to {location} on {trip_date} with my {travel_group}.
-        My interests are {', '.join(interests)}. 
-        Can you recommend some must-visit places and attractions?
-        """
+        prompt = (
+            f"I am planning a trip to {location} on {trip_date} with my {travel_group}.\n"
+            f"My interests are {', '.join(interests)}.\n"
+            "Can you recommend 3 must-visit places for each category?\n"
+            "Return the results in json object following this structure:\n"
+            '{"Introduction": "Sample Introduction", "Category 1": ['
+            '{"name": "Example name 1", "description": "Example description 1", "address": "Example address 1"},'
+            '{"name": "Example name 2", "description": "Example description 2", "address": "Example address 2"},'
+            '{"name": "Example name 3", "description": "Example description 3", "address": "Example address 3"}], '
+            '"Category 2": etc. etc. }'
+        )
 
         # Call ChatGPT API
         response = openaiclient.chat.completions.create(
@@ -204,12 +204,11 @@ def get_recommendations():
         )
 
         # Extract and return response
-        # recommendations = response["choices"][0]["message"]["content"]
         recommendations = response.choices[0].message.content
         return jsonify({"recommendations": recommendations})
 
     except Exception as e:
-        print(f"Error: {str(e)}") 
+        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
