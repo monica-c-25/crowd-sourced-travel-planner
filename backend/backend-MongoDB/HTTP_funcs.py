@@ -1,6 +1,7 @@
 from locationApi.locApi import geocode, reverse_geocode
 from bson import ObjectId
 
+
 def _get(request_body: dict, collection: object) -> object:
     if not request_body:
         result = list(collection.find())
