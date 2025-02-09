@@ -8,7 +8,6 @@ const AIRecommendations = () => {
   const { recommendations: rawRecommendations } = location.state || {};
 
   const [recommendations, setRecommendations] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const parseRecommendations = (rawData) => {
     // Extract everything between the triple backticks (```) because recommendations is a string
@@ -35,7 +34,6 @@ const AIRecommendations = () => {
     if (rawRecommendations) {
       const parsedRecommendations = parseRecommendations(rawRecommendations);
       setRecommendations(parsedRecommendations);
-      setLoading(false);
     }
   }, [rawRecommendations]);
 
@@ -43,9 +41,6 @@ const AIRecommendations = () => {
     if (!recommendations) {
       return <p>Loading...</p>;
     }
-
-    console.log(typeof recommendations);
-    console.log(recommendations);
 
     return Object.keys(recommendations).map((category, index) => {
       // Skip 'Introduction' if it's present
@@ -70,17 +65,13 @@ const AIRecommendations = () => {
 
   return (
     <div className="recommendations-container">
-      {loading ? (
-        <p>Loading recommendations...</p> // Display loading text
-      ) : (
-        <>
-          {recommendations && recommendations.Introduction && (
-            <h2>{recommendations.Introduction}</h2>
-          )}
-  
-          {renderCategories()}
-        </>
-      )}
+      <>
+        {recommendations && recommendations.Introduction && (
+          <h2>{recommendations.Introduction}</h2>
+        )}
+
+        {renderCategories()}
+      </>
     </div>
   );
 };

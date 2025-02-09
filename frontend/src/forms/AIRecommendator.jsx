@@ -13,6 +13,7 @@ const ChatbotForm = () => {
   });
   const [customInterest, setCustomInterest] = useState(""); // Stores user-inputted custom interests
   const [recommendations, setRecommendations] = useState("");
+  const [loading, setLoading] = useState(false); 
 
   const navigate = useNavigate();  
 
@@ -65,6 +66,8 @@ const ChatbotForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const response = await fetch(
         "http://localhost:8001/get_recommendations",
@@ -77,10 +80,12 @@ const ChatbotForm = () => {
       const data = await response.json();
 
       setRecommendations(data.recommendations);
+      setLoading(false);
 
       navigate("/ai-recommendation", { state: { recommendations: data.recommendations } });
     } catch (error) {
       console.error("Error fetching recommendations:", error);
+      setLoading(false);
     }
   };
 
@@ -215,6 +220,8 @@ const ChatbotForm = () => {
           </div>
         )}
       </form>
+      
+      {loading && <div className="loading-indicator">Loading...</div>}
     </div>
   );
 };
