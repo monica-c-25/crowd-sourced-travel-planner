@@ -215,13 +215,6 @@ const ChatbotForm = () => {
           </div>
         )}
       </form>
-
-      {/* {recommendations && (
-        <div className="recommendations">
-          <h3>Recommended Places:</h3>
-          <p>{recommendations}</p>
-        </div>
-      )} */}
     </div>
   );
 };
