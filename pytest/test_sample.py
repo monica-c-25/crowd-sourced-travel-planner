@@ -1,0 +1,17 @@
+from playwright.sync_api import Page
+import pytest
+
+# to view: pytest --headed
+
+# @pytest.mark.skip_browser("chromium")
+# @pytest.mark.only_browser("chromium")
+
+# --browser-channel chrome
+
+# --tracing retain-on-failure
+# use with trace.playwright.dev OR run in terminal: playwright show-trace {trace.zip file}
+
+# pytest -k "<test name>" to run only that test
+
+
+# --base-url http://localhost:3000/
