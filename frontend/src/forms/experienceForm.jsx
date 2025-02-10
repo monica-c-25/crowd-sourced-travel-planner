@@ -8,8 +8,8 @@ function ExperienceForm() {
   const [formData, setFormData] = useState({
     title: "",
     eventDate: today,
-    Description: "",
-    Location: ""
+    description: "",
+    location: ""
   });
 
   const handleChange = (e) => {
@@ -32,20 +32,23 @@ function ExperienceForm() {
         body: JSON.stringify({
           title: formData.title,
           eventDate: formData.eventDate,
-          Description: formData.Description,
-          Location: formData.Location, // Send lat/lon string
+          creationDate: today,
+          description: formData.description,
+          photoURL: "",
+          location: formData.location, // Send lat/lon string
+          rating: {"average": 0, "total": 0}
         }),
       });
 
       if (response.ok) {
         const result = await response.json();
         if (result.Message === "Success") {
-          alert(result.Message || "Experience added successfully!");
+          alert("Experience added successfully!");
             setFormData({
               title: "",
               eventDate: today,
-              Description: "",
-              Location: "",
+              description: "",
+              location: "",
           });
 
           window.location.href = "/explore";
@@ -87,15 +90,16 @@ function ExperienceForm() {
           name="eventDate"
           value={formData.eventDate}
           onChange={handleChange}
+          required
         />
       </div>
       </div>
       <div className="form-group">
-        <label htmlFor="Description">Description:</label>
+        <label htmlFor="description">Description:</label>
         <textarea
-          id="Description"
-          name="Description"
-          value={formData.Description}
+          id="description"
+          name="description"
+          value={formData.description}
           onChange={handleChange}
           placeholder="Add a detailed description"
           maxLength="1200"
@@ -103,12 +107,12 @@ function ExperienceForm() {
         />
       </div>
       <div className="form-group location">
-        <label htmlFor="Location">Location:</label>
+        <label htmlFor="location">Location:</label>
         <input
           type="text"
-          id="Location"
-          name="Location"
-          value={formData.Location}
+          id="location"
+          name="location"
+          value={formData.location}
           onChange={handleChange}
           placeholder="Add a location or Address"
           required
@@ -126,8 +130,8 @@ function ExperienceForm() {
               setFormData({
                 title: "",
                 eventDate: today,
-                Description: "",
-                Location: "",
+                description: "",
+                location: "",
               })
             }
           >
