@@ -11,7 +11,7 @@ def _get(request_body: dict, collection: object) -> object:
 
     for res in result:
 
-        location = res["Location"]
+        location = res["location"]
         lat = location.get("lat")
         lon = location.get("lon")
 
@@ -26,11 +26,11 @@ def _get(request_body: dict, collection: object) -> object:
                 # address
                 # TODO eliminate backwards communication, aka translation
                 # from lat and long to loco back to lat and long
-                res["Location"] = (
+                res["location"] = (
                     address["address"] if address else "Address not found"
                 )
             except ValueError:
-                res["Location"] = "Invalid lat/lon"
+                res["location"] = "Invalid lat/lon"
 
     return result
 
@@ -51,13 +51,13 @@ def _delete(collection: object, query: str) -> None:
 def _post(collection: object, request: object) -> str:
 
     if collection.name == "Experience":
-        data = request["Location"]
+        data = request["location"]
         geoloc = geocode(data)
 
         if geoloc is None:
             raise ValueError("Invalid location entered")
         # TODO add long and lat here instead of back translating
-        request["Location"] = geoloc
+        request["location"] = geoloc
         result = collection.insert_one(request)
         return str(result.inserted_id)
 

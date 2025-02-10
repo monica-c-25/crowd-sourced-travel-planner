@@ -49,8 +49,8 @@ return (
                 <h3>{experience.title}</h3>
                 <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
                 <p className="date">{experience.eventDate}</p>
-                <p>{experience.Location}</p>
-                <p>{experience.Description}</p>
+                <p>{experience.location}</p>
+                <p>{experience.description}</p>
               </div>
             ))
           ) : (
