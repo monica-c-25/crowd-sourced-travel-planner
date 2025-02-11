@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import './Experiences.css';
 import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Explore = () => {
   const [experiences, setExperiences] = useState([]);
@@ -35,7 +36,10 @@ const Explore = () => {
 return (
     <div className="explore-container">
       <h1>Explore Experiences</h1>
-      <button className="button" onClick={() => navigate("/experience-form")}>Add New Experience</button>
+      <div className="button-container">
+        <button className="button" onClick={() => navigate("/experience-form")}>Add New Experience</button>
+        <button className="button" onClick={() => navigate("/ai-recommendator")}>Use AI to plan a trip!</button>
+      </div>
       <div className="search-bar-container">
         <SearchBar />
       </div>
@@ -45,13 +49,17 @@ return (
         <div className="experience-grid">
           {experiences.length > 0 ? (
             experiences.map((experience, index) => (
-              <div key={index} className="experience-card">
+              <Link
+                key={index}
+                to={`/experience-detail/${experience._id}`} // Navigate to details page
+                className="experience-card"
+              >
                 <h3>{experience.title}</h3>
                 <img src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
                 <p className="date">{experience.eventDate}</p>
                 <p>{experience.Location}</p>
                 <p>{experience.Description}</p>
-              </div>
+              </Link>
             ))
           ) : (
             <p>No experiences available.</p>
