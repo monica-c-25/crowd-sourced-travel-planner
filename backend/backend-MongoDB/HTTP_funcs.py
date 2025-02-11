@@ -1,4 +1,44 @@
 from locationApi.locApi import geocode, reverse_geocode
+from pymongo.mongo_client import MongoClient
+from bson.objectid import ObjectId
+from pymongo.server_api import ServerApi
+from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv()
+USER = getenv('USER')
+PASSWORD = getenv('PASSWORD')
+uri = (
+    f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
+    "retryWrites=true&w=majority&appName=Capstone"
+)
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+
+def _linked_update(collections: dict, collection_name: str,
+                   cross_id: str) -> None:
+
+    for name, _id in collections.items():
+
+        collection = client[name][name]
+        update_query = collection.find_one(
+            {"_id": ObjectId(_id)}
+        )
+
+        if collection_name in update_query:
+            collection_update_query = {
+                collection_name: update_query[collection]
+            }
+        else:
+            collection_update_query = {
+                collection_name: []
+            }
+
+        collection_update_query[collection_name].append(cross_id)
+        collection.update_one(
+            {"_id": update_query["_id"]},
+            {"$set": collection_update_query}
+        )
 
 
 def _get(request_body: dict, collection: object) -> object:
@@ -7,7 +47,7 @@ def _get(request_body: dict, collection: object) -> object:
     else:
         result = collection.find_one({collection.name: request_body["Query"]})
 
-    _strip_id(result)
+    _update_id(result)
 
     for res in result:
 
@@ -65,7 +105,6 @@ def _post(collection: object, request: object) -> str:
 
     elif collection.name == "User":
 
-        print(request["username"])
         username_in_db = (
             False
             if collection.find_one(
@@ -79,21 +118,56 @@ def _post(collection: object, request: object) -> str:
             else "Username Not Available"
         )
 
+    elif collection.name == "Comment":
+        comment_id = str(collection.insert_one(request).inserted_id)
+
+        collections = {
+            "User": request["user_id"],
+            "Experience": request["experience_id"]
+        }
+        collection_name = collection.name
+
+        _linked_update(collections, collection_name, comment_id)
+        return comment_id
+
+    elif collection.name == "Experience":
+        experience_id = str(collection.insert_one(request).inserted_id)
+
+        collections = {
+            "Trip": request["trip_id"],
+            "User": request["user_id"],
+            "Location": request["location_id"]
+        }
+
+        collection_name = collection.name
+
+        _linked_update(collections, collection_name, experience_id)
+        return experience_id
+
+    elif collection.name == "Trip":
+        trip_id = str(collection.insert_one(request).inserted_id)
+
+        collections = {
+            "User": request["user_id"],
+            "Experience": request["experience_id"],
+            "Location": request["location_id"]
+        }
+        _linked_update(collections, collection_name, trip_id)
+        return trip_id
+
     else:
         return str(collection.insert_one(request).inserted_id)
 
 
-def _strip_id(input_data: object) -> None:
+def _update_id(input_data: object) -> None:
 
     # If input_data is a list (multiple documents)
     if isinstance(input_data, list):
         for data in input_data:
-            if '_id' in data:
-                del data['_id']
+            data['_id'] = str(data['_id'])
     # If input_data is a single document (dictionary)
     elif isinstance(input_data, dict):
-        if '_id' in input_data:
-            del input_data['_id']
+        input_data['_id'] = str(input_data['_id'])
 
 
 def _set_payload(input_data: object, payload: dict) -> None:
@@ -102,3 +176,14 @@ def _set_payload(input_data: object, payload: dict) -> None:
 
     for key, value in input_data.items():
         payload["$set"][key] = value
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    USER = getenv('USER')
+    PASSWORD = getenv('PASSWORD')
+    uri = (
+        f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
+        "retryWrites=true&w=majority&appName=Capstone"
+    )
+    client = MongoClient(uri, server_api=ServerApi('1'))
