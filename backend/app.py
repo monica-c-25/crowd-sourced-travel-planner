@@ -34,8 +34,12 @@ oauth.register(
 # Connect to MongoDB
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
-db = client["User"]
-users_collection = db["User"]
+
+users_db = client["User"]
+experiences_db = client["Experience"]
+
+users_collection = users_db["User"]
+experiences_collection = experiences_db["Experience"]
 
 # ------------------- AUTH0 LOGIN -------------------
 
@@ -103,6 +107,50 @@ def sync_user():
         }
         users_collection.insert_one(new_user)
         return jsonify({"message": "New user created successfully"}), 201
+
+
+# ------------------- FILTER EXPERIENCES -------------------
+
+@app.route("/api/filter-experiences", methods=["GET"])
+def filter_experiences():
+    """Filter experiences by creation date."""
+
+    try:
+        # Get date parameters from query string (e.g., from frontend)
+        start_date_str = request.args.get("start_date", None)
+        end_date_str = request.args.get("end_date", None)
+
+        # Prepare date filters
+        date_filter = {}
+
+        # Check if the start_date and end_date are provided
+        if start_date_str:
+            date_filter["creationDate"] = {"$gte": start_date_str}
+        if end_date_str:
+            date_filter["creationDate"] = date_filter.get("creationDate", {})
+            date_filter["creationDate"]["$lte"] = end_date_str
+
+        # Query the database based on whether the filter exists
+        if date_filter:
+            experiences = experiences_collection.find(date_filter)
+        else:
+            experiences = experiences_collection.find()
+
+        # Sort by creationDate in descending order (newest first)
+        experiences = experiences.sort("creationDate", -1)
+
+        # Serialize the results
+        experiences_list = []
+        for experience in experiences:
+            experience["_id"] = str(experience["_id"])
+            experiences_list.append(experience)
+
+        return jsonify(experiences_list)
+
+    except Exception as e:
+        # Print the exception to the server log for debugging
+        print(f"Error occurred: {e}")
+        return jsonify({"error": "An error occurred."}), 500
 
 
 if __name__ == '__main__':
