@@ -1,13 +1,15 @@
 from locationApi.locApi import geocode, reverse_geocode
+from bson import ObjectId
 
 
 def _get(request_body: dict, collection: object) -> object:
     if not request_body:
         result = list(collection.find())
     else:
-        result = collection.find_one({collection.name: request_body["Query"]})
+        result = collection.find_one({"_id": ObjectId(request_body["Query"])})
 
-    _strip_id(result)
+    if result is not None and not isinstance(result, list):
+        result = [result]
 
     for res in result:
 
