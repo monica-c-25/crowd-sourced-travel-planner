@@ -1,0 +1,94 @@
+/* Container for the recommendations section */
+.recommendations-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading for the overall recommendations */
+.recommendations-container h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Category section (Food, Attractions, etc.) */
+.category {
+  margin-bottom: 30px;
+}
+
+/* Category title (Food, Attractions, etc.) */
+.category h3 {
+  font-size: 30px;
+  font-weight: 500;
+  color: #3398B2;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* List of items under each category */
+.category ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each item in the list */
+.category-item {
+  background-color: #fff;
+  border: 1px solid #e3e3e3;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect for each item */
+.category-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Title of each item */
+.category-item h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Description for each item */
+.category-item p {
+  font-size: 14px;
+  color: #666;
+  margin: 10px 0;
+}
+
+/* Address text */
+.category-item p strong {
+  font-weight: 600;
+  color: #2e3a59;
+}
+
+/* Loading message or if there are no recommendations */
+.recommendations-container p {
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+}
+
+/* Styling for the 'Introduction' text (if present) */
+.recommendations-container h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color:  #3398B2;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
