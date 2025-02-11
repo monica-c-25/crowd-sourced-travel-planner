@@ -1,6 +1,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+
 # Test Homepage
 # Assumptions: User is NOT logged in
 @pytest.fixture
@@ -29,7 +30,7 @@ def test_about_us_link_redirect(setup, page: Page):
 
 def test_login_logout(setup, page: Page):
     user_info = page.locator('.user-info')
-    
+
     # If the user is not logged in
     if not user_info.is_visible():
         page.locator('role=button[name="Login"]').click()

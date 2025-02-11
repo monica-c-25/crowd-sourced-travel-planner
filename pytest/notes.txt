@@ -1,6 +1,3 @@
-from playwright.sync_api import Page
-import pytest
-
 # to view: pytest --headed
 
 # @pytest.mark.skip_browser("chromium")
