@@ -41,37 +41,59 @@ def _linked_update(collections: dict, collection_name: str,
         )
 
 
+def comment_decoder(collection: object, result: object, collections_to_loop: list) -> None
+    collection_to_insert = {collection.name: {}}
+    for _id in result[collection.name]:
+
+        # Get the user name from the comment
+        query_collection = client[collection.name][collection.name]
+        username = query_collection.find_one({"_id": ObjectId(_id)})["username"]
+        
+        if username not in collection_to_insert[collection.name]:
+            collection_to_insert[collection.name][username] = []
+
+        collection_to_insert[collection.name][username].append(
+            client[collection][collection].find_one(
+                {"_id": ObjectId(_id)}))
+            
+
+def decoder(collection: object, result: object, collections_to_loop: list) -> None:
+
+    if collection.name == "Comment":
+        return comment_decoder(collection, result, collections_to_loop)
+
+    collection_to_insert = {collection.name: []}
+    for _id in result[collection.name]:
+
+        query_collection = client[collection][collection]
+        collection_to_insert[collection.name].append(
+            query_collection.find_one({"_id": ObjectId(_id)}))        
+
 def _get(request_body: dict, collection: object) -> object:
     if not request_body:
         result = list(collection.find())
-    else:
-        result = collection.find_one({"_id": ObjectId(request_body["Query"])})
+    elif "_id" in request_body:
+        result = collection.find_one({"_id": ObjectId(request_body["_id"])})
+
+    if not result:
+        return
 
     _update_id(result)
-    if result is not None and not isinstance(result, list):
-        result = [result]
 
-    for res in result:
-        location = res["Location"]
-        lat = location.get("lat")
-        lon = location.get("lon")
+    collections_to_loop = None
 
-        # Ensure lat/lon are valid and convert them
-        if lat and lon:
-            try:
-                lat = float(lat)
-                lon = float(lon)
-                # Call reverse geocode API to convert lat/lon to an address
-                address = reverse_geocode(lat, lon)
-                # If address is found, update the Location field with
-                # address
-                # TODO eliminate backwards communication, aka translation
-                # from lat and long to loco back to lat and long
-                res["Location"] = (
-                    address["address"] if address else "Address not found"
-                )
-            except ValueError:
-                res["Location"] = "Invalid lat/lon"
+    if collection.name == "Trip":
+        collections_to_loop = ["User", "Experience", "Photos"]
+    elif collection.name == "Experience":
+        collections_to_loop = ["User", "Photo", "Comment"]
+    elif collection.name == "Photo":
+        collections_to_loop = ["User"]
+    elif collection.name == "Comment":
+        collections_to_loop = ["User"]
+
+    for collection in collections_to_loop:
+        if collection.name in result and not result[collection.name]:
+            decoder(collection, result, collections_to_loop)
 
     return result
 
@@ -90,16 +112,28 @@ def _delete(collection: object, query: str) -> None:
 
 
 def _post(collection: object, request: object) -> str:
+
     if collection.name == "Experience":
         data = request["Location"]
         geoloc = geocode(data)
 
         if geoloc is None:
             raise ValueError("Invalid location entered")
-        # TODO add long and lat here instead of back translating
-        request["Location"] = geoloc
-        result = collection.insert_one(request)
-        return str(result.inserted_id)
+
+        request["coords"] = geoloc
+
+        experience_id = str(collection.insert_one(request).inserted_id)
+
+        collections = {
+            "Trip": request["trip_id"],
+            "User": request["user_id"],
+            "Location": request["location_id"]
+        }
+
+        collection_name = collection.name
+
+        _linked_update(collections, collection_name, experience_id)
+        return experience_id
 
     elif collection.name == "User":
 
@@ -127,20 +161,6 @@ def _post(collection: object, request: object) -> str:
 
         _linked_update(collections, collection_name, comment_id)
         return comment_id
-
-    elif collection.name == "Experience":
-        experience_id = str(collection.insert_one(request).inserted_id)
-
-        collections = {
-            "Trip": request["trip_id"],
-            "User": request["user_id"],
-            "Location": request["location_id"]
-        }
-
-        collection_name = collection.name
-
-        _linked_update(collections, collection_name, experience_id)
-        return experience_id
 
     elif collection.name == "Trip":
         trip_id = str(collection.insert_one(request).inserted_id)
