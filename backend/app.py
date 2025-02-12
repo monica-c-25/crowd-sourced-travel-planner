@@ -1,11 +1,10 @@
 import os
-from flask import Flask, jsonify, redirect, request, render_template, send_file
+from flask import Flask, jsonify, redirect, request
 from flask_cors import CORS, cross_origin
 from authlib.integrations.flask_client import OAuth
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
-# from google.cloud import storage, datastore
-# import io
+
 
 # Load environment variables
 ENV_FILE = find_dotenv()

@@ -237,7 +237,11 @@ def photo_request_handler():
             return jsonify({"Error": str(e)}), 500
 
     if request.method == 'DELETE':
-        # Sample DELETE Request: DELETE /api/photos?experience_id=some_experience_id&photo_url=https://storage.googleapis.com/cs467-crowd-sourced-travel-planner-images/photo1.jpg
+        # Sample DELETE Request:
+        # DELETE /api/photos?experience_id=some_experience_id
+        #   &photo_url=https://storage.googleapis.com
+        #   /cs467-crowd-sourced-travel-planner-images
+        #   /photo1.jpg
         # Update Data
         try:
             experience_id = request.args.get("experience_id")
