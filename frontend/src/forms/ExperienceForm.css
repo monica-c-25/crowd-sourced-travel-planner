@@ -1,0 +1,116 @@
+.experience-form {
+  max-width: 75%;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Inter";
+  margin-top: 0px;
+}
+
+.experience-form h1, h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.quote {
+  font-size:medium;
+  color:#888e94;
+  font-style: italic;
+}
+
+.quote-author {
+  font-size:small;
+  color:#888e94;
+  text-align: right;
+  margin-right: 50px;
+}
+
+.form-group {
+  margin-top:15px;
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  min-width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-group.location {
+  display: flex;
+  align-items: center; /* Centers label and input vertically */
+  gap: 10px; /* Adds space between label and input */
+}
+
+.form-group.location label {
+  white-space: nowrap; /* Prevents label from wrapping */
+}
+
+.form-group.location input {
+  flex: 1; /* Allows input to take up remaining space */
+  min-width: 0; /* Prevents overflow */
+}
+
+.location {
+  display: flex;
+  gap: 10px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between; /* Space out buttons to the ends */
+  align-items: center; /* Align buttons vertically */
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.button-group-left {
+  display: flex; /* Group submit and reset buttons together */
+  gap: 0.5rem; /* Add spacing between submit and reset buttons */
+}
+
+.submit-button,
+.reset-button,
+.cancel-button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: #3398B2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 150px;
+}
+
+.reset-button {
+  background-color: #888e94;
+}
+
+.cancel-button {
+  background-color: #888e94;
+}
+
+.submit-button:hover {
+  background-color: #2b8196;
+}
+
+.reset-button:hover {
+  background-color: #5a6268;
+}

@@ -1,0 +1,109 @@
+/* Main container for the Explore page */
+.explore-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+  }
+  
+  /* Title section */
+  .explore-container h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .button-container {
+    display: flex;            /* Use flexbox to align items side by side */
+    gap: 20px;                /* Adds space between the buttons */
+    justify-content: center;  /* Centers the buttons horizontally */
+  }
+
+  .button {
+    font-size: 1rem;
+    background-color: #3398B2;
+    padding: .5rem 1.5rem;
+    color: white;
+    border-radius: 1.5rem;
+    margin-bottom: 15px;
+  }
+  .button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+  
+  /* Loading message styling */
+  .loading-message {
+    font-size: 1.5rem;
+    color: #888;
+  }
+  
+  /* Grid container for the experience cards */
+  .experience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Individual experience card styling */
+  .experience-card {
+    background-color:rgba(51, 152, 178, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+    max-height: 400px;
+    overflow: hidden;
+    text-overflow: ellipses;
+  }
+  
+  .experience-card:hover {
+    transform: translateY(-10px);
+    cursor: pointer;
+  }
+  
+  /* Experience title styling */
+  .experience-card h3 {
+    font-size: 1rem;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  /* Description section styling */
+  .experience-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+  
+  /* Photos section styling */
+  .experience-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+  
+  /* User section styling */
+  .experience-card .date {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 5px;
+    font-style: italic;
+  }
+  
+  .search-bar-container {
+    margin-bottom: 20px; /* Adjust as needed */
+    width: 100%; /* Optional: to ensure it spans the container */
+    max-width: 800px; /* Optional: control width */
+  }
