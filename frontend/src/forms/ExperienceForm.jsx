@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Assuming you have this context
+import { useAuth } from "../context/AuthContext";
 import "./ExperienceForm.css";
 
 function ExperienceForm() {

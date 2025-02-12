@@ -7,6 +7,7 @@ import About from './pages/About.jsx';
 import Explore from './pages/Experiences.jsx';
 import ExperienceForm from './forms/ExperienceForm.jsx';
 import ExperienceDetail from './pages/ExperienceDetail.jsx';
+import ReviewForm from './forms/ReviewForm.jsx';
 import ChatbotForm from './forms/AIRecommendator.jsx';
 import { AuthProvider } from "./context/AuthContext";
 import AIRecommendations from "./pages/AIRecommendation.jsx";
@@ -26,6 +27,7 @@ const App = () => {
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
+                            <Route path="/review-form" element={<ReviewForm />} />
                             <Route path="/ai-recommendator" element={<ChatbotForm />} />
                             <Route path="/ai-recommendation" element={<AIRecommendations />} />
                         </Routes>
