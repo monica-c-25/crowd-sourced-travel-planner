@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import "./experienceForm.css";
+import "./ExperienceForm.css";
+import { useNavigate } from "react-router-dom";
 
 function ExperienceForm() {
+  const navigate = useNavigate();
+  const today = new Date().toISOString().split("T")[0];
   const [formData, setFormData] = useState({
     title: "",
-    eventDate: "",
+    eventDate: today,
     Description: "",
     Location: ""
   });
@@ -36,16 +39,21 @@ function ExperienceForm() {
 
       if (response.ok) {
         const result = await response.json();
-        alert(result.message || "Experience added successfully!");
-        setFormData({
-          title: "",
-          eventDate: "",
-          Description: "",
-          Location: "",
-        });
+        if (result.Message === "Success") {
+          alert(result.Message || "Experience added successfully!");
+            setFormData({
+              title: "",
+              eventDate: today,
+              Description: "",
+              Location: "",
+          });
+        } else {
+          alert(result.Message || "Unable to add experience");
+          
+        }
       } else {
         const errorData = await response.json();
-        alert(`Error: ${errorData.message || "Failed to add experience."}`);
+        alert(`Error: ${errorData.Message || "Failed to add experience."}`);
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -56,8 +64,8 @@ function ExperienceForm() {
   return (
     <form onSubmit={handleSubmit} className="experience-form">
       <h1>Share Your Experience</h1>
-      <h2>" Life is about creating and living experiences that are worth sharing "</h2>
-      <h2>- Steve Jobs</h2>
+      <h2 className="quote">" Life is about creating and living experiences that are worth sharing "</h2>
+      <h2 className="quote-author">- Steve Jobs</h2>
       <div className="form-group">
         <label htmlFor="title">Title:</label>
         <input
@@ -105,22 +113,31 @@ function ExperienceForm() {
         />
       </div>
       <div className="form-actions">
-        <button type="submit" className="submit-button">
-          Create
-        </button>
+        <div className="button-group-left">
+          <button type="submit" className="submit-button">
+            Create
+          </button>
+          <button
+            type="button"
+            className="reset-button"
+            onClick={() =>
+              setFormData({
+                title: "",
+                eventDate: today,
+                Description: "",
+                Location: "",
+              })
+            }
+          >
+            Reset
+          </button>
+        </div>
         <button
           type="button"
-          className="reset-button"
-          onClick={() =>
-            setFormData({
-              title: "",
-              eventDate: "",
-              Description: "",
-              Location: "",
-            })
-          }
+          className="cancel-button"
+          onClick={() => navigate("/explore")}
         >
-          Reset
+          Cancel
         </button>
       </div>
     </form>
