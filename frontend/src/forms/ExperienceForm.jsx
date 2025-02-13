@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import "./ExperienceForm.css";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Assuming you have this context
+import "./ExperienceForm.css";
 
 function ExperienceForm() {
   const navigate = useNavigate();
@@ -9,8 +10,22 @@ function ExperienceForm() {
     title: "",
     eventDate: today,
     description: "",
+    photoURL: "",
     location: ""
   });
+
+  const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
+  const { isAuthenticated } = useAuth(); // Assuming this hook tells you if the user is authenticated
+
+  // Redirect user if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      alert("You must be signed in to access this page");
+      navigate(-1); // Redirect to login page
+    } else {
+      setLoading(false); // Only render content when authentication is verified
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,17 +59,16 @@ function ExperienceForm() {
         const result = await response.json();
         if (result.Message === "Success") {
           alert("Experience added successfully!");
-            setFormData({
-              title: "",
-              eventDate: today,
-              description: "",
-              location: "",
+          setFormData({
+            title: "",
+            eventDate: today,
+            description: "",
+            location: "",
           });
 
           window.location.href = "/explore";
         } else {
           alert(result.Message || "Unable to add experience");
-          
         }
       } else {
         const errorData = await response.json();
@@ -66,10 +80,14 @@ function ExperienceForm() {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // You can show a loading spinner or any other placeholder
+  }
+
   return (
     <form onSubmit={handleSubmit} className="experience-form">
       <h1>Share Your Experience</h1>
-      <h2 className="quote">" Life is about creating and living experiences that are worth sharing "</h2>
+      <h2 className="quote">"Life is about creating and living experiences that are worth sharing"</h2>
       <h2 className="quote-author">- Steve Jobs</h2>
       <div className="form-group">
         <label htmlFor="title">Title:</label>
@@ -82,8 +100,9 @@ function ExperienceForm() {
           placeholder="Add a title"
           required
         />
+      </div>
       <div className="form-group">
-        <label htmlFor="eventDate">Date of Experience</label>
+        <label htmlFor="eventDate">Date of Experience:</label>
         <input
           type="date"
           id="eventDate"
@@ -92,7 +111,6 @@ function ExperienceForm() {
           onChange={handleChange}
           required
         />
-      </div>
       </div>
       <div className="form-group">
         <label htmlFor="description">Description:</label>

@@ -3,10 +3,12 @@ import './Experiences.css';
 import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Explore = () => {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();  // Ensure you destructure the result of useAuth properly
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,10 +16,10 @@ const Explore = () => {
     const fetchExperiences = async () => {
       try {
         const response = await fetch("http://localhost:8001/api/experience-data", {
-            headers: { "Accept": "application/json" },});
+            headers: { "Accept": "application/json" },
+        });
         const data = await response.json();
         console.log("Response Data:", data); 
-        console.log(data.Message);
         if (data.Message === "Success") {
           setExperiences(data.data);
         } else {
@@ -33,12 +35,24 @@ const Explore = () => {
     fetchExperiences();
   }, []);
 
-return (
+  const handleAddExperienceClick = () => {
+    if (isAuthenticated) {
+      navigate("/experience-form");
+    } else {
+      alert("You must be signed in to add an experience.");
+    }
+  };
+
+  return (
     <div className="explore-container">
       <h1>Explore Experiences</h1>
       <div className="button-container">
-        <button className="button" onClick={() => navigate("/experience-form")}>Add New Experience</button>
-        <button className="button" onClick={() => navigate("/ai-recommendator")}>Use AI to plan a trip!</button>
+        <button className="button" onClick={handleAddExperienceClick}>
+          Add New Experience
+        </button>
+        <button className="button" onClick={() => navigate("/ai-recommendator")}>
+          Use AI to plan a trip!
+        </button>
       </div>
       <div className="search-bar-container">
         <SearchBar />

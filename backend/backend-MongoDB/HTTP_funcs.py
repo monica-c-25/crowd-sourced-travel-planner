@@ -12,7 +12,6 @@ def _get(request_body: dict, collection: object) -> object:
         result = [result]
 
     for res in result:
-
         location = res["location"]
         lat = location.get("lat")
         lon = location.get("lon")

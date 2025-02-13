@@ -4,12 +4,15 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import './ExperienceDetail.css';
 import { FaRegBookmark } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
+
 
 const ExperienceDetail = () => {
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchExperience = async () => {
@@ -34,6 +37,14 @@ const ExperienceDetail = () => {
   if (loading) return <p>Loading...</p>;
   if (!experience) return <p>Experience not found.</p>;
 
+  const handleWriteReviewClick = () => {
+    if (isAuthenticated) {
+      navigate("/review-form");
+    } else {
+      alert("You must be signed in to write a review.");
+    }
+  };
+
   return (
     <>
     <div className="search-bar">
@@ -43,7 +54,7 @@ const ExperienceDetail = () => {
       <div className="header-container">
         <div className="header-group-left">
           <h1>{experience.title}</h1>
-          <button className="review-btn">Write a Review</button>
+          <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
         </div>
         <button className="bookmark-btn"><FaRegBookmark />Bookmark</button>
       </div>
@@ -52,9 +63,12 @@ const ExperienceDetail = () => {
           <p>
             Created by <a href="">User</a>
           </p>
-          <p>&#123; Pull Rating from Database Here &#125; <a href="">N Ratings</a></p>
+          <p>Average rating: {experience.rating.average}  (<a href="">{experience.rating.total} Reviews</a>)</p>
         </div>
-        <p className="eventdate"><strong>Event Date:</strong> {experience.eventDate}</p>
+        <div className="header-detail-right">
+          <p><strong>Event Date:</strong> {experience.eventDate}</p>
+          <p><strong>Created On:</strong> {experience.creationDate}</p>
+        </div>
       </div>
       
       <img className="images" src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
@@ -62,11 +76,11 @@ const ExperienceDetail = () => {
       <div className="detail-container">
         <div className="detail-left">
           <h4>Description</h4> 
-          <p>{experience.Description}</p>
+          <p>{experience.description}</p>
         </div>
         <div className="detail-right">
           <h4>Location</h4> 
-          <p>{experience.Location}</p>
+          <p>{experience.location}</p>
         </div>
       </div>
 
