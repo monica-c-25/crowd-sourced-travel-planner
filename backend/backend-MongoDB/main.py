@@ -214,23 +214,10 @@ def get_recommendations():
 
 
 # ------------------- Photo Storage -------------------
-datastore_client = datastore.Client()
 PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
 
-# def _get_next_photo_id():
-#     db = client["Photo"]
-#     collection = db["Photo"]
-#     # Find the highest current photo ID in the collection
-#     last_photo = collection.find().sort("_id", -1).limit(1)
-#     if last_photo.count() > 0:
-#         # Increment the highest ID found
-#         return last_photo[0]["_id"] + 1
-#     else:
-#         # If no photos exist, start with 1
-#         return 1
 
-
-@app.route('/api/photos', methods=['POST', 'GET', 'DELETE', 'PUT'])
+@app.route('/api/photos', methods=['POST', 'GET', 'DELETE'])
 def photo_request_handler():
     db = client["Experience"]
     collection = db["Experience"]
