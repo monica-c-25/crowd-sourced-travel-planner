@@ -213,7 +213,6 @@ def get_recommendations():
         return jsonify({"error": str(e)}), 500
 
 
-
 # ------------------- Photo Storage -------------------
 datastore_client = datastore.Client()
 PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
@@ -415,7 +414,6 @@ def filter_experiences():
         # Print the exception to the server log for debugging
         print(f"Error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
-
 
 
 if __name__ == '__main__':
