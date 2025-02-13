@@ -36,11 +36,6 @@ oauth.register(
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
 
-db = client["User"]
-users_collection = db["User"]
-photo_db = client["Photo"]
-photo_collection = db["Photo"]
-
 
 users_db = client["User"]
 users_collection = users_db["User"]
