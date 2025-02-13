@@ -60,9 +60,9 @@
     margin-bottom: 5px;
 }
 
-.eventdate {
-    display:flex;
-    align-items: center;
+.header-detail-right {
+    /* display:flex;
+    align-items: center; */
     color: #333333;
     font-size: 15px;
 }
