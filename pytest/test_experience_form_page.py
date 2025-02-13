@@ -5,6 +5,12 @@ from playwright.sync_api import Page, expect
 @pytest.fixture
 def setup_experience_form(page: Page):
     # Setup: Go to Experience form page before each test
+    page.goto("http://localhost:3000")
+    page.locator('role=button[name="Login"]').click()
+    expect(page).to_have_title("Log in | travel-planner")
+    page.fill('#username', 'tester123@testmail.com')
+    page.fill('#password', 'Test123!')
+    page.locator('button:text("Continue")').click()
     page.goto("http://localhost:3000/experience-form")
 
 
