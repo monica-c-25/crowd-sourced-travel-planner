@@ -16,7 +16,7 @@ CORS(app, origins="http://localhost:3000", supports_credentials=True)
 uri = getenv("MONGO_URI")
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
-  api_key=getenv('OPENAI_API_KEY')
+    api_key=getenv('OPENAI_API_KEY')
 )
 
 
