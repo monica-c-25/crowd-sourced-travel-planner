@@ -75,7 +75,7 @@ const Explore = () => {
         <p className="loading-message">Loading...</p>
       ) : (
         <div className="experience-grid">
-          {experiences.length > 0 ? (
+          {Array.isArray(experiences) && experiences.length > 0 ? (
             experiences.map((experience, index) => (
               <Link
                 key={index}
