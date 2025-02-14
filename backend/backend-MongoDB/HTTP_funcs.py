@@ -6,7 +6,7 @@ from os import getenv
 from dotenv import load_dotenv
 
 load_dotenv()
-USER = getenv('USER')
+USER = getenv('MONGO_USER')
 PASSWORD = getenv('PASSWORD')
 uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
@@ -22,9 +22,8 @@ def _linked_update(collections: dict, collection_name: str,
 
         collection = client[name][name]
         update_query = collection.find_one(
-            {"_id": ObjectId(_id[0])}
+            {"_id": ObjectId(_id)}
         )
-
         if collection_name in update_query:
             collection_update_query = {
                 collection_name: update_query[collection_name]
@@ -69,9 +68,9 @@ def decoder(collection: str, result: object) -> None:
         return comment_decoder(collection, result)
 
     collection_to_insert = {collection: []}
-
-    for _id in result[collection]:
-
+    if not isinstance(result[collection], list):
+        collection_list = [result[collection]]
+    for _id in collection_list:
         query_collection = client[collection][collection]
         retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
 
@@ -83,9 +82,7 @@ def decoder(collection: str, result: object) -> None:
 
 
 def _decoder_setup(collections_to_loop: list, result: dict) -> None:
-
     for collection in collections_to_loop:
-        print(result[collection])
         if collection in result and result[collection]:
             decoder(collection, result)
 
@@ -169,7 +166,7 @@ def _post(collection: object, request: object) -> str:
             False
             if collection.find_one(
                 {"username": request["username"]}
-                ) is None
+            ) is None
             else True)
 
         return (
