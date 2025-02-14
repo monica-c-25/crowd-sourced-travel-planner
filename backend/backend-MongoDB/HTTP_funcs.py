@@ -22,7 +22,7 @@ def _linked_update(collections: dict, collection_name: str,
 
         collection = client[name][name]
         update_query = collection.find_one(
-            {"_id": ObjectId(_id)}
+            {"_id": ObjectId(_id[0])}
         )
         if collection_name in update_query:
             collection_update_query = {
@@ -68,9 +68,8 @@ def decoder(collection: str, result: object) -> None:
         return comment_decoder(collection, result)
 
     collection_to_insert = {collection: []}
-    if not isinstance(result[collection], list):
-        collection_list = [result[collection]]
-    for _id in collection_list:
+
+    for _id in result[collection]:
         query_collection = client[collection][collection]
         retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
 

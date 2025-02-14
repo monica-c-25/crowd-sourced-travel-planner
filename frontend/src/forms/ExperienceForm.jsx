@@ -81,7 +81,7 @@ function ExperienceForm() {
           photoURL: "",
           location: formData.location, // Send lat/lon string
           rating: {"average": 0, "total": 0},
-          User: userID
+          User: [userID]
         }),
       });
 
