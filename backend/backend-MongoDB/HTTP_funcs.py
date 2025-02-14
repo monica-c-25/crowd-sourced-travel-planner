@@ -1,4 +1,4 @@
-from locationApi.locApi import geocode, reverse_geocode
+from locationApi.locApi import geocode
 from pymongo.mongo_client import MongoClient
 from bson.objectid import ObjectId
 from pymongo.server_api import ServerApi
@@ -22,12 +22,12 @@ def _linked_update(collections: dict, collection_name: str,
 
         collection = client[name][name]
         update_query = collection.find_one(
-            {"_id": ObjectId(_id)}
+            {"_id": ObjectId(_id[0])}
         )
 
         if collection_name in update_query:
             collection_update_query = {
-                collection_name: update_query[collection]
+                collection_name: update_query[collection_name]
             }
         else:
             collection_update_query = {
@@ -41,39 +41,63 @@ def _linked_update(collections: dict, collection_name: str,
         )
 
 
-def comment_decoder(collection: object, result: object, collections_to_loop: list) -> None
+def comment_decoder(collection: object, result: object) -> None:
     collection_to_insert = {collection.name: {}}
     for _id in result[collection.name]:
 
         # Get the user name from the comment
         query_collection = client[collection.name][collection.name]
-        username = query_collection.find_one({"_id": ObjectId(_id)})["username"]
-        
+        username = query_collection.find_one(
+            {"_id": ObjectId(_id)})["username"]
+
+        if not username:
+            continue
+
         if username not in collection_to_insert[collection.name]:
             collection_to_insert[collection.name][username] = []
 
-        collection_to_insert[collection.name][username].append(
-            client[collection][collection].find_one(
-                {"_id": ObjectId(_id)}))
-            
+        retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
+        if not retrieved_object:
+            collection_to_insert[collection.name][username].append(
+                retrieved_object)
 
-def decoder(collection: object, result: object, collections_to_loop: list) -> None:
 
-    if collection.name == "Comment":
-        return comment_decoder(collection, result, collections_to_loop)
+def decoder(collection: str, result: object) -> None:
 
-    collection_to_insert = {collection.name: []}
-    for _id in result[collection.name]:
+    if collection == "Comment":
+        print(1)
+        return comment_decoder(collection, result)
+
+    collection_to_insert = {collection: []}
+
+    for _id in result[collection]:
 
         query_collection = client[collection][collection]
-        collection_to_insert[collection.name].append(
-            query_collection.find_one({"_id": ObjectId(_id)}))        
+        retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
+
+        if retrieved_object:
+            retrieved_object["_id"] = str(retrieved_object["_id"])
+            collection_to_insert[collection].append(retrieved_object)
+
+    result[collection] = collection_to_insert[collection]
+
+
+def _decoder_setup(collections_to_loop: list, result: dict) -> None:
+
+    for collection in collections_to_loop:
+        print(result[collection])
+        if collection in result and result[collection]:
+            decoder(collection, result)
+
 
 def _get(request_body: dict, collection: object) -> object:
     if not request_body:
-        result = list(collection.find())
+        cursor = collection.find()
+        result = [item for item in cursor]
     elif "_id" in request_body:
         result = collection.find_one({"_id": ObjectId(request_body["_id"])})
+    else:
+        result = collection.find_one(request_body)
 
     if not result:
         return
@@ -90,10 +114,15 @@ def _get(request_body: dict, collection: object) -> object:
         collections_to_loop = ["User"]
     elif collection.name == "Comment":
         collections_to_loop = ["User"]
+    else:
+        return result
 
-    for collection in collections_to_loop:
-        if collection.name in result and not result[collection.name]:
-            decoder(collection, result, collections_to_loop)
+    if not isinstance(result, list):
+        _decoder_setup(collections_to_loop, result)
+        return result
+
+    for item in result:
+        _decoder_setup(collections_to_loop, item)
 
     return result
 
@@ -124,11 +153,10 @@ def _post(collection: object, request: object) -> str:
 
         experience_id = str(collection.insert_one(request).inserted_id)
 
-        collections = {
-            "Trip": request["trip_id"],
-            "User": request["user_id"],
-            "Location": request["location_id"]
-        }
+        collections = {}
+        for value in ["Trip", "User"]:
+            if value in request:
+                collections[value] = request[value]
 
         collection_name = collection.name
 
@@ -153,23 +181,22 @@ def _post(collection: object, request: object) -> str:
     elif collection.name == "Comment":
         comment_id = str(collection.insert_one(request).inserted_id)
 
-        collections = {
-            "User": request["user_id"],
-            "Experience": request["experience_id"]
-        }
-        collection_name = collection.name
+        collections = {}
+        for value in ["User", "Experience"]:
+            if value in request:
+                collections[value] = request[value]
 
-        _linked_update(collections, collection_name, comment_id)
+        _linked_update(collections, collection.name, comment_id)
         return comment_id
 
     elif collection.name == "Trip":
         trip_id = str(collection.insert_one(request).inserted_id)
 
-        collections = {
-            "User": request["user_id"],
-            "Experience": request["experience_id"],
-            "Location": request["location_id"]
-        }
+        collections = {}
+        for value in ["User", "Experience"]:
+            if value in request:
+                collections[value] = request[value]
+
         _linked_update(collections, collection_name, trip_id)
         return trip_id
 
