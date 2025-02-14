@@ -20,6 +20,9 @@ uri = (
     "retryWrites=true&w=majority&appName=Capstone"
 )
 client = MongoClient(uri, server_api=ServerApi('1'))
+openaiclient = OpenAI(
+  api_key=getenv('OPENAI_API_KEY')
+)
 
 
 def general_request(request: object, collection: object) -> None:
@@ -171,46 +174,50 @@ def comment_request_handler():
     return general_request(request, collection)
 
 
-# # AI (OPENAI API) RECOMMENDATIONS
-# @app.route("/get_recommendations", methods=["POST"])
-# def get_recommendations():
-#     try:
-#         data = request.json
-#         location = data.get("location")
-#         trip_date = data.get("trip_date")
-#         travel_group = data.get("travel_group")
-#         interests = data.get("interests", [])
+# AI (OPENAI API) RECOMMENDATIONS
+@app.route("/get_recommendations", methods=["POST"])
+def get_recommendations():
+    try:
+        data = request.json
+        location = data.get("location")
+        trip_date = data.get("trip_date")
+        travel_group = data.get("travel_group")
+        interests = data.get("interests", [])
 
-#         # Ensure all required data is present
-#         if not location or not trip_date or not travel_group or not interests:
-#             return jsonify({"error": "Missing required fields"}), 400
+        # Ensure all required data is present
+        if not location or not trip_date or not travel_group or not interests:
+            return jsonify({"error": "Missing required fields"}), 400
 
-#         # Create prompt for ChatGPT
-#         prompt = (
-#             f"I am planning a trip to {location} on {trip_date} with my {travel_group}.\n"
-#             f"My interests are {', '.join(interests)}.\n"
-#             "Can you recommend 3 must-visit places for each category?\n"
-#             "Return the results in json object following this structure:\n"
-#             '{"Introduction": "Sample Introduction", "Category 1": ['
-#             '{"name": "Example name 1", "description": "Example description 1", "address": "Example address 1"},'
-#             '{"name": "Example name 2", "description": "Example description 2", "address": "Example address 2"},'
-#             '{"name": "Example name 3", "description": "Example description 3", "address": "Example address 3"}], '
-#             '"Category 2": etc. etc. }'
-#         )
+        # Create prompt for ChatGPT
+        prompt = (
+            f"I am planning a trip to {location} on {trip_date} with my"
+            "{travel_group}.\n"
+            f"My interests are {', '.join(interests)}.\n"
+            "Can you recommend 3 must-visit places for each category?\n"
+            "Return the results in json object following this structure:\n"
+            '{"Introduction": "Sample Introduction", "Category 1": ['
+            '{"name": "Example name 1", "description": "Example description 1"'
+            ', "address": "Example address 1"},'
+            '{"name": "Example name 2", "description": "Example description 2"'
+            ', "address": "Example address 2"},'
+            '{"name": "Example name 3", "description": "Example description 3"'
+            ', "address": "Example address 3"}], '
+            '"Category 2": etc. etc. }'
+        )
 
-#         # Call ChatGPT API
-#         response = openaiclient.chat.completions.create(
-#             model="gpt-4o-mini",
-#             messages=[{"role": "user", "content": prompt}]
-#         )
+        # Call ChatGPT API
+        response = openaiclient.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}]
+        )
 
-#         # Extract and return response
-#         recommendations = response.choices[0].message.content
-#         return jsonify({"recommendations": recommendations})
+        # Extract and return response
+        recommendations = response.choices[0].message.content
+        return jsonify({"recommendations": recommendations})
 
-#     except Exception as e:
-#         print(f"Error: {str(e)}")
-#         return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 # ------------------- FILTER EXPERIENCES -------------------
