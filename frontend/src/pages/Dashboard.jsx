@@ -15,7 +15,7 @@ const Dashboard = () => {
           alert("You must be signed in to add an experience.");
         }
     };
-    
+
     return (
         <div className="board-body body-content">
             <div className="board-nav">
@@ -50,7 +50,6 @@ const Dashboard = () => {
             <div className="trip-nav">
                 <div className="left">
                     <h3 className="title">My Trips</h3>
-                    <button>Log Trip</button>
                     <button>Plan New Trip</button>
                 </div>
                 <div className="right">
