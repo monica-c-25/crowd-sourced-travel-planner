@@ -21,7 +21,6 @@ const Explore = () => {
             method: "GET", // Specify GET method if it's a GET request
             headers: {
               Accept: "application/json", // The response is expected in JSON
-              "Content-Type": "application/json", // Requesting JSON data
             },
           }
         );

@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
+import pprint
 
 load_dotenv()
 USER = getenv('MONGO_USER')
@@ -63,9 +64,9 @@ def comment_decoder(collection: object, result: object) -> None:
 
 def decoder(collection: str, result: object) -> None:
 
-    if collection == "Comment":
-        print(1)
-        return comment_decoder(collection, result)
+    # if collection == "Comment":
+    #     print(1)
+    #     return comment_decoder(collection, result)
 
     collection_to_insert = {collection: []}
 
@@ -105,7 +106,10 @@ def _get(request_body: dict, collection: object) -> object:
     if collection.name == "Trip":
         collections_to_loop = ["User", "Experience", "Photos"]
     elif collection.name == "Experience":
-        collections_to_loop = ["User", "Photo", "Comment"]
+        if not request_body:
+            collections_to_loop = ["User", "Photo"]
+        else:
+            collections_to_loop = ["User", "Photo", "Comment"]
     elif collection.name == "Photo":
         collections_to_loop = ["User"]
     elif collection.name == "Comment":
@@ -120,6 +124,7 @@ def _get(request_body: dict, collection: object) -> object:
     for item in result:
         _decoder_setup(collections_to_loop, item)
 
+    print("Result from _get: ",result)
     return result
 
 
