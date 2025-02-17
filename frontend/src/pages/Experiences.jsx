@@ -4,6 +4,7 @@ import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import '../index.css';
 
 const Explore = () => {
   const [experiences, setExperiences] = useState([]);
@@ -19,7 +20,7 @@ const Explore = () => {
             headers: { "Accept": "application/json" },
         });
         const data = await response.json();
-        console.log("Response Data:", data); 
+        console.log("Response Data:", data);
         if (data.Message === "Success") {
           setExperiences(data.data);
         } else {
@@ -44,7 +45,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="explore-container">
+    <div className="explore-container body-content">
       <h1>Explore Experiences</h1>
       <div className="button-container">
         <button className="button" onClick={handleAddExperienceClick}>

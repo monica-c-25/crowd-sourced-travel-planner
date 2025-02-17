@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Assuming you have this context
 import "./ExperienceForm.css";
+import '../index.css';
 
 function ExperienceForm() {
   const navigate = useNavigate();
@@ -159,7 +160,7 @@ function ExperienceForm() {
         <button
           type="button"
           className="cancel-button"
-          onClick={() => navigate("/explore")}
+          onClick={() => navigate(-1)}
         >
           Cancel
         </button>

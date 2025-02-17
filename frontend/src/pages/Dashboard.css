@@ -1,0 +1,32 @@
+.body-content {
+    font-size: 18px;
+}
+
+.board-nav h1 {
+    font-weight: 400;
+    font-size: 45px;
+}
+
+.experience-nav h3, .trip-nav h3 {
+    font-weight: 300;
+    font-size: 30px;
+}
+
+.board-nav, .experience-nav, .trip-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.left, .right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.board-links {
+    display: flex;
+    gap: 1rem;
+}
+

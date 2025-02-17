@@ -11,6 +11,7 @@ import ChatbotForm from './forms/AIRecommendator.jsx';
 import { AuthProvider } from "./context/AuthContext";
 import AIRecommendations from "./pages/AIRecommendation.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import Dashboard from './pages/Dashboard.jsx';
 
 const App = () => {
     return (
@@ -28,6 +29,7 @@ const App = () => {
                             <Route path="/experience-form" element={<ExperienceForm />} />
                             <Route path="/ai-recommendator" element={<ChatbotForm />} />
                             <Route path="/ai-recommendation" element={<AIRecommendations />} />
+                            <Route path="/dashboard" element={<Dashboard />} />
                         </Routes>
                     </div>
                 </main>
