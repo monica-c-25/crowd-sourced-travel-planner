@@ -8,9 +8,9 @@ const Dashboard = () => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
 
-    const handleAddExperienceClick = () => {
+    const handleCreateTripClick = () => {
         if (isAuthenticated) {
-          navigate("/experience-form");
+          navigate("/trip-form");
         } else {
           alert("You must be signed in to add an experience.");
         }
@@ -35,12 +35,12 @@ const Dashboard = () => {
 
             <div className="experience-nav">
                 <div className="left">
-                    <h3 className="title">My Experiences</h3>
-                    <button onClick={handleAddExperienceClick}>
-                        Create New Experience</button>
+                    <h3 className="title">My Trips</h3>
+                    <button onClick={handleCreateTripClick}>
+                        Create a Trip</button>
                 </div>
                 <div className="right">
-                    <div>xx Experience(s)</div>
+                    <div>xx Trip(s)</div>
                     <button>Default</button>
                     <button>A-Z</button>
                     <button>List View</button>
@@ -49,11 +49,10 @@ const Dashboard = () => {
 
             <div className="trip-nav">
                 <div className="left">
-                    <h3 className="title">My Trips</h3>
-                    <button>Plan New Trip</button>
+                    <h3 className="title">Bookmarked</h3>
                 </div>
                 <div className="right">
-                    <div>xx Trip(s)</div>
+                    <div>xx Experience(s)</div>
                     <button>Default</button>
                     <button>A-Z</button>
                     <button>List View</button>

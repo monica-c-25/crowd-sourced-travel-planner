@@ -1,5 +1,5 @@
 .experience-form {
-  max-width: 75%;
+  min-width: 65%;
   margin: 10% auto;
   padding: 20px;
   border: 1px solid #ccc;
@@ -7,7 +7,7 @@
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   font-family: "Inter";
-  margin-top: 0px;
+  margin-top: 40px;
 }
 
 .experience-form h1, h2 {
@@ -43,7 +43,6 @@
 
 .form-group input,
 .form-group textarea {
-  min-width: 100%;
   max-width: 100%;
   padding: 10px;
   font-size: 1rem;
