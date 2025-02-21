@@ -15,7 +15,7 @@ function ExperienceForm() {
   });
 
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
-  const { isAuthenticated } = useAuth(); // Assuming this hook tells you if the user is authenticated
+  const { isAuthenticated, userID } = useAuth();
 
   // Redirect user if not authenticated
   useEffect(() => {
@@ -51,7 +51,8 @@ function ExperienceForm() {
           description: formData.description,
           photoURL: "",
           location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0}
+          rating: {"average": 0, "total": 0},
+          User: [userID]
         }),
       });
 

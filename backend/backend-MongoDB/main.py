@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
 load_dotenv()
-USER = getenv('USER')
+USER = getenv('MONGO_USER')
 PASSWORD = getenv('PASSWORD')
 uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
@@ -21,7 +21,7 @@ uri = (
 )
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
-  api_key=getenv('OPENAI_API_KEY')
+    api_key=getenv('OPENAI_API_KEY')
 )
 
 
@@ -44,8 +44,8 @@ def general_request(request: object, collection: object) -> None:
     if request.method == 'GET':
         # Get Data
         try:
-            filters = request.json
-            print(filters)
+            # filters = request.json
+            filters = request.args.to_dict()
             response_data = _get(filters, collection)
             response = {
                 "Message": "Success",
@@ -111,13 +111,11 @@ def get_experience_by_id(experience_id):
 
     try:
         # Pass experience_id as part of the request body to _get
-
-        filters = {"Query": experience_id}
+        filters = {"_id": experience_id}
         experience_data = _get(filters, collection)
 
         if experience_data:
-            # If data is returned, it will be a list with one experience
-            experience = experience_data[0]  # Get the first experience
+            experience = experience_data  # Get the first experience
             experience["_id"] = str(experience["_id"])  # ObjectId to string
             response = {
                 "Message": "Success",
