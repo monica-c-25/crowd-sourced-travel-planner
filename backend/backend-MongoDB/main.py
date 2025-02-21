@@ -5,7 +5,7 @@ from os import getenv
 from dotenv import load_dotenv
 from HTTP_funcs import _get, _put, _post, _delete, _set_payload
 from flask_cors import CORS
-from google.cloud import storage, datastore
+from google.cloud import storage
 from bson.objectid import ObjectId
 from openai import OpenAI
 
