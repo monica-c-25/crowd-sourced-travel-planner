@@ -3,17 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Assuming you have this context
 import "./ExperienceForm.css";
 
-function ExperienceForm() {
+function ExperienceForm(props) {
+
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({    
     title: "",
     eventDate: today,
     description: "",
     photoURL: "",
+    user: [props.user],
     location: ""
   });
-
+  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
 
