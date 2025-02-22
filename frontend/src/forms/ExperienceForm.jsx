@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Assuming you have this context
+import { useAuth } from "../context/AuthContext";
 import "./ExperienceForm.css";
 
 function ExperienceForm() {
@@ -14,18 +14,17 @@ function ExperienceForm() {
     location: ""
   });
 
-  const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
-  const { isAuthenticated } = useAuth(); // Assuming this hook tells you if the user is authenticated
+  const { isAuthenticated, isLoading } = useAuth();
 
-  // Redirect user if not authenticated
+  // Redirect user if not authenticated or while loading
   useEffect(() => {
+    if (isLoading) return;
+
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
-      navigate(-1); // Redirect to login page
-    } else {
-      setLoading(false); // Only render content when authentication is verified
+      navigate(-1); // Redirect to previous page
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,8 +49,8 @@ function ExperienceForm() {
           creationDate: today,
           description: formData.description,
           photoURL: "",
-          location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0}
+          location: formData.location,
+          rating: { average: 0, total: 0 },
         }),
       });
 
@@ -80,8 +79,8 @@ function ExperienceForm() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // You can show a loading spinner or any other placeholder
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   return (
