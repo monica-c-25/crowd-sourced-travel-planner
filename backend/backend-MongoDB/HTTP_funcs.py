@@ -72,13 +72,17 @@ def _get(request_body: dict, collection: object) -> object:
     else:
         return result
 
-    if not isinstance(result, list):
-        _decoder_setup(collections_to_loop, result)
-        return result
-
-    for item in result:
-        _decoder_setup(collections_to_loop, item)
-
+    # Handle case where result is a list of dictionaries
+    if isinstance(result, list):
+        for doc in result:
+            for collection_name in collections_to_loop:
+                if collection_name in doc:
+                    decode(collection_name, doc)  # Decode each dictionary item
+    # Handle case where result is a single dictionary
+    elif isinstance(result, dict):
+        for collection_name in collections_to_loop:
+            if collection_name in result:
+                decode(collection_name, result)  # Decode the single document
     return result
 
 
@@ -97,12 +101,14 @@ def decode(collection: str, result: dict) -> None:
             })
             comment_comment = comment["Comment"]
             user_comment = comment["User"][0]
+            comment_date = comment["commentDate"]
+            rating = comment["rating"]
 
             user_comment = users.find_one({
                 "_id": ObjectId(user_comment)
             })["name"]
 
-            result[collection][i] = (user_comment, comment_comment)
+            result[collection][i] = (user_comment, comment_date, comment_comment, rating)
 
         elif collection == "User":
             users = client["User"]["User"]
