@@ -278,7 +278,8 @@ def photo_request_handler():
         # Sample GET Request: GET /api/photos?experience_id=some_experience_id
         # Get Data
         try:
-            experience_id = request.args.get("experience_id")
+            data = request.get_json()
+            experience_id = data.get("experience_id")
             # experience_id = request.form.get('experience_id')
             if not experience_id:
                 return jsonify({"Error": "Experience ID Required"}), 400
@@ -315,9 +316,10 @@ def photo_request_handler():
         #   /photo1.jpg
         # Update Data
         try:
-            experience_id = request.args.get("experience_id")
+            data = request.get_json()
+            experience_id = data.get("experience_id")
             # experience_id = request.form.get('experience_id')
-            photo_url_to_delete = request.args.get('photo_url')
+            photo_url_to_delete = photo_data.get('photo_url')
             if not experience_id or not photo_url_to_delete:
                 return jsonify({"Error": "Experience_id and Photo_url are required."}), 400
 
