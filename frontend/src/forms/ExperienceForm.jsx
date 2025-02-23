@@ -3,20 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Assuming you have this context
 import "./ExperienceForm.css";
 
-function ExperienceForm() {
+function ExperienceForm(props) {
+
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({    
     title: "",
     eventDate: today,
     description: "",
     photoURL: "",
+    user: [props.user],
     location: ""
   });
-
+  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
-  const [userID, setUserID] = useState(null);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, userID } = useAuth();
 
   // Redirect user if not authenticated
   useEffect(() => {
@@ -25,36 +26,8 @@ function ExperienceForm() {
       navigate(-1); // Redirect to login page
     } else {
       setLoading(false); // Only render content when authentication is verified
-
-      // Fetch user data if authenticated
-      if (user) {
-        const loginData = {
-          auth0_id: user.sub,
-          email: user.email,
-          name: user.name,
-          picture: user.picture,
-        };
-
-        // Send user data to backend to sync and get MongoDB _id
-        fetch("http://localhost:46725/api/sync-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(loginData),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.userID) {
-              setUserID(data.userID); // Set the MongoDB _id
-            }
-          })
-          .catch((error) => {
-            console.error("Error syncing user data:", error);
-          });
-      }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -21,6 +21,7 @@ def _linked_update(collections: dict, collection_name: str,
 
     for name, _id in collections.items():
 
+        print(f"{name}: {_id}")
         collection = client[name][name]
         update_query = collection.find_one(
             {"_id": ObjectId(_id[0])}
@@ -39,52 +40,6 @@ def _linked_update(collections: dict, collection_name: str,
             {"_id": update_query["_id"]},
             {"$set": collection_update_query}
         )
-
-
-def comment_decoder(collection: object, result: object) -> None:
-    collection_to_insert = {collection.name: {}}
-    for _id in result[collection.name]:
-
-        # Get the user name from the comment
-        query_collection = client[collection.name][collection.name]
-        username = query_collection.find_one(
-            {"_id": ObjectId(_id)})["username"]
-
-        if not username:
-            continue
-
-        if username not in collection_to_insert[collection.name]:
-            collection_to_insert[collection.name][username] = []
-
-        retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
-        if not retrieved_object:
-            collection_to_insert[collection.name][username].append(
-                retrieved_object)
-
-
-def decoder(collection: str, result: object) -> None:
-
-    # if collection == "Comment":
-    #     print(1)
-    #     return comment_decoder(collection, result)
-
-    collection_to_insert = {collection: []}
-
-    for _id in result[collection]:
-        query_collection = client[collection][collection]
-        retrieved_object = query_collection.find_one({"_id": ObjectId(_id)})
-
-        if retrieved_object:
-            retrieved_object["_id"] = str(retrieved_object["_id"])
-            collection_to_insert[collection].append(retrieved_object)
-
-    result[collection] = collection_to_insert[collection]
-
-
-def _decoder_setup(collections_to_loop: list, result: dict) -> None:
-    for collection in collections_to_loop:
-        if collection in result and result[collection]:
-            decoder(collection, result)
 
 
 def _get(request_body: dict, collection: object) -> object:
@@ -124,8 +79,36 @@ def _get(request_body: dict, collection: object) -> object:
     for item in result:
         _decoder_setup(collections_to_loop, item)
 
-    print("Result from _get: ",result)
     return result
+
+
+def decode(collection: str, result: dict) -> None:
+
+    for i in range(len(result[collection])):
+        print(result[collection][i])
+
+        if collection == "Comment":
+            comments = client["Comment"]["Comment"]
+            users = client["User"]["User"]
+
+            # Finds the id of the comment 
+            comment = comments.find_one({
+                "_id": ObjectId(result[collection][i])
+            })
+            comment_comment = comment["Comment"]
+            user_comment = comment["User"][0]
+
+            user_comment = users.find_one({
+                "_id": ObjectId(user_comment)
+            })["name"]
+
+            result[collection][i] = (user_comment, comment_comment)
+
+        elif collection == "User":
+            users = client["User"]["User"]
+            result[collection][i] = users.find_one({
+                "_id": ObjectId(result[collection][i])
+            })["name"]
 
 
 def _put(collection: object, payload: dict, prev_name: str) -> None:
