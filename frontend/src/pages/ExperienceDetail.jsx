@@ -41,7 +41,7 @@ const ExperienceDetail = () => {
 
   const handleWriteReviewClick = () => {
     if (isAuthenticated) {
-      navigate("/review-form");
+      navigate(`/review-form/${id}`);
     } else {
       alert("You must be signed in to write a review.");
     }
@@ -63,7 +63,7 @@ const ExperienceDetail = () => {
       <div className="header-detail">
         <div className="header-detail-left">
           <p>Created by <a href="">{experience.User[0]}</a></p>
-          <p>Average rating: {experience.rating.average}  (<a href="">{experience.rating.total} Reviews</a>)</p>
+          <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p>
         </div>
         <div className="header-detail-right">
           <p><strong>Event Date:</strong> {experience.eventDate}</p>
@@ -117,7 +117,6 @@ const ExperienceDetail = () => {
           </div>
         )}
       </div>
-      
     </div>
     </>
   );

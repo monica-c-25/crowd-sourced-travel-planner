@@ -27,7 +27,7 @@ const App = () => {
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
-                            <Route path="/review-form" element={<ReviewForm />} />
+                            <Route path="/review-form/:id" element={<ReviewForm />} />
                             <Route path="/ai-recommendator" element={<ChatbotForm />} />
                             <Route path="/ai-recommendation" element={<AIRecommendations />} />
                         </Routes>

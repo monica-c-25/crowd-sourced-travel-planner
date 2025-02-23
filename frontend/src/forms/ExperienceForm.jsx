@@ -21,13 +21,13 @@ function ExperienceForm(props) {
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
-    if (isLoading) return;
-
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
+    } else {
+      setLoading(false); // Only render content when authentication is verified
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated,  navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,7 +83,7 @@ function ExperienceForm(props) {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
