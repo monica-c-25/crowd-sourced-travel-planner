@@ -87,8 +87,9 @@ const Explore = () => {
                   alt="No Img Available"
                 />
                 <p className="date">{experience.eventDate}</p>
-                <p>{experience.location}</p>
-                <p>{experience.description}</p>
+                <p><strong>Location: </strong> {experience.location}</p>
+                <p><strong>Description: </strong>{experience.description}</p>
+                <p><strong>Created By: </strong>{experience.User[0]}</p>
               </Link>
             ))
           ) : (
