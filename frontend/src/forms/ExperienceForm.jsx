@@ -3,19 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Assuming you have this context
 import "./ExperienceForm.css";
 
-function ExperienceForm() {
+function ExperienceForm(props) {
+
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({    
     title: "",
     eventDate: today,
     description: "",
     photoURL: "",
+    user: [props.user],
     location: ""
   });
-
+  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
-  const { isAuthenticated } = useAuth(); // Assuming this hook tells you if the user is authenticated
+  const { isAuthenticated, userID } = useAuth();
 
   // Redirect user if not authenticated
   useEffect(() => {
@@ -51,7 +53,8 @@ function ExperienceForm() {
           description: formData.description,
           photoURL: "",
           location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0}
+          rating: {"average": 0, "total": 0},
+          User: [userID]
         }),
       });
 
