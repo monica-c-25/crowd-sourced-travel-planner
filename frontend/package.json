@@ -4,9 +4,11 @@
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
+    "@playwright/test": "^1.50.1",
     "cra-template": "1.2.0",
     "font-awesome": "^4.7.0",
     "mongodb": "^6.13.0",
+    "playwright": "^1.50.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",

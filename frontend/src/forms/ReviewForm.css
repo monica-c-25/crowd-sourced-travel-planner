@@ -1,0 +1,33 @@
+.review-form {
+    width: 50%;
+    max-width: 75%;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: "Inter";
+    margin-top: 0px;
+  }
+
+.review-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.star-rating {
+    display: inline-flex;
+    font-size: 2rem;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .star {
+    color: lightgray;
+  }
+  
+  .star.filled {
+    color: gold;
+  }

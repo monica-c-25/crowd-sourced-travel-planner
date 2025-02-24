@@ -92,7 +92,8 @@ def sync_user():
             )
             return jsonify({"message": "User data updated successfully"}), 200
         else:
-            return jsonify({"message": "No changes to update"}), 200
+            return jsonify({"message": "No changes to update",
+                            "userID": str(existing_user["_id"])}), 200
 
     else:
         # If the user does not exist, create a new user
@@ -102,8 +103,9 @@ def sync_user():
             "name": name,
             "picture": picture
         }
-        users_collection.insert_one(new_user)
-        return jsonify({"message": "New user created successfully"}), 201
+        new_user_result = users_collection.insert_one(new_user)
+        return jsonify({"message": "New user created successfully",
+                        "userID": str(new_user_result.inserted_id)}), 201
 
 
 if __name__ == '__main__':
