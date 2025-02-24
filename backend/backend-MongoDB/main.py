@@ -12,14 +12,21 @@ load_dotenv()
 app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
-uri = getenv("MONGO_URI")
+load_dotenv()
+USER = getenv('MONGO_USER')
+PASSWORD = getenv('PASSWORD')
+uri = (
+    f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
+    "retryWrites=true&w=majority&appName=Capstone"
+)
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
-  api_key=getenv('OPENAI_API_KEY')
+    api_key=getenv('OPENAI_API_KEY')
 )
 
 
 def general_request(request: object, collection: object) -> None:
+
     if request.method == 'POST':
         # Add Data
         try:
@@ -36,14 +43,9 @@ def general_request(request: object, collection: object) -> None:
     if request.method == 'GET':
         # Get Data
         try:
-            # filters = request.args.to_dict()
-            # response_data = _get(filters, collection)
-            response_data = _get({}, collection)  # Fetch data
-            # Convert ObjectId to string
-            for experience in response_data:
-                experience["_id"] = str(experience["_id"])
-
-            # response = _get(request.get_json(), collection)
+            # filters = request.json
+            filters = request.args.to_dict()
+            response_data = _get(filters, collection)
             response = {
                 "Message": "Success",
                 "data": response_data
@@ -108,13 +110,11 @@ def get_experience_by_id(experience_id):
 
     try:
         # Pass experience_id as part of the request body to _get
-
-        filters = {"Query": experience_id}
+        filters = {"_id": experience_id}
         experience_data = _get(filters, collection)
 
         if experience_data:
-            # If data is returned, it will be a list with one experience
-            experience = experience_data[0]  # Get the first experience
+            experience = experience_data  # Get the first experience
             experience["_id"] = str(experience["_id"])  # ObjectId to string
             response = {
                 "Message": "Success",
@@ -164,6 +164,7 @@ def trip_request_handler():
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def comment_request_handler():
 
+    print(request)
     db = client["Comment"]
     collection = db["Comment"]
 
@@ -186,14 +187,18 @@ def get_recommendations():
 
         # Create prompt for ChatGPT
         prompt = (
-            f"I am planning a trip to {location} on {trip_date} with my {travel_group}.\n"
+            f"I am planning a trip to {location} on {trip_date} with my"
+            "{travel_group}.\n"
             f"My interests are {', '.join(interests)}.\n"
             "Can you recommend 3 must-visit places for each category?\n"
             "Return the results in json object following this structure:\n"
             '{"Introduction": "Sample Introduction", "Category 1": ['
-            '{"name": "Example name 1", "description": "Example description 1", "address": "Example address 1"},'
-            '{"name": "Example name 2", "description": "Example description 2", "address": "Example address 2"},'
-            '{"name": "Example name 3", "description": "Example description 3", "address": "Example address 3"}], '
+            '{"name": "Example name 1", "description": "Example description 1"'
+            ', "address": "Example address 1"},'
+            '{"name": "Example name 2", "description": "Example description 2"'
+            ', "address": "Example address 2"},'
+            '{"name": "Example name 3", "description": "Example description 3"'
+            ', "address": "Example address 3"}], '
             '"Category 2": etc. etc. }'
         )
 
