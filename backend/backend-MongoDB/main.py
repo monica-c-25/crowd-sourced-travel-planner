@@ -232,36 +232,37 @@ def photo_request_handler(experience_id):
     if request.method == 'POST':
         # Add Photo
         try:
-            # Check if there is a file in the request
-            if 'file' not in request.files:
-                return jsonify({'Error': 'No file sent in request'}), 400
+            # Get all files in the request
+            files = request.files.getlist('file')
+            if not files:
+                return jsonify({'Error': 'No files sent in request'}), 400
 
-            # Set file_obj to the file sent in the request
-            file_obj = request.files['file']
-
-            # Create a storage client and upload the file
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(PHOTO_BUCKET)
-            file_name = f"{str(ObjectId())}_{file_obj.filename}"
-            blob = bucket.blob(file_name)
-            file_obj.seek(0)  # Reset file pointer to the beginning
-            blob.upload_from_file(file_obj)
-            photo_url = blob.public_url
+            photo_data_list = []
 
-            # Prepare photo metadata
-            photo_data = {
-                "file_name": file_name,
-                "photo_url": photo_url
-            }
+            for file_obj in files:
+                file_name = f"{str(ObjectId())}_{file_obj.filename}"
+                blob = bucket.blob(file_name)
+                file_obj.seek(0)  # Reset file pointer to the beginning
+                blob.upload_from_file(file_obj)
+                photo_url = blob.public_url
 
-            # Find the experience by its ID and add the photo data
+                # Add the uploaded photo's metadata to the list
+                photo_data = {
+                    "file_name": file_name,
+                    "photo_url": photo_url
+                }
+                photo_data_list.append(photo_data)
+
+            # Update the experience with the list of photo data
             experience = collection.find_one({"_id": ObjectId(experience_id)})
             if experience:
                 collection.update_one(
                     {"_id": ObjectId(experience_id)},
-                    {"$push": {"photo_data": photo_data}}
+                    {"$push": {"photo_data": {"$each": photo_data_list}}}
                 )
-                return jsonify({"Message": "Success", "photo_url": photo_url})
+                return jsonify({"Message": "Success", "photo_data": photo_data_list})
             else:
                 return jsonify({'Error': 'Experience Not Found'}), 404
 
