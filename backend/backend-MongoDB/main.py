@@ -29,7 +29,6 @@ def general_request(request: object, collection: object) -> None:
 
     if request.method == 'POST':
         # Add Data
-        print(request.args)
         try:
             response = {
                 "Message": "Success",
@@ -172,7 +171,7 @@ def comment_request_handler():
     return general_request(request, collection)
 
 
-# # AI (OPENAI API) RECOMMENDATIONS
+# AI (OPENAI API) RECOMMENDATIONS
 @app.route("/get_recommendations", methods=["POST"])
 def get_recommendations():
     try:
