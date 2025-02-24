@@ -303,46 +303,46 @@ def photo_request_handler(experience_id):
             return jsonify({"Error": str(e)}), 500
 
     if request.method == 'DELETE':
-        # Delete Data
+        # Delete Photo
         try:
+            # Get JSON data from the request body
             data = request.get_json()
             experience_id = data.get("experience_id")
-            # experience_id = request.form.get('experience_id')
-            photo_url_to_delete = photo_data.get('photo_url')
+            # Get the photo URL to delete
+            photo_url_to_delete = data.get('photo_url')
+
+            # Check if both experience_id and photo_url are provided
             if not experience_id or not photo_url_to_delete:
                 return jsonify({"Error": "Experience_id and Photo_url are required."}), 400
 
+            # Extract the file name from the photo_url
             file_name = photo_url_to_delete.split('/')[-1]
 
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(PHOTO_BUCKET)
 
             blob = bucket.blob(file_name)
-            # Check if file exists in Cloud Storage
             if not blob.exists():
-                return jsonify({'error': "File not found"}), 404
-            # Delete the file from Cloud Storage
+                return jsonify({'error': "File not found in Cloud Storage"}), 404
+
             blob.delete()
-            # Delete corresponding photo metadata from MongoDB
-            result = collection.delete_one({"file_name": file_name})
 
-            # experience = collection.find_one({"_id" : experience_id})
-            experience = collection.find_one({"_id": ObjectId(experience_id)})
-            if experience:
-                result = collection.update_one(
-                    {"_id": experience_id},
-                    {"$pull": {"photo_data": {"photo_url": photo_url_to_delete}}}
-                )
+            # Remove the photo metadata from MongoDB
+            result = collection.update_one(
+                {"_id": ObjectId(experience_id)},
+                {"$pull": {"photo_data": {"photo_url": photo_url_to_delete}}}
+            )
 
-                if result.modified_count > 0:
-                    response = {
-                        "message": "Success: Photo URL Removed",
-                        "experience_id": experience_id,
-                        "removed_photo_url": photo_url_to_delete
-                    }
-                    return jsonify(response), 200
-                else:
-                    return jsonify({'Error': "Experience Not Found"}), 404
+            # Check if the experience document was updated successfully
+            if result.modified_count > 0:
+                response = {
+                    "message": "Success: Photo URL Removed",
+                    "experience_id": experience_id,
+                    "removed_photo_url": photo_url_to_delete
+                }
+                return jsonify(response), 200
+            else:
+                return jsonify({'Error': "Experience Not Found or Photo URL not in database"}), 404
 
         except Exception as e:
             return jsonify({"Error": str(e)}), 500
