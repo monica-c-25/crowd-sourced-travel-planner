@@ -7,12 +7,12 @@
     font-size: 45px;
 }
 
-.experience-nav h3, .trip-nav h3 {
+.experience-nav h3, .trip-nav h3, .bookmark-nav h3{
     font-weight: 300;
     font-size: 30px;
 }
 
-.board-nav, .experience-nav, .trip-nav {
+.board-nav, .experience-nav, .trip-nav, .bookmark-nav {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5rem;

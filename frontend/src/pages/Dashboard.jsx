@@ -35,6 +35,20 @@ const Dashboard = () => {
 
             <div className="experience-nav">
                 <div className="left">
+                    <h3 className="title">My Experiences</h3>
+                    <button onClick={() => navigate("/experience-form")}>
+                        Create an Experience</button>
+                </div>
+                <div className="right">
+                    <div>xx Experience(s)</div>
+                    <button>Default</button>
+                    <button>A-Z</button>
+                    <button>List View</button>
+                </div>
+            </div>
+
+            <div className="trip-nav">
+                <div className="left">
                     <h3 className="title">My Trips</h3>
                     <button onClick={handleCreateTripClick}>
                         Create a Trip</button>
@@ -47,7 +61,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            <div className="trip-nav">
+            <div className="bookmark-nav">
                 <div className="left">
                     <h3 className="title">Bookmarked</h3>
                 </div>
