@@ -15,18 +15,22 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
+<<<<<<<<< Temporary merge branch 1
 
   const { isAuthenticated, isLoading } = useAuth();
+=========
+  
+  const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
+  const { isAuthenticated, userID } = useAuth();
+>>>>>>>>> Temporary merge branch 2
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
-    if (isLoading) return;
-
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +56,8 @@ function ExperienceForm(props) {
           description: formData.description,
           photoURL: "",
           location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0}
+          rating: {"average": 0, "total": 0},
+          User: [userID]
         }),
       });
 
@@ -81,7 +86,7 @@ function ExperienceForm(props) {
     }
   };
 
-  if (isLoading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
