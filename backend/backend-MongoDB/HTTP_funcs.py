@@ -84,7 +84,7 @@ def decode(collection: str, result: dict) -> None:
             comments = client["Comment"]["Comment"]
             users = client["User"]["User"]
 
-            # Finds the id of the comment 
+            # Finds the id of the comment
             comment = comments.find_one({
                 "_id": ObjectId(result[collection][i])
             })
@@ -102,6 +102,14 @@ def decode(collection: str, result: dict) -> None:
             result[collection][i] = users.find_one({
                 "_id": ObjectId(result[collection][i])
             })["name"]
+
+        elif collection == "Experience":
+            experiences = client["Experience"]["Experience"]
+            result[collection][i] = experiences.find_one({
+                "_id": ObjectId(result[collection][i])
+            })
+
+        # TODO Add photos
 
 
 def _put(collection: object, payload: dict, prev_name: str) -> None:
