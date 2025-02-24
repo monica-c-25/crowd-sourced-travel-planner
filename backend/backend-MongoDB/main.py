@@ -74,17 +74,16 @@ def general_request(request: object, collection: object) -> None:
         data = request.get_json()
         update_payload = dict()
 
-        if "Previous_Title" in data:
-            query_name = data["Previous_Title"]
-            del data["Previous_Title"]
+        if "mongo_id" in data:
+            query_id = data["mongo_id"]
+            del data["mongo_id"]
         else:
-            query_name = data["Experience"]
+            query_id = data["Experience"]
 
         _set_payload(data, update_payload)
 
         try:
-            _put(collection, "Experience", update_payload,
-                 query_name)
+            _put(collection, update_payload, query_id)
             response = {
                 "Message": "Success"
             }
@@ -98,7 +97,7 @@ def general_request(request: object, collection: object) -> None:
 
 
 # GETS EXPERIENCE DETAILS
-@app.route('/api/experience-data/<experience_id>', methods=['GET'])
+@app.route('/api/experience-data/<experience_id>', methods=['GET','PUT'])
 def get_experience_by_id(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
@@ -109,21 +108,24 @@ def get_experience_by_id(experience_id):
         return jsonify({"Message": f"Invalid ID: {str(e)}"})
 
     try:
-        # Pass experience_id as part of the request body to _get
-        filters = {"_id": experience_id}
-        experience_data = _get(filters, collection)
+        if request.method == 'GET':
+            # Pass experience_id as part of the request body to _get
+            filters = {"_id": experience_id}
+            experience_data = _get(filters, collection)
 
-        if experience_data:
-            experience = experience_data  # Get the first experience
-            experience["_id"] = str(experience["_id"])  # ObjectId to string
-            response = {
-                "Message": "Success",
-                "data": experience
-            }
-        else:
-            response = {
-                "Message": "Experience not found"
-            }
+            if experience_data:
+                experience = experience_data  # Get the first experience
+                experience["_id"] = str(experience["_id"])  # ObjectId to string
+                response = {
+                    "Message": "Success",
+                    "data": experience
+                }
+            else:
+                response = {
+                    "Message": "Experience not found"
+                }
+        elif request.method == 'PUT':
+            return general_request(request, collection)
 
     except Exception as e:
         response = {

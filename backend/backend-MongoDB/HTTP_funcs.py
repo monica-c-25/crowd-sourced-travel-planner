@@ -125,10 +125,10 @@ def decode(collection: str, result: dict) -> None:
         # TODO Add photos
 
 
-def _put(collection: object, payload: dict, prev_name: str) -> None:
-
+def _put(collection: object, payload: dict, id_to_update: str) -> None:
+    print("COLLECTION.NAME is: ",collection.name)
     collection.update_one(
-        {collection.name: prev_name},
+        {"_id": ObjectId(id_to_update)},
         payload
     )
 

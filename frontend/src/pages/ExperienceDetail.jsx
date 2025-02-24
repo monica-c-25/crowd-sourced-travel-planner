@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import './ExperienceDetail.css';
-import { FaRegBookmark } from "react-icons/fa";
+import { FaRegBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+
 
 
 const ExperienceDetail = () => {
@@ -12,9 +13,16 @@ const ExperienceDetail = () => {
   const [experience, setExperience] = useState(null);
   const [comments, setComments] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-
+  const { isAuthenticated, user } = useAuth();
+  const [formData, setFormData] = useState({ 
+    title: "",
+    description: "",
+    eventDate: "",
+    location: ""
+  });
+  
   useEffect(() => {
     const fetchExperience = async () => {
       try {
@@ -22,7 +30,7 @@ const ExperienceDetail = () => {
         const data = await response.json();
         if (data.Message === "Success") {
           setExperience(data.data);
-          setComments(data.data.Comment)
+          setComments(data.data.Comment);
         } else {
           console.error("Experience not found.");
         }
@@ -32,7 +40,7 @@ const ExperienceDetail = () => {
         setLoading(false);
       }
     };
-
+  
     fetchExperience();
   }, [id]);
 
@@ -47,6 +55,81 @@ const ExperienceDetail = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value, // Update the corresponding field in the form data
+    }));
+  };
+
+  const handleEditButtonClick = () => {
+    setFormData({
+      title: experience.title,
+      description: experience.description,
+      eventDate: experience.eventDate,
+      location: experience.location
+    })
+    setEditOpen(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditOpen(false);
+  };
+
+  const handleEditSubmit = async () => {
+    // Prepare an object to store the fields that have changed
+    const updatedData = {
+      "mongo_id": id
+    };
+  
+    // Check for changes and add them to updatedData
+    if (formData.description !== experience.description) {
+      updatedData.description = formData.description;
+    }
+    if (formData.title !== experience.title) {
+      updatedData.title = formData.title;
+    }
+    if (formData.eventDate !== experience.eventDate) {
+      updatedData.eventDate = formData.eventDate;
+    }
+    if (formData.location !== experience.location) {
+      updatedData.location = formData.location;
+    }
+  
+    // If no data has changed, don't send anything
+    if (Object.keys(updatedData).length === 1) {
+      alert("No changes detected.");
+      setEditOpen(false);
+      return;
+    }
+
+    // Send the updated data to the server
+    try {
+      const response = await fetch(`http://localhost:8001/api/experience-data`, {
+        method: "PUT",
+        body: JSON.stringify(updatedData), // Only send the updated fields
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      if (data.Message === "Success") {
+        // Update the experience object with the new data
+        setExperience((prevExperience) => ({
+          ...prevExperience,
+          ...updatedData, // Update only the changed fields
+        }));
+        setEditOpen(false); // Close the modal
+      } else {
+        console.error("Error updating experience.");
+      }
+    } catch (error) {
+      console.error("Error updating experience:", error);
+    }
+  };
+
   return (
     <>
     <div className="search-bar">
@@ -58,7 +141,12 @@ const ExperienceDetail = () => {
           <h1>{experience.title}</h1>
           <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
         </div>
-        <button className="bookmark-btn"><FaRegBookmark />Bookmark</button>
+        <div className="header-group-right">
+          {user && user.name === experience.User[0] && (
+            <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
+          )}
+          <button className="bookmark-btn"><FaRegBookmark />Bookmark</button>
+        </div>
       </div>
       <div className="header-detail">
         <div className="header-detail-left">
@@ -84,6 +172,56 @@ const ExperienceDetail = () => {
         </div>
       </div>
 
+      {editOpen && (
+        <div className="edit-overlay">
+          <div className="edit-form">
+            <h3>Edit Experience</h3>
+            <label htmlFor="title">Title:</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Add a title"
+              required
+            />
+            <label htmlFor="eventDate">Date of Experience:</label>
+            <input
+              type="date"
+              id="eventDate"
+              name="eventDate"
+              value={formData.eventDate}
+              onChange={handleInputChange}
+              required
+            />
+            <label htmlFor="location">Location:</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              placeholder="Add a location or Address"
+              required
+            />
+            <label htmlFor="description">Description:</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows="5"
+              cols="40"
+            ></textarea>
+            <div className="edit-form-actions">
+              <button onClick={handleEditSubmit}>Save</button>
+              <button onClick={handleEditCancel}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review section with comments */}
       <div className="review-container">
         <h4>Latest Reviews</h4>
         <a href="">See More Reviews</a>
