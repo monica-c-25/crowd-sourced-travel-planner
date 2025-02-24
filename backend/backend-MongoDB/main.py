@@ -220,68 +220,55 @@ def comment_request_handler():
 
 
 # ------------------- Photo Storage -------------------
-PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
+# PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
 
 
-@app.route('/api/photos', methods=['POST', 'GET', 'DELETE'])
-def photo_request_handler():
+@app.route('/api/experience-data/<experience_id>/photos', methods=['POST', 'GET', 'DELETE'])
+def photo_request_handler(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
+    PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
 
     if request.method == 'POST':
         # Add Photo
         try:
-            # Any files in the request will be available in request.files object
-            # Check if there is an entry in request.files with the key 'file'
+            # Check if there is a file in the request
             if 'file' not in request.files:
-                return ('No file sent in request', 400)
+                return jsonify({'Error': 'No file sent in request'}), 400
+
             # Set file_obj to the file sent in the request
             file_obj = request.files['file']
-            # Create a storage client
+
+            # Create a storage client and upload the file
             storage_client = storage.Client()
-            # Get a handle on the bucket
             bucket = storage_client.get_bucket(PHOTO_BUCKET)
             file_name = f"{str(ObjectId())}_{file_obj.filename}"
-            # Create a blob object for the bucket with the name of the file
             blob = bucket.blob(file_name)
-            # Position the file_obj to its beginning
-            file_obj.seek(0)
-
-            # # Generate new photo_id
-            # photo_id = _get_next_photo_id()
-
-            # Upload the file into Cloud Storage
+            file_obj.seek(0)  # Reset file pointer to the beginning
             blob.upload_from_file(file_obj)
             photo_url = blob.public_url
 
+            # Prepare photo metadata
             photo_data = {
                 "file_name": file_name,
                 "photo_url": photo_url
             }
 
-            # Save photo_url into Experience Collection
-            experience_id = request.form.get('experience_id')
-            # experience_id = request.args.get("experience_id")
-            # experience = collection.find_one({"_id" : experience_id})
+            # Find the experience by its ID and add the photo data
             experience = collection.find_one({"_id": ObjectId(experience_id)})
             if experience:
                 collection.update_one(
-                    {"_id": experience_id},
+                    {"_id": ObjectId(experience_id)},
                     {"$push": {"photo_data": photo_data}}
                 )
-                response = {
-                    "Message": "Success",
-                    "ID": _post(collection, request.get_json())
-                }
-                return jsonify(response)
+                return jsonify({"Message": "Success", "photo_url": photo_url})
             else:
-                return jsonify({'Error': "Experience Not Found"}), 404
+                return jsonify({'Error': 'Experience Not Found'}), 404
 
         except Exception as e:
             return jsonify({"Error": str(e)}), 500
 
     if request.method == 'GET':
-        # Sample GET Request: GET /api/photos?experience_id=some_experience_id
         # Get Data
         try:
             data = request.get_json()
@@ -315,12 +302,7 @@ def photo_request_handler():
             return jsonify({"Error": str(e)}), 500
 
     if request.method == 'DELETE':
-        # Sample DELETE Request:
-        # DELETE /api/photos?experience_id=some_experience_id
-        #   &photo_url=https://storage.googleapis.com
-        #   /cs467-crowd-sourced-travel-planner-images
-        #   /photo1.jpg
-        # Update Data
+        # Delete Data
         try:
             data = request.get_json()
             experience_id = data.get("experience_id")
