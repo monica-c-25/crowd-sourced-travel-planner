@@ -97,7 +97,7 @@ def general_request(request: object, collection: object) -> None:
 
 
 # GETS EXPERIENCE DETAILS
-@app.route('/api/experience-data/<experience_id>', methods=['GET','PUT'])
+@app.route('/api/experience-data/<experience_id>', methods=['GET', 'PUT'])
 def get_experience_by_id(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
@@ -115,7 +115,7 @@ def get_experience_by_id(experience_id):
 
             if experience_data:
                 experience = experience_data  # Get the first experience
-                experience["_id"] = str(experience["_id"])  # ObjectId to string
+                experience["_id"] = str(experience["_id"]) 
                 response = {
                     "Message": "Success",
                     "data": experience

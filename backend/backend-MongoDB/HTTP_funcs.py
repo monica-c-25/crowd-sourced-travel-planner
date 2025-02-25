@@ -4,7 +4,6 @@ from bson.objectid import ObjectId
 from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
-import pprint
 
 load_dotenv()
 USER = getenv('MONGO_USER')
@@ -126,7 +125,7 @@ def decode(collection: str, result: dict) -> None:
 
 
 def _put(collection: object, payload: dict, id_to_update: str) -> None:
-    print("COLLECTION.NAME is: ",collection.name)
+    print("COLLECTION.NAME is: ", collection.name)
     collection.update_one(
         {"_id": ObjectId(id_to_update)},
         payload
@@ -214,23 +213,24 @@ def _update_id(input_data: object) -> None:
     # If input_data is a single document (dictionary)
     elif isinstance(input_data, dict):
         input_data['_id'] = str(input_data['_id'])
-        
+
+
 def _update_rating(value: str, request: object):
     experience = client[value][value].find_one({"_id": ObjectId(request[value][0])})
     total_reviews = experience.get("rating", {}).get("total", 0)
     current_avg = experience.get("rating", {}).get("average", 0)
-    
+
     new_total_reviews = total_reviews + 1
     new_total = current_avg * total_reviews + request["rating"]
-    
+
     # Step 3: Calculate the new average rating
     new_average_rating = new_total / new_total_reviews
-    
+
     # Step 4: Update the experience with the new ratings
     client[value][value].update_one(
         {"_id": experience["_id"]},
         {
-            "$set": {"rating":{
+            "$set": {"rating": {
                 "total": new_total_reviews,
                 "average": new_average_rating
             }}
