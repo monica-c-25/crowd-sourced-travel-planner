@@ -115,7 +115,7 @@ def get_experience_by_id(experience_id):
 
             if experience_data:
                 experience = experience_data  # Get the first experience
-                experience["_id"] = str(experience["_id"]) 
+                experience["_id"] = str(experience["_id"])
                 response = {
                     "Message": "Success",
                     "data": experience
