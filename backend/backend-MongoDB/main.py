@@ -161,7 +161,7 @@ def user_request_handler_by_ID(user_id):
     # Grabs collection DB
     db = client["User"]
     collection = db["User"]
-    
+
     filters = {"_id": user_id}
 
     user_data = _get(filters, collection)
@@ -177,6 +177,7 @@ def user_request_handler_by_ID(user_id):
             "Message": "Experience not found"
         }
     return jsonify(response)
+
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def trip_request_handler():
