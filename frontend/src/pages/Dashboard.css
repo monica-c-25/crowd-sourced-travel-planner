@@ -12,7 +12,7 @@
     font-size: 30px;
 }
 
-.board-nav, .experience-nav, .trip-nav {
+.board-nav, .experience-nav, .trip-nav, .bookmark-nav {
     display: flex;
     justify-content: space-between;
     margin-bottom: 5rem;

@@ -14,10 +14,10 @@ function TripForm() {
     const [formData, setFormData] = useState({
         title: "",
         eventDate: { start: "", end: "" },
-        selectedTrips: [],
+        selectedExperiences: [],
     });
 
-    const [experiences, setExperiences] = useState([]); 
+    const [experiences, setExperiences] = useState([]);
     const [filter, setFilter] = useState("all");
 
     useEffect(() => {
@@ -57,14 +57,14 @@ function TripForm() {
         });
     };
 
-    const handleTripSelection = (tripId) => {
+    const handleExperienceSelection = (experienceId) => {
         setFormData((prev) => {
-            const isSelected = prev.selectedTrips.includes(tripId);
+            const isSelected = prev.selectedExperiences.includes(experienceId);
             return {
                 ...prev,
-                selectedTrips: isSelected
-                    ? prev.selectedTrips.filter((id) => id !== tripId)
-                    : [...prev.selectedTrips, tripId],
+                selectedExperiences: isSelected
+                    ? prev.selectedExperiences.filter((id) => id !== experienceId)
+                    : [...prev.selectedExperiences, experienceId],
             };
         });
     };
@@ -83,7 +83,7 @@ function TripForm() {
 
         const formPayload = {
             title: formData.title,
-            selectedTrips: formData.selectedTrips,
+            selectedExperiences: formData.selectedExperiences,
             creationDate: today,
             eventDate: formData.eventDate,
         };
@@ -103,7 +103,7 @@ function TripForm() {
                 setFormData({
                     title: "",
                     eventDate: { start: "", end: "" },
-                    selectedTrips: [],
+                    selectedExperiences: [],
                 });
                 window.location.href = "/dashboard";
             } else {
@@ -136,9 +136,9 @@ function TripForm() {
                     />
                 </div>
 
-                {/* Select Trips Section */}
+                {/* Select Experiences Section */}
                 <div className="form-group filters">
-                    <label>Select trips from your experiences</label>
+                    <label>Select your experiences</label>
                     <div className="trip-filters">
                         <button
                             type="button"
@@ -162,15 +162,15 @@ function TripForm() {
                             Bookmarked
                         </button>
                     </div>
-                    <div className="trip-list">
-                        {experiences.map((trip) => (
+                    <div className="experience-list">
+                        {experiences.map((experience) => (
                             <div
-                                key={trip._id}
-                                className={`trip-card ${formData.selectedTrips.includes(trip._id) ? "selected" : ""}`}
-                                onClick={() => handleTripSelection(trip._id)}
+                                key={experience._id}
+                                className={`trip-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
+                                onClick={() => handleExperienceSelection(experience._id)}
                             >
-                                <img src={trip.photoURL || "/default-trip.jpg"} alt={trip.title} />
-                                <p>{trip.title}</p>
+                                <img src={experience.photoURL || "/default-experience.jpg"} alt={experience.title} />
+                                <p>{experience.title}</p>
                             </div>
                         ))}
                     </div>
@@ -250,7 +250,7 @@ function TripForm() {
                             onClick={() => setFormData({
                                 title: "",
                                 eventDate: { start: "", end: "" },
-                                selectedTrips: [],
+                                selectedExperiences: [],
                             })}
                         >
                             Reset
