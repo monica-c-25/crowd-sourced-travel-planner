@@ -57,7 +57,7 @@ def general_request(request: object, collection: object) -> None:
         return jsonify(response)
 
     if request.method == 'DELETE':
-        # Update Data
+        # Delete Data
         try:
             query_name = request.get_json()['Query']
             _delete(collection, query_name)
@@ -71,6 +71,7 @@ def general_request(request: object, collection: object) -> None:
         return jsonify(response)
 
     if request.method == 'PUT':
+        # Update Data
         data = request.get_json()
         update_payload = dict()
 
@@ -144,7 +145,7 @@ def experience_request_handler():
     return general_request(request, collection)
 
 
-@app.route('/api/user-data', methods=['GET', 'POST'])
+@app.route('/api/user-data', methods=['GET', 'POST', 'PUT'])
 def user_request_handler():
 
     # Grabs collection DB
@@ -153,6 +154,29 @@ def user_request_handler():
 
     return general_request(request, collection)
 
+
+@app.route('/api/user-data/<user_id>', methods=['GET'])
+def user_request_handler_by_ID(user_id):
+
+    # Grabs collection DB
+    db = client["User"]
+    collection = db["User"]
+    
+    filters = {"_id": user_id}
+
+    user_data = _get(filters, collection)
+    if user_data:
+        user = user_data  # Get the first experience
+        user["_id"] = str(user["_id"])
+        response = {
+            "Message": "Success",
+            "data": user
+        }
+    else:
+        response = {
+            "Message": "Experience not found"
+        }
+    return jsonify(response)
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def trip_request_handler():
