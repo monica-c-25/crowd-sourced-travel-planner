@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import './Dashboard.css';
@@ -7,6 +7,11 @@ import '../index.css';
 const Dashboard = () => {
     const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+
+    // State to track which button is selected in each section
+    const [selectedExperienceButton, setSelectedExperienceButton] = useState("default");
+    const [selectedTripButton, setSelectedTripButton] = useState("default");
+    const [selectedBookmarkButton, setSelectedBookmarkButton] = useState("default");
 
     const handleCreateExperienceClick = () => {
         if (isAuthenticated) {
@@ -22,6 +27,18 @@ const Dashboard = () => {
         } else {
           alert("You must be signed in to add an experience.");
         }
+    };
+
+    const handleExperienceButtonClick = (buttonType) => {
+        setSelectedExperienceButton(buttonType);
+    };
+
+    const handleTripButtonClick = (buttonType) => {
+        setSelectedTripButton(buttonType);
+    };
+
+    const handleBookmarkButtonClick = (buttonType) => {
+        setSelectedBookmarkButton(buttonType);
     };
 
     return (
@@ -49,9 +66,24 @@ const Dashboard = () => {
                 </div>
                 <div className="right">
                     <div>xx Experiences(s)</div>
-                    <button>Default</button>
-                    <button>A-Z</button>
-                    <button>List View</button>
+                    <button
+                        className={selectedExperienceButton === "default" ? "selected" : "not-selected"}
+                        onClick={() => handleExperienceButtonClick("default")}
+                    >
+                        Default
+                    </button>
+                    <button
+                        className={selectedExperienceButton === "az" ? "selected" : "not-selected"}
+                        onClick={() => handleExperienceButtonClick("az")}
+                    >
+                        A-Z
+                    </button>
+                    <button
+                        className={selectedExperienceButton === "list" ? "selected" : "not-selected"}
+                        onClick={() => handleExperienceButtonClick("list")}
+                    >
+                        List View
+                    </button>
                 </div>
             </div>
 
@@ -63,9 +95,24 @@ const Dashboard = () => {
                 </div>
                 <div className="right">
                     <div>xx Trip(s)</div>
-                    <button>Default</button>
-                    <button>A-Z</button>
-                    <button>List View</button>
+                    <button
+                        className={selectedTripButton === "default" ? "selected" : "not-selected"}
+                        onClick={() => handleTripButtonClick("default")}
+                    >
+                        Default
+                    </button>
+                    <button
+                        className={selectedTripButton === "az" ? "selected" : "not-selected"}
+                        onClick={() => handleTripButtonClick("az")}
+                    >
+                        A-Z
+                    </button>
+                    <button
+                        className={selectedTripButton === "list" ? "selected" : "not-selected"}
+                        onClick={() => handleTripButtonClick("list")}
+                    >
+                        List View
+                    </button>
                 </div>
             </div>
 
@@ -75,9 +122,24 @@ const Dashboard = () => {
                 </div>
                 <div className="right">
                     <div>xx Experience(s)</div>
-                    <button>Default</button>
-                    <button>A-Z</button>
-                    <button>List View</button>
+                    <button
+                        className={selectedBookmarkButton === "default" ? "selected" : "not-selected"}
+                        onClick={() => handleBookmarkButtonClick("default")}
+                    >
+                        Default
+                    </button>
+                    <button
+                        className={selectedBookmarkButton === "az" ? "selected" : "not-selected"}
+                        onClick={() => handleBookmarkButtonClick("az")}
+                    >
+                        A-Z
+                    </button>
+                    <button
+                        className={selectedBookmarkButton === "list" ? "selected" : "not-selected"}
+                        onClick={() => handleBookmarkButtonClick("list")}
+                    >
+                        List View
+                    </button>
                 </div>
             </div>
         </div>

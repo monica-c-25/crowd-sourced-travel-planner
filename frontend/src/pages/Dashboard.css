@@ -7,7 +7,7 @@
     font-size: 45px;
 }
 
-.experience-nav h3, .trip-nav h3 {
+.experience-nav h3, .trip-nav h3, .bookmark-nav h3{
     font-weight: 300;
     font-size: 30px;
 }
@@ -30,3 +30,15 @@
     gap: 1rem;
 }
 
+
+button.not-selected {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid rgb(184, 184, 184);
+    border-radius: 15px;
+}
+
+button:hover {
+    background-color: #80ccdf !important;
+    text-decoration: none !important;
+}
