@@ -15,22 +15,19 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
-<<<<<<<<< Temporary merge branch 1
-
-  const { isAuthenticated, isLoading } = useAuth();
-=========
   
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
->>>>>>>>> Temporary merge branch 2
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
+    } else {
+      setLoading(false); // Only render content when authentication is verified
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated,  navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

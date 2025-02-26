@@ -58,7 +58,7 @@ def general_request(request: object, collection: object) -> None:
         return jsonify(response)
 
     if request.method == 'DELETE':
-        # Update Data
+        # Delete Data
         try:
             query_name = request.get_json()['Query']
             _delete(collection, query_name)
@@ -72,20 +72,20 @@ def general_request(request: object, collection: object) -> None:
         return jsonify(response)
 
     if request.method == 'PUT':
+        # Update Data
         data = request.get_json()
         update_payload = dict()
 
-        if "Previous_Title" in data:
-            query_name = data["Previous_Title"]
-            del data["Previous_Title"]
+        if "mongo_id" in data:
+            query_id = data["mongo_id"]
+            del data["mongo_id"]
         else:
-            query_name = data["Experience"]
+            query_id = data["Experience"]
 
         _set_payload(data, update_payload)
 
         try:
-            _put(collection, "Experience", update_payload,
-                 query_name)
+            _put(collection, update_payload, query_id)
             response = {
                 "Message": "Success"
             }
@@ -99,7 +99,7 @@ def general_request(request: object, collection: object) -> None:
 
 
 # GETS EXPERIENCE DETAILS
-@app.route('/api/experience-data/<experience_id>', methods=['GET'])
+@app.route('/api/experience-data/<experience_id>', methods=['GET', 'PUT'])
 def get_experience_by_id(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
@@ -110,21 +110,24 @@ def get_experience_by_id(experience_id):
         return jsonify({"Message": f"Invalid ID: {str(e)}"})
 
     try:
-        # Pass experience_id as part of the request body to _get
-        filters = {"_id": experience_id}
-        experience_data = _get(filters, collection)
+        if request.method == 'GET':
+            # Pass experience_id as part of the request body to _get
+            filters = {"_id": experience_id}
+            experience_data = _get(filters, collection)
 
-        if experience_data:
-            experience = experience_data  # Get the first experience
-            experience["_id"] = str(experience["_id"])  # ObjectId to string
-            response = {
-                "Message": "Success",
-                "data": experience
-            }
-        else:
-            response = {
-                "Message": "Experience not found"
-            }
+            if experience_data:
+                experience = experience_data  # Get the first experience
+                experience["_id"] = str(experience["_id"])
+                response = {
+                    "Message": "Success",
+                    "data": experience
+                }
+            else:
+                response = {
+                    "Message": "Experience not found"
+                }
+        elif request.method == 'PUT':
+            return general_request(request, collection)
 
     except Exception as e:
         response = {
@@ -143,7 +146,7 @@ def experience_request_handler():
     return general_request(request, collection)
 
 
-@app.route('/api/user-data', methods=['GET', 'POST'])
+@app.route('/api/user-data', methods=['GET', 'POST', 'PUT'])
 def user_request_handler():
 
     # Grabs collection DB
@@ -151,6 +154,30 @@ def user_request_handler():
     collection = db["User"]
 
     return general_request(request, collection)
+
+
+@app.route('/api/user-data/<user_id>', methods=['GET'])
+def user_request_handler_by_ID(user_id):
+
+    # Grabs collection DB
+    db = client["User"]
+    collection = db["User"]
+
+    filters = {"_id": user_id}
+
+    user_data = _get(filters, collection)
+    if user_data:
+        user = user_data  # Get the first experience
+        user["_id"] = str(user["_id"])
+        response = {
+            "Message": "Success",
+            "data": user
+        }
+    else:
+        response = {
+            "Message": "Experience not found"
+        }
+    return jsonify(response)
 
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])

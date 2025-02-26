@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./ReviewForm.css";
+import { useParams } from 'react-router-dom';
 
-// Need to link USER AND EXPERIENCE
 
-function ReviewForm() {
-  const { isAuthenticated } = useAuth();
+function ReviewForm(props) {
+  const { isAuthenticated, userID } = useAuth();
+  const { id } = useParams(); // Get experience ID from URL
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const today = new Date().toISOString().split("T")[0];
@@ -14,6 +15,7 @@ function ReviewForm() {
     commentDate: today,
     review: "",
     rating: 0,
+    user: [props.user]
   });
   const [hoverRating, setHoverRating] = useState(0);
 
@@ -45,10 +47,10 @@ function ReviewForm() {
         },
         body: JSON.stringify({
           commentDate: today,
-          review: formData.review,
+          Comment: formData.Comment,
           rating: formData.rating,
-          user_id: "Linkage not implemented",
-          experience_id: "Linkage not implemented"
+          User: [userID],
+          Experience: [id]
         }),
       });
 
@@ -58,7 +60,7 @@ function ReviewForm() {
           alert("Thanks for leaving a review!");
           setFormData({
             commentDate: today,
-            review: "",
+            Comment: "",
             rating: 0,
           });
 
@@ -100,11 +102,11 @@ function ReviewForm() {
             </span>
           ))}
         </div>
-        <label htmlFor="review">Review:</label>
+        <label htmlFor="Comment">Review:</label>
         <textarea
-          id="review"
-          name="review"
-          value={formData.review}
+          id="Comment"
+          name="Comment"
+          value={formData.Comment}
           onChange={handleChange}
           placeholder="Write your review."
           maxLength="1200"
