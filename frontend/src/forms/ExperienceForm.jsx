@@ -8,7 +8,7 @@ function ExperienceForm(props) {
 
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({    
+  const [formData, setFormData] = useState({
     title: "",
     eventDate: today,
     description: "",
@@ -16,22 +16,26 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
-<<<<<<<<< Temporary merge branch 1
 
-  const { isAuthenticated, isLoading } = useAuth();
-=========
-  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
->>>>>>>>> Temporary merge branch 2
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
+    if (loading) return; // Skip the check while loading
+
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, loading, navigate]);
+
+  useEffect(() => {
+    // After the component mounts, we check if user is authenticated
+    if (isAuthenticated) {
+      setLoading(false); // Set loading to false only once authentication is confirmed
+    }
+  }, [isAuthenticated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -166,7 +170,7 @@ function ExperienceForm(props) {
         <button
           type="button"
           className="cancel-button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/explore")}
         >
           Cancel
         </button>

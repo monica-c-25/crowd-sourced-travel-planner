@@ -351,30 +351,32 @@ def photo_request_handler(experience_id):
 
 @app.route("/api/filter-experiences", methods=["GET"])
 def filter_experiences():
-    """Filter experiences by creation date."""
+    """Filter experiences by creation date and user ID."""
     db = client["Experience"]
     experiences_collection = db["Experience"]
 
     try:
-        # Get date parameters from query string (e.g., from frontend)
+        # Get query parameters from frontend (user_id, start_date, end_date)
+        user_id = request.args.get("user_id", None)  # Assuming user_id is passed as a query param
         start_date_str = request.args.get("start_date", None)
         end_date_str = request.args.get("end_date", None)
 
-        # Prepare date filters
-        date_filter = {}
+        # Prepare the base filter
+        filters = {}
 
-        # Check if the start_date and end_date are provided
+        # If a user_id is provided, filter by user_id
+        if user_id:
+            filters["user_id"] = user_id
+
+        # Prepare date filters if provided
         if start_date_str:
-            date_filter["creationDate"] = {"$gte": start_date_str}
+            filters["creationDate"] = {"$gte": start_date_str}
         if end_date_str:
-            date_filter["creationDate"] = date_filter.get("creationDate", {})
-            date_filter["creationDate"]["$lte"] = end_date_str
+            filters["creationDate"] = filters.get("creationDate", {})
+            filters["creationDate"]["$lte"] = end_date_str
 
-        # Query the database based on whether the filter exists
-        if date_filter:
-            experiences = experiences_collection.find(date_filter)
-        else:
-            experiences = experiences_collection.find()
+        # Query the database based on the filters
+        experiences = experiences_collection.find(filters)
 
         # Sort by creationDate in descending order (newest first)
         experiences = experiences.sort("creationDate", -1)
@@ -382,13 +384,12 @@ def filter_experiences():
         # Serialize the results
         experiences_list = []
         for experience in experiences:
-            experience["_id"] = str(experience["_id"])
+            experience["_id"] = str(experience["_id"])  # Convert ObjectId to string
             experiences_list.append(experience)
 
         return jsonify(experiences_list)
 
     except Exception as e:
-        # Print the exception to the server log for debugging
         print(f"Error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
 
