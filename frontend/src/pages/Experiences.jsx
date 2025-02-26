@@ -4,7 +4,6 @@ import SearchBar from "../components/SearchBar";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import '../index.css';
 
 const Explore = () => {
   const [experiences, setExperiences] = useState([]);
@@ -55,7 +54,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="explore-container body-content">
+    <div className="explore-container">
       <h1>Explore Experiences</h1>
       <div className="button-container">
         <button className="button" onClick={handleAddExperienceClick}>

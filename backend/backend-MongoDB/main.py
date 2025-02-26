@@ -20,6 +20,7 @@ uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
     "retryWrites=true&w=majority&appName=Capstone"
 )
+
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
     api_key=getenv('OPENAI_API_KEY')
@@ -139,7 +140,6 @@ def get_experience_by_id(experience_id):
 
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def experience_request_handler():
-
     db = client["Experience"]
     collection = db["Experience"]
 
@@ -178,6 +178,40 @@ def user_request_handler_by_ID(user_id):
             "Message": "Experience not found"
         }
     return jsonify(response)
+
+
+@app.route('/api/user-experiences/<user_id>', methods=['GET'])
+def get_user_experiences(user_id):
+    db = client["User"]
+    user_collection = db["User"]
+    experience_collection = client["Experience"]["Experience"]
+
+    try:
+        # Ensure user_id is a valid ObjectId
+        mongo_user_id = ObjectId(user_id)
+
+        # Fetch user document by MongoDB _id
+        user = user_collection.find_one({"_id": mongo_user_id})
+        if not user:
+            return jsonify({"Message": "User not found", "data": []}), 404
+
+        # Extract experience IDs (stored as strings)
+        experience_ids = user.get("Experience", [])
+
+        # Convert experience IDs to ObjectId format
+        experience_object_ids = [ObjectId(exp_id) for exp_id in experience_ids]
+
+        # Fetch experiences from the Experience collection
+        experiences = list(experience_collection.find({"_id": {"$in": experience_object_ids}}))
+
+        # Convert ObjectId to string for frontend compatibility
+        for experience in experiences:
+            experience["_id"] = str(experience["_id"])
+
+        return jsonify({"Message": "Success", "data": experiences})
+
+    except Exception as e:
+        return jsonify({"Message": f"Error: {str(e)}"}), 500
 
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])

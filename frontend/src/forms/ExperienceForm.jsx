@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "./ExperienceForm.css";
-import '../index.css';
 
 function ExperienceForm(props) {
 
@@ -22,8 +21,6 @@ function ExperienceForm(props) {
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
-    if (loading) return; // Skip the check while loading
-
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page

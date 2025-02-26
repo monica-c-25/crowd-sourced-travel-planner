@@ -5,7 +5,7 @@ import './Dashboard.css';
 import '../index.css';
 
 const Dashboard = () => {
-    const { isAuthenticated, user } = useAuth(); // Get user details (user ID)
+    const { isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
 
     // State to track which button is selected in each section
@@ -56,12 +56,16 @@ const Dashboard = () => {
     const fetchUserExperiences = async (userId) => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/user-experiences/${userId}`);
+            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userId}`);
             const data = await response.json();
-            if (response.ok) {
-                setExperiences(data);
+
+            console.log("Fetched Data:", data); // Debugging: Ensure correct response
+
+            if (response.ok && Array.isArray(data.data)) {
+                setExperiences(data.data);
             } else {
-                console.error("Failed to fetch experiences", data);
+                console.error("Fetched data is not an array:", data);
+                setExperiences([]); // Ensure empty state if data is incorrect
             }
         } catch (error) {
             console.error("Error fetching experiences:", error);
@@ -120,30 +124,29 @@ const Dashboard = () => {
             </div>
 
             {/* Display User's Experiences */}
-            {loading ? (
-                <p>Loading experiences...</p>
-            ) : (
-                <div className="user-experiences">
-                    {experiences.length === 0 ? (
-                        <p>No experiences to display.</p>
-                    ) : (
-                        experiences.map((experience) => (
-                            <div key={experience._id} className="experience-card">
-                                <h4>{experience.title}</h4>
-                                <p><strong>Date:</strong> {experience.eventDate}</p>
-                                <p><strong>Location:</strong> {experience.location}</p>
-                                <p><strong>Description:</strong> {experience.description}</p>
-                                <p><strong>Created on:</strong> {experience.creationDate}</p>
-                                {experience.photoURL && <img src={experience.photoURL} alt="Experience" />}
-                                <div className="ratings">
-                                    <p><strong>Rating:</strong> {experience.rating ? `Avg: ${experience.rating.average}` : "No ratings yet"}</p>
-                                </div>
-                            </div>
-                        ))
-                    )}
+            <div className="user-experiences">
+    {loading ? (
+        <p>Loading experiences...</p>
+    ) : (
+        experiences.length === 0 ? (
+            <p>No experiences to display.</p>
+        ) : (
+            experiences.map((experience) => (
+                <div key={experience._id} className="experience-card">
+                    <h4>{experience.title}</h4>
+                    <p><strong>Date:</strong> {experience.eventDate}</p>
+                    <p><strong>Location:</strong> {experience.location}</p>
+                    <p><strong>Description:</strong> {experience.description}</p>
+                    <p><strong>Created on:</strong> {experience.creationDate}</p>
+                    {experience.photoURL && <img src={experience.photoURL} alt="Experience" />}
+                    <div className="ratings">
+                        <p><strong>Rating:</strong> {experience.rating ? `Avg: ${experience.rating.average}` : "No ratings yet"}</p>
+                    </div>
                 </div>
-            )}
-
+            ))
+        )
+    )}
+</div>
             {/* My Trips Section */}
             <div className="trip-nav">
                 <div className="left">
