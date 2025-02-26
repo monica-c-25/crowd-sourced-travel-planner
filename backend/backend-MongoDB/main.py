@@ -5,6 +5,7 @@ from os import getenv
 from dotenv import load_dotenv
 from HTTP_funcs import _get, _put, _post, _delete, _set_payload
 from flask_cors import CORS
+from google.cloud import storage
 from bson.objectid import ObjectId
 from openai import OpenAI
 
@@ -12,14 +13,21 @@ load_dotenv()
 app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
-uri = getenv("MONGO_URI")
+load_dotenv()
+USER = getenv('MONGO_USER')
+PASSWORD = getenv('PASSWORD')
+uri = (
+    f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
+    "retryWrites=true&w=majority&appName=Capstone"
+)
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
-  api_key=getenv('OPENAI_API_KEY')
+    api_key=getenv('OPENAI_API_KEY')
 )
 
 
 def general_request(request: object, collection: object) -> None:
+
     if request.method == 'POST':
         # Add Data
         try:
@@ -36,14 +44,9 @@ def general_request(request: object, collection: object) -> None:
     if request.method == 'GET':
         # Get Data
         try:
-            # filters = request.args.to_dict()
-            # response_data = _get(filters, collection)
-            response_data = _get({}, collection)  # Fetch data
-            # Convert ObjectId to string
-            for experience in response_data:
-                experience["_id"] = str(experience["_id"])
-
-            # response = _get(request.get_json(), collection)
+            # filters = request.json
+            filters = request.args.to_dict()
+            response_data = _get(filters, collection)
             response = {
                 "Message": "Success",
                 "data": response_data
@@ -108,13 +111,11 @@ def get_experience_by_id(experience_id):
 
     try:
         # Pass experience_id as part of the request body to _get
-
-        filters = {"Query": experience_id}
+        filters = {"_id": experience_id}
         experience_data = _get(filters, collection)
 
         if experience_data:
-            # If data is returned, it will be a list with one experience
-            experience = experience_data[0]  # Get the first experience
+            experience = experience_data  # Get the first experience
             experience["_id"] = str(experience["_id"])  # ObjectId to string
             response = {
                 "Message": "Success",
@@ -164,6 +165,7 @@ def trip_request_handler():
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def comment_request_handler():
 
+    print(request)
     db = client["Comment"]
     collection = db["Comment"]
 
@@ -186,14 +188,18 @@ def get_recommendations():
 
         # Create prompt for ChatGPT
         prompt = (
-            f"I am planning a trip to {location} on {trip_date} with my {travel_group}.\n"
+            f"I am planning a trip to {location} on {trip_date} with my"
+            "{travel_group}.\n"
             f"My interests are {', '.join(interests)}.\n"
             "Can you recommend 3 must-visit places for each category?\n"
             "Return the results in json object following this structure:\n"
             '{"Introduction": "Sample Introduction", "Category 1": ['
-            '{"name": "Example name 1", "description": "Example description 1", "address": "Example address 1"},'
-            '{"name": "Example name 2", "description": "Example description 2", "address": "Example address 2"},'
-            '{"name": "Example name 3", "description": "Example description 3", "address": "Example address 3"}], '
+            '{"name": "Example name 1", "description": "Example description 1"'
+            ', "address": "Example address 1"},'
+            '{"name": "Example name 2", "description": "Example description 2"'
+            ', "address": "Example address 2"},'
+            '{"name": "Example name 3", "description": "Example description 3"'
+            ', "address": "Example address 3"}], '
             '"Category 2": etc. etc. }'
         )
 
@@ -211,6 +217,134 @@ def get_recommendations():
         print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+
+# ------------------- Photo Storage -------------------
+# PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
+
+
+@app.route('/api/experience-data/<experience_id>/photos', methods=['POST', 'GET', 'DELETE'])
+def photo_request_handler(experience_id):
+    db = client["Experience"]
+    collection = db["Experience"]
+    PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
+
+    if request.method == 'POST':
+        # Add Photo
+        try:
+            # Get all files in the request
+            files = request.files.getlist('file')
+            if not files:
+                return jsonify({'Error': 'No files sent in request'}), 400
+
+            storage_client = storage.Client()
+            bucket = storage_client.get_bucket(PHOTO_BUCKET)
+            photo_data_list = []
+
+            for file_obj in files:
+                file_name = f"{str(ObjectId())}_{file_obj.filename}"
+                blob = bucket.blob(file_name)
+                file_obj.seek(0)  # Reset file pointer to the beginning
+                blob.upload_from_file(file_obj)
+                photo_url = blob.public_url
+
+                # Add the uploaded photo's metadata to the list
+                photo_data = {
+                    "file_name": file_name,
+                    "photo_url": photo_url
+                }
+                photo_data_list.append(photo_data)
+
+            # Update the experience with the list of photo data
+            experience = collection.find_one({"_id": ObjectId(experience_id)})
+            if experience:
+                collection.update_one(
+                    {"_id": ObjectId(experience_id)},
+                    {"$push": {"photo_data": {"$each": photo_data_list}}}
+                )
+                return jsonify({"Message": "Success", "photo_data": photo_data_list})
+            else:
+                return jsonify({'Error': 'Experience Not Found'}), 404
+
+        except Exception as e:
+            return jsonify({"Error": str(e)}), 500
+
+    if request.method == 'GET':
+        # Get Data
+        try:
+            data = request.get_json()
+            experience_id = data.get("experience_id")
+            # experience_id = request.form.get('experience_id')
+            if not experience_id:
+                return jsonify({"Error": "Experience ID Required"}), 400
+
+            # experience = collection.find_one({"_id" : experience_id})
+            experience = collection.find_one({"_id": ObjectId(experience_id)})
+            if experience:
+                photo_data = experience.get("photo_data", [])
+                photo_urls = [photo["photo_url"] for photo in photo_data]
+
+                if not photo_urls:
+                    response = {
+                        "message": "No photos found for this experience",
+                        "experience_id": ObjectId(experience_id)
+                    }
+                    return jsonify(response)
+                response = {
+                    "message": "Success",
+                    "experience_id": experience_id,
+                    "photo_urls": photo_urls
+                }
+                return jsonify(response), 200
+            else:
+                return jsonify({'Error': "Experience Not Found"}), 404
+
+        except Exception as e:
+            return jsonify({"Error": str(e)}), 500
+
+    if request.method == 'DELETE':
+        # Delete Photo
+        try:
+            # Get JSON data from the request body
+            data = request.get_json()
+            experience_id = data.get("experience_id")
+            # Get the photo URL to delete
+            photo_url_to_delete = data.get('photo_url')
+
+            # Check if both experience_id and photo_url are provided
+            if not experience_id or not photo_url_to_delete:
+                return jsonify({"Error": "Experience_id and Photo_url are required."}), 400
+
+            # Extract the file name from the photo_url
+            file_name = photo_url_to_delete.split('/')[-1]
+
+            storage_client = storage.Client()
+            bucket = storage_client.get_bucket(PHOTO_BUCKET)
+
+            blob = bucket.blob(file_name)
+            if not blob.exists():
+                return jsonify({'error': "File not found in Cloud Storage"}), 404
+
+            blob.delete()
+
+            # Remove the photo metadata from MongoDB
+            result = collection.update_one(
+                {"_id": ObjectId(experience_id)},
+                {"$pull": {"photo_data": {"photo_url": photo_url_to_delete}}}
+            )
+
+            # Check if the experience document was updated successfully
+            if result.modified_count > 0:
+                response = {
+                    "message": "Success: Photo URL Removed",
+                    "experience_id": experience_id,
+                    "removed_photo_url": photo_url_to_delete
+                }
+                return jsonify(response), 200
+            else:
+                return jsonify({'Error': "Experience Not Found or Photo URL not in database"}), 404
+
+        except Exception as e:
+            return jsonify({"Error": str(e)}), 500
 
 # ------------------- FILTER EXPERIENCES -------------------
 

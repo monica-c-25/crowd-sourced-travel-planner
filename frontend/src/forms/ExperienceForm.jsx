@@ -1,30 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Assuming you have this context
+import { useAuth } from "../context/AuthContext";
 import "./ExperienceForm.css";
 import '../index.css';
 
-function ExperienceForm() {
+function ExperienceForm(props) {
+
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({    
     title: "",
     eventDate: today,
     description: "",
     photoURL: "",
+    user: [props.user],
     location: ""
   });
+<<<<<<<<< Temporary merge branch 1
 
+  const { isAuthenticated, isLoading } = useAuth();
+=========
+  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
-  const { isAuthenticated } = useAuth(); // Assuming this hook tells you if the user is authenticated
+  const { isAuthenticated, userID } = useAuth();
+>>>>>>>>> Temporary merge branch 2
 
-  // Redirect user if not authenticated
+  // Redirect user if not authenticated or while loading
   useEffect(() => {
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
-      navigate(-1); // Redirect to login page
-    } else {
-      setLoading(false); // Only render content when authentication is verified
+      navigate(-1); // Redirect to previous page
     }
   }, [isAuthenticated, navigate]);
 
@@ -52,7 +57,8 @@ function ExperienceForm() {
           description: formData.description,
           photoURL: "",
           location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0}
+          rating: {"average": 0, "total": 0},
+          User: [userID]
         }),
       });
 
@@ -82,7 +88,7 @@ function ExperienceForm() {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // You can show a loading spinner or any other placeholder
+    return <div>Loading...</div>;
   }
 
   return (

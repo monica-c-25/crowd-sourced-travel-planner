@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const { loginWithRedirect, logout, isAuthenticated, isLoading, user } = useAuth0();
+  const [userID, setUserID] = useState(null);
 
   // Sync with MongoDB if user is authenticated
   useEffect(() => {
@@ -26,6 +27,7 @@ export const AuthProvider = ({ children }) => {
       })
         .then((response) => response.json())
         .then((data) => {
+          setUserID(data.userID);
           console.log("User data synced with MongoDB:", data);
         })
         .catch((error) => {
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         isLoading,
         user, // Provide the Auth0 user object directly
+        userID // Provide the Mongo UserId
       }}
     >
       {children}
