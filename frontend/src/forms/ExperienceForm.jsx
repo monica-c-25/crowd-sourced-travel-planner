@@ -27,15 +27,10 @@ function ExperienceForm(props) {
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
+    } else {
+      setLoading(false); // Only render content when authentication is verified
     }
-  }, [isAuthenticated, loading, navigate]);
-
-  useEffect(() => {
-    // After the component mounts, we check if user is authenticated
-    if (isAuthenticated) {
-      setLoading(false); // Set loading to false only once authentication is confirmed
-    }
-  }, [isAuthenticated]);
+  }, [isAuthenticated,  navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
