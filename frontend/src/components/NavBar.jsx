@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Import the AuthContext
+import { useAuth } from "../context/AuthContext";
 import "../components/NavBar.css";
 
 const NavBar = () => {
@@ -36,6 +36,9 @@ const NavBar = () => {
 
         {isAuthenticated ? (
           <>
+            <li>
+              <Link to="/dashboard" className="link">My Dashboard</Link>
+            </li>
             {/* User is authenticated, show their info */}
             <li className="link">
               <div className="dropdown">
