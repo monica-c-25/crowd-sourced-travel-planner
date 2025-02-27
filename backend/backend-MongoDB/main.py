@@ -197,18 +197,23 @@ def get_user_experiences(user_id):
 
         # Extract experience IDs (stored as strings)
         experience_ids = user.get("Experience", [])
+        bookmark_ids = user.get("Bookmarks", [])
 
         # Convert experience IDs to ObjectId format
         experience_object_ids = [ObjectId(exp_id) for exp_id in experience_ids]
+        bookmark_object_ids = [ObjectId(bm_id) for bm_id in bookmark_ids]
 
         # Fetch experiences from the Experience collection
         experiences = list(experience_collection.find({"_id": {"$in": experience_object_ids}}))
+        bookmarks = list(experience_collection.find({"_id": {"$in": bookmark_object_ids}}))
 
         # Convert ObjectId to string for frontend compatibility
         for experience in experiences:
             experience["_id"] = str(experience["_id"])
+        for bookmark in bookmarks:
+            bookmark["_id"] = str(bookmark["_id"])
 
-        return jsonify({"Message": "Success", "data": experiences})
+        return jsonify({"Message": "Success", "data": [experiences, bookmarks]})
 
     except Exception as e:
         return jsonify({"Message": f"Error: {str(e)}"}), 500

@@ -5,7 +5,7 @@ import './Dashboard.css';
 import '../index.css';
 
 const Dashboard = () => {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, userID } = useAuth();
     const navigate = useNavigate();
 
     // State to track which button is selected in each section
@@ -13,8 +13,13 @@ const Dashboard = () => {
     const [selectedTripButton, setSelectedTripButton] = useState("default");
     const [selectedBookmarkButton, setSelectedBookmarkButton] = useState("default");
 
+    // State to track viewMode
+    const [expViewMode, setExpViewMode] = useState("grid");
+    const [bmViewMode, setBMViewMode] = useState("grid");
+
     // State to hold user-specific experiences
     const [experiences, setExperiences] = useState([]);
+    const [bookmarks, setBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // Handle user creating an experience
@@ -36,6 +41,11 @@ const Dashboard = () => {
 
     const handleExperienceButtonClick = (buttonType) => {
         setSelectedExperienceButton(buttonType);
+        if (buttonType === "list") {
+            setExpViewMode("list"); // Switch to list view
+        } else {
+            setExpViewMode("grid"); // Switch back to grid view
+        }
     };
 
     const handleTripButtonClick = (buttonType) => {
@@ -44,6 +54,11 @@ const Dashboard = () => {
 
     const handleBookmarkButtonClick = (buttonType) => {
         setSelectedBookmarkButton(buttonType);
+        if (buttonType === "list") {
+            setBMViewMode("list"); // Switch to list view
+        } else {
+            setBMViewMode("grid"); // Switch back to grid view
+        }
     };
 
     // Fetch user's experiences based on their ID
@@ -53,19 +68,22 @@ const Dashboard = () => {
         }
     }, [isAuthenticated, user]);
 
-    const fetchUserExperiences = async (userId) => {
+    const fetchUserExperiences = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userId}`);
+            console.log("user ID is: ", userID);
+            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userID}`);
             const data = await response.json();
 
-            console.log("Fetched Data:", data); // Debugging: Ensure correct response
+            console.log("Fetched Data:", data[0]); // Debugging: Ensure correct response
 
-            if (response.ok && Array.isArray(data.data)) {
-                setExperiences(data.data);
+            if (response.ok && Array.isArray(data.data[0])) {
+                setExperiences(data.data[0]);
+                setBookmarks(data.data[1]);
             } else {
                 console.error("Fetched data is not an array:", data);
                 setExperiences([]); // Ensure empty state if data is incorrect
+                setBookmarks([]);
             }
         } catch (error) {
             console.error("Error fetching experiences:", error);
@@ -83,17 +101,17 @@ const Dashboard = () => {
                 </div>
                 <div className="right">
                     <div className="board-links">
-                        <div>My Experiences</div>
+                        <a href="#experience-nav">My Experiences</a>
                         <div>|</div>
-                        <div>My Trips</div>
+                        <a href="#trip-nav">My Trips</a>
                         <div>|</div>
-                        <div>Bookmarked</div>
+                        <a href="#bookmark-nav">Bookmarked</a>
                     </div>
                 </div>
             </div>
 
             {/* My Experiences Section */}
-            <div className="experience-nav">
+            <div id="experience-nav" className="experience-nav">
                 <div className="left">
                     <h3 className="title">My Experiences</h3>
                     <button onClick={handleCreateExperienceClick}>
@@ -124,31 +142,32 @@ const Dashboard = () => {
             </div>
 
             {/* Display User's Experiences */}
-            <div className="user-experiences">
-    {loading ? (
-        <p>Loading experiences...</p>
-    ) : (
-        experiences.length === 0 ? (
-            <p>No experiences to display.</p>
-        ) : (
-            experiences.map((experience) => (
-                <div key={experience._id} className="experience-card">
-                    <h4>{experience.title}</h4>
-                    <p><strong>Date:</strong> {experience.eventDate}</p>
-                    <p><strong>Location:</strong> {experience.location}</p>
-                    <p><strong>Description:</strong> {experience.description}</p>
-                    <p><strong>Created on:</strong> {experience.creationDate}</p>
-                    {experience.photoURL && <img src={experience.photoURL} alt="Experience" />}
-                    <div className="ratings">
-                        <p><strong>Rating:</strong> {experience.rating ? `Avg: ${experience.rating.average}` : "No ratings yet"}</p>
-                    </div>
-                </div>
-            ))
-        )
-    )}
-</div>
+            <div className={`user-experiences ${expViewMode === "list" ? "list-view" : ""}`}>
+                {loading ? (
+                    <p>Loading experiences...</p>
+                ) : (
+                    experiences.length === 0 ? (
+                        <p>No experiences to display.</p>
+                    ) : (
+                        experiences.map((experience) => (
+                            <div key={experience._id} className="experience-card">
+                                <h4>{experience.title}</h4>
+                                <p><strong>Date:</strong> {experience.eventDate}</p>
+                                <p><strong>Location:</strong> {experience.location}</p>
+                                <p><strong>Description:</strong> {experience.description}</p>
+                                <p><strong>Created on:</strong> {experience.creationDate}</p>
+                                {experience.photoURL && <img src={experience.photoURL} alt="Experience" />}
+                                <div className="ratings">
+                                    <p><strong>Rating:</strong> {experience.rating ? `Avg: ${experience.rating.average}` : "No ratings yet"}</p>
+                                </div>
+                            </div>
+                        ))
+                    )
+                )}
+            </div>
+
             {/* My Trips Section */}
-            <div className="trip-nav">
+            <div id="trip-nav" className="trip-nav">
                 <div className="left">
                     <h3 className="title">My Trips</h3>
                     <button onClick={handleCreateTripClick}>
@@ -179,12 +198,12 @@ const Dashboard = () => {
             </div>
 
             {/* Bookmarked Section */}
-            <div className="bookmark-nav">
+            <div id="bookmark-nav" className="bookmark-nav">
                 <div className="left">
                     <h3 className="title">Bookmarked</h3>
                 </div>
                 <div className="right">
-                    <div>xx Experience(s)</div>
+                    <div>{bookmarks.length} Experience(s)</div>
                     <button
                         className={selectedBookmarkButton === "default" ? "selected" : "not-selected"}
                         onClick={() => handleBookmarkButtonClick("default")}
@@ -204,6 +223,31 @@ const Dashboard = () => {
                         List View
                     </button>
                 </div>
+            </div>
+
+            {/* Display Bookmarked Experiences */}
+            <div className={`bookmark-experiences ${bmViewMode === "list" ? "list-view" : ""}`}>
+                {loading ? (
+                    <p>Loading bookmarked experiences...</p>
+                ) : (
+                    bookmarks.length === 0 ? (
+                        <p>No bookmarked experiences to display.</p>
+                    ) : (
+                        bookmarks.map((bookmark) => (
+                            <div key={bookmark._id} className="bookmark-card">
+                                <h4>{bookmark.title}</h4>
+                                <p><strong>Date:</strong> {bookmark.eventDate}</p>
+                                <p><strong>Location:</strong> {bookmark.location}</p>
+                                <p><strong>Description:</strong> {bookmark.description}</p>
+                                <p><strong>Created on:</strong> {bookmark.creationDate}</p>
+                                {bookmark.photoURL && <img src={bookmark.photoURL} alt="Experience" />}
+                                <div className="ratings">
+                                    <p><strong>Rating:</strong> {bookmark.rating ? `Avg: ${bookmark.rating.average}` : "No ratings yet"}</p>
+                                </div>
+                            </div>
+                        ))
+                    )
+                )}
             </div>
         </div>
     );
