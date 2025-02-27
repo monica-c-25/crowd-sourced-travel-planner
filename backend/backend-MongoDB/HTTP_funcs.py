@@ -46,6 +46,7 @@ def _get(request_body: dict, collection: object) -> object:
         cursor = collection.find()
         result = [item for item in cursor]
     elif "_id" in request_body:
+        print("_id is", request_body)
         result = collection.find_one({"_id": ObjectId(request_body["_id"])})
     else:
         result = collection.find_one(request_body)
@@ -125,7 +126,6 @@ def decode(collection: str, result: dict) -> None:
 
 
 def _put(collection: object, payload: dict, id_to_update: str) -> None:
-    print("COLLECTION.NAME is: ", collection.name)
     collection.update_one(
         {"_id": ObjectId(id_to_update)},
         payload

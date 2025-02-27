@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 import './ExperienceDetail.css';
-import { FaRegBookmark, FaRegEdit } from "react-icons/fa";
+import { FaRegBookmark, FaBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 
@@ -15,13 +15,17 @@ const ExperienceDetail = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, userID } = useAuth();
   const [formData, setFormData] = useState({ 
     title: "",
     description: "",
     eventDate: "",
     location: ""
   });
+  const [updatedData, setUpdatedData] = useState({
+    "mongo_id": id
+  });
+  const [bookmarks, setBookmarks] = useState([]);
   
   useEffect(() => {
     const fetchExperience = async () => {
@@ -40,9 +44,67 @@ const ExperienceDetail = () => {
         setLoading(false);
       }
     };
-  
+
+    const fetchUserBookmarks = async () => {
+      if (isAuthenticated && userID) {
+        try {
+          const response = await fetch(`http://localhost:8001/api/user-data/${userID}`);
+          const data = await response.json();
+          if (data.Message === "Success") {
+            setBookmarks(data.data.Bookmarks || []); // Set the bookmarks from the DB
+          }
+        } catch (error) {
+          console.error("Error fetching user bookmarks:", error);
+        }
+      }
+    };
+
     fetchExperience();
-  }, [id]);
+    fetchUserBookmarks();
+  }, [id, isAuthenticated, userID]);
+
+  // Function to toggle bookmark state for an experience
+  const handleBookmarkClick = async () => {
+    if (!isAuthenticated) {
+      alert("You must be signed in to bookmark.");
+      return;
+    }
+
+    const isBookmarked = bookmarks.includes(id);
+    let updatedBookmarks;
+
+    if (isBookmarked) {
+      updatedBookmarks = bookmarks.filter(bookmark => bookmark !== id);
+    } else {
+      updatedBookmarks = [...bookmarks, id];
+      console.log("updated Bookmarks", updatedBookmarks);
+    }
+
+    try {
+      // Update the database with the new bookmarks list
+      const response = await fetch(`http://localhost:8001/api/user-data`, {
+        method: "PUT",
+        body: JSON.stringify({ 
+          "mongo_id": userID, Bookmarks: updatedBookmarks 
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      if (data.Message === "Success") {
+        // Update the local state
+        setBookmarks(updatedBookmarks);
+      } else {
+        console.error("Error updating bookmarks.");
+      }
+    } catch (error) {
+      console.error("Error updating bookmarks:", error);
+    }
+  };
+
+  const isBookmarked = bookmarks.includes(id);
 
   if (loading) return <p>Loading...</p>;
   if (!experience) return <p>Experience not found.</p>;
@@ -79,9 +141,7 @@ const ExperienceDetail = () => {
 
   const handleEditSubmit = async () => {
     // Prepare an object to store the fields that have changed
-    const updatedData = {
-      "mongo_id": id
-    };
+    let updated = { ...updatedData };
   
     // Check for changes and add them to updatedData
     if (formData.description !== experience.description) {
@@ -96,6 +156,7 @@ const ExperienceDetail = () => {
     if (formData.location !== experience.location) {
       updatedData.location = formData.location;
     }
+    setUpdatedData(updated);
   
     // If no data has changed, don't send anything
     if (Object.keys(updatedData).length === 1) {
@@ -103,7 +164,7 @@ const ExperienceDetail = () => {
       setEditOpen(false);
       return;
     }
-
+  
     // Send the updated data to the server
     try {
       const response = await fetch(`http://localhost:8001/api/experience-data`, {
@@ -145,7 +206,15 @@ const ExperienceDetail = () => {
           {user && user.name === experience.User[0] && (
             <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
           )}
-          <button className="bookmark-btn"><FaRegBookmark />Bookmark</button>
+          <button className="bookmark-btn" onClick={handleBookmarkClick}>{isBookmarked ? (
+        <>
+          <FaBookmark /> Unbookmark
+        </>
+      ) : (
+        <>
+          <FaRegBookmark /> Bookmark
+        </>
+      )}</button>
         </div>
       </div>
       <div className="header-detail">
