@@ -15,14 +15,8 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
-<<<<<<<<< Temporary merge branch 1
-
-  const { isAuthenticated, isLoading } = useAuth();
-=========
-  
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
->>>>>>>>> Temporary merge branch 2
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
