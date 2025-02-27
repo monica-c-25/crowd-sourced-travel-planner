@@ -15,6 +15,29 @@ uri = (
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
+def _search_for_experience(collection: object, request_body: dict):
+    results = []
+
+    if request_body["type"] == "Name":
+        queried_results = collection.find({
+            "title": {"$regex": request_body["input"], "$options": "i"}
+        })
+
+    else:
+        queried_results = collection.find({
+            "title": {"$regex": request_body["input"], "$options": "i"}
+        })
+
+    if not queried_results:
+        return {"Message": "Unsuccessful"}
+
+    for item in queried_results:
+        item["_id"] = str(item["_id"])
+        results.append(item)
+
+    return {"message": "success", "data": results}
+
+
 def _linked_update(collections: dict, collection_name: str,
                    cross_id: str) -> None:
 

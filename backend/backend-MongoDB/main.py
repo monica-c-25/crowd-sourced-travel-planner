@@ -3,7 +3,9 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
-from HTTP_funcs import _get, _put, _post, _delete, _set_payload
+from HTTP_funcs import (
+    _get, _put, _post, _delete, _set_payload, _search_for_experience
+)
 from flask_cors import CORS
 from bson.objectid import ObjectId
 from openai import OpenAI
@@ -95,6 +97,15 @@ def general_request(request: object, collection: object) -> None:
             }
 
         return jsonify(response)
+
+
+@app.route('/api/search', methods=['POST'])
+def search_for_experience():
+    db = client["Experience"]
+    collection = db["Experience"]
+
+    if request.method == 'POST':
+        return _search_for_experience(collection, request.json)
 
 
 # GETS EXPERIENCE DETAILS
