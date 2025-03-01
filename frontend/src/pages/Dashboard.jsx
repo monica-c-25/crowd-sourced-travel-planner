@@ -15,12 +15,19 @@ const Dashboard = () => {
 
     // State to track viewMode
     const [expViewMode, setExpViewMode] = useState("grid");
+    const [tripViewMode, setTripViewMode] = useState("grid");
     const [bmViewMode, setBMViewMode] = useState("grid");
 
-    // State to hold user-specific experiences
+    // State to hold user-specific experiences, trips, and bookmarks
     const [experiences, setExperiences] = useState([]);
+    const [trips, setTrips] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // States to store the original unsorted data
+    const [originalExperiences, setOriginalExperiences] = useState([]);
+    const [originalTrips, setOriginalTrips] = useState([]);
+    const [originalBookmarks, setOriginalBookmarks] = useState([]);
 
     // Handle user creating an experience
     const handleCreateExperienceClick = () => {
@@ -42,51 +49,93 @@ const Dashboard = () => {
     const handleExperienceButtonClick = (buttonType) => {
         setSelectedExperienceButton(buttonType);
         if (buttonType === "list") {
-            setExpViewMode("list"); // Switch to list view
-        } else {
-            setExpViewMode("grid"); // Switch back to grid view
+            setExpViewMode("list");
+        } else if (buttonType === "az") {
+            setExpViewMode("grid");
+            // Sort experiences A-Z by title
+            const sortedExperiences = [...experiences].sort((a, b) =>
+                a.title.localeCompare(b.title)
+            );
+            setExperiences(sortedExperiences);
+        } else if (buttonType === "default") {
+            setExpViewMode("grid");
+            // Reset to the original, unsorted experiences
+            setExperiences([...originalExperiences]);
         }
     };
 
     const handleTripButtonClick = (buttonType) => {
         setSelectedTripButton(buttonType);
+        if (buttonType === "list") {
+            setTripViewMode("list");
+        } else if (buttonType === "az") {
+            setTripViewMode("grid");
+            // Sort trips A-Z by title
+            const sortedTrips = [...trips].sort((a, b) =>
+                a.title.localeCompare(b.title)
+            );
+            setTrips(sortedTrips);
+        } else if (buttonType === "default") {
+            setTripViewMode("grid");
+            // Reset to the original, unsorted trips
+            setTrips([...originalTrips]);
+        }
     };
 
     const handleBookmarkButtonClick = (buttonType) => {
         setSelectedBookmarkButton(buttonType);
         if (buttonType === "list") {
-            setBMViewMode("list"); // Switch to list view
-        } else {
-            setBMViewMode("grid"); // Switch back to grid view
+            setBMViewMode("list");
+        } else if (buttonType === "az") {
+            setBMViewMode("grid");
+            // Sort bookmarks A-Z by title
+            const sortedBookmarks = [...bookmarks].sort((a, b) =>
+                a.title.localeCompare(b.title)
+            );
+            setBookmarks(sortedBookmarks);
+        } else if (buttonType === "default") {
+            setBMViewMode("grid");
+            // Reset to the original, unsorted bookmarks
+            setBookmarks([...originalBookmarks]);
         }
     };
 
-    // Fetch user's experiences based on their ID
+    // Fetch user data (experiences, trips, bookmarks) and store the original data
     useEffect(() => {
-        if (isAuthenticated && user) {
-            fetchUserExperiences(user.auth0_id); // Assuming `user.auth0_id` is the user's ID
+        if (isAuthenticated && userID) {
+            fetchUserExperiencesAndTrips(userID);
         }
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, userID]);
 
-    const fetchUserExperiences = async () => {
+    const fetchUserExperiencesAndTrips = async (userID) => {
         setLoading(true);
         try {
-            console.log("user ID is: ", userID);
+            // Fetch experiences and bookmarks
             const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userID}`);
             const data = await response.json();
 
-            console.log("Fetched Data:", data[0]); // Debugging: Ensure correct response
-
             if (response.ok && Array.isArray(data.data[0])) {
                 setExperiences(data.data[0]);
+                setOriginalExperiences(data.data[0]); // Store original experiences data
                 setBookmarks(data.data[1]);
+                setOriginalBookmarks(data.data[1]); // Store original bookmarks data
             } else {
-                console.error("Fetched data is not an array:", data);
-                setExperiences([]); // Ensure empty state if data is incorrect
+                setExperiences([]);
                 setBookmarks([]);
             }
+
+            // Fetch trips
+            const tripResponse = await fetch(`http://127.0.0.1:8001/api/user-trips/${userID}`);
+            const tripData = await tripResponse.json();
+
+            if (tripResponse.ok && Array.isArray(tripData.data)) {
+                setTrips(tripData.data);
+                setOriginalTrips(tripData.data); // Store original trips data
+            } else {
+                setTrips([]);
+            }
         } catch (error) {
-            console.error("Error fetching experiences:", error);
+            console.error("Error fetching experiences and trips:", error);
         } finally {
             setLoading(false);
         }
@@ -175,7 +224,7 @@ const Dashboard = () => {
                     </button>
                 </div>
                 <div className="right">
-                    <div>xx Trip(s)</div>
+                    <div>{trips.length} Trip(s)</div>
                     <button
                         className={selectedTripButton === "default" ? "selected" : "not-selected"}
                         onClick={() => handleTripButtonClick("default")}
@@ -195,6 +244,24 @@ const Dashboard = () => {
                         List View
                     </button>
                 </div>
+            </div>
+
+            {/* Display User's Trips */}
+            <div className={`user-trips ${tripViewMode === "list" ? "list-view" : ""}`}>
+                {loading ? (
+                    <p>Loading trips...</p>
+                ) : trips.length === 0 ? (
+                    <p>No trips to display.</p>
+                ) : (
+                    trips.map((trip) => (
+                        <div key={trip._id} className="trip-card">
+                            <h4>{trip.title}</h4>
+                            <p><strong>Created on:</strong> {trip.creationDate}</p>
+                            <p><strong>Event Date:</strong> {trip.eventDate ? `${trip.eventDate.start} to ${trip.eventDate.end}` : "Not set"}</p>
+                            {trip.photoURL && <img src={trip.photoURL} alt="Trip" />}
+                        </div>
+                    ))
+                )}
             </div>
 
             {/* Bookmarked Section */}

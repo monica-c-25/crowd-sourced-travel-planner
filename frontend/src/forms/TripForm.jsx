@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import "./TripForm.css";
+import { useAuth } from "../context/AuthContext"; // Assuming this context gives the user info
+import './TripForm.css';
 import '../index.css';
 
 function TripForm() {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, userID } = useAuth();
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -28,8 +28,10 @@ function TripForm() {
             setLoading(false);
             fetchExperiences();
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, userID, navigate]);
 
+
+    // Fetch available experiences to select for the trip
     const fetchExperiences = async () => {
         try {
             const response = await fetch("http://127.0.0.1:8001/api/experience-data");
@@ -47,7 +49,6 @@ function TripForm() {
             console.error("Error fetching experiences:", error);
         }
     };
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -83,11 +84,11 @@ function TripForm() {
 
         const formPayload = {
             title: formData.title,
-            selectedExperiences: formData.selectedExperiences,
+            selectedExperiences: formData.selectedExperiences.length ? formData.selectedExperiences : [],
             creationDate: today,
             eventDate: formData.eventDate,
+            user_id: userID, // Assuming userID is stored in the context
         };
-
 
         try {
             const response = await fetch("http://127.0.0.1:8001/api/trip-data", {
@@ -105,7 +106,7 @@ function TripForm() {
                     eventDate: { start: "", end: "" },
                     selectedExperiences: [],
                 });
-                window.location.href = "/dashboard";
+                window.location.href = "/dashboard"; // Or navigate to another route if needed
             } else {
                 alert("Failed to add trip");
             }
@@ -166,7 +167,7 @@ function TripForm() {
                         {experiences.map((experience) => (
                             <div
                                 key={experience._id}
-                                className={`trip-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
+                                className={`experience-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
                                 onClick={() => handleExperienceSelection(experience._id)}
                             >
                                 <img src={experience.photoURL || "/default-experience.jpg"} alt={experience.title} />

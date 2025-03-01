@@ -15,8 +15,16 @@ const Explore = () => {
     // Fetch experiences from the backend API
     const fetchExperiences = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8001/api/experience-data",
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        // Ensure the API URL is defined
+        if (!apiUrl) {
+          console.error("API URL is not defined in the environment variables.");
+          return;
+        }
+
+        // Fetch data using the dynamic API URL
+        const response = await fetch(`${apiUrl}/api/experience-data`,
           {
             method: "GET", // Specify GET method if it's a GET request
             headers: {

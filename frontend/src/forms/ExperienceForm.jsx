@@ -41,7 +41,9 @@ function ExperienceForm(props) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8001/api/experience-data", {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      const response = await fetch(`${apiUrl}/api/experience-data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,9 +53,7 @@ function ExperienceForm(props) {
           eventDate: formData.eventDate,
           creationDate: today,
           description: formData.description,
-          photoURL: "",
           location: formData.location, // Send lat/lon string
-          rating: {"average": 0, "total": 0},
           User: [userID]
         }),
       });
@@ -68,7 +68,6 @@ function ExperienceForm(props) {
             description: "",
             location: "",
           });
-
           window.location.href = "/explore";
         } else {
           alert(result.Message || "Unable to add experience");

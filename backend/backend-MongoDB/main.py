@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -138,6 +139,40 @@ def get_experience_by_id(experience_id):
     return jsonify(response)
 
 
+@app.route('/api/user-trips/<user_id>', methods=['GET'])
+def get_user_trips(user_id):
+    db = client["User"]
+    user_collection = db["User"]
+    trip_collection = client["Trip"]["Trip"]
+
+    try:
+        # Ensure user_id is a valid ObjectId
+        mongo_user_id = ObjectId(user_id)
+
+        # Fetch user document by MongoDB _id
+        user = user_collection.find_one({"_id": mongo_user_id})
+        if not user:
+            return jsonify({"Message": "User not found", "data": []}), 404
+
+        # Extract trip IDs (stored as strings)
+        trip_ids = user.get("Trips", [])
+
+        # Convert trip IDs to ObjectId format
+        trip_object_ids = [ObjectId(trip_id) for trip_id in trip_ids]
+
+        # Fetch trips from the Trip collection
+        trips = list(trip_collection.find({"_id": {"$in": trip_object_ids}}))
+
+        # Convert ObjectId to string for frontend compatibility
+        for trip in trips:
+            trip["_id"] = str(trip["_id"])
+
+        return jsonify({"Message": "Success", "data": trips})
+
+    except Exception as e:
+        return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def experience_request_handler():
     db = client["Experience"]
@@ -223,9 +258,40 @@ def get_user_experiences(user_id):
 def trip_request_handler():
 
     db = client["Trip"]
-    collection = db["Trip"]
+    user_db = client["User"]
 
-    return general_request(request, collection)
+    try:
+        # Get the data for the new trip from the request body
+        trip_data = request.get_json()
+
+        # Get user ID from the trip data (assuming it's part of the trip data)
+        user_id = trip_data.get('user_id')
+
+        # Ensure that the user exists
+        user = user_db["User"].find_one({"_id": ObjectId(user_id)})
+        if not user:
+            return jsonify({"Message": "User not found"}), 404
+
+        # Insert the new trip into the 'Trip' collection
+        trip_data["creationDate"] = str(datetime.datetime.utcnow())  # Add creation date if necessary
+        result = db["Trip"].insert_one(trip_data)
+
+        # Get the newly inserted trip's ID
+        trip_id = result.inserted_id
+
+        # Update the user's 'Trips' field by adding the new trip's ID
+        user_db["User"].update_one(
+            {"_id": ObjectId(user_id)},
+            {"$push": {"Trips": trip_id}}
+        )
+
+        return jsonify({
+            "Message": "Trip created successfully",
+            "trip_id": str(trip_id)  # Return the trip ID in the response
+        }), 201
+
+    except Exception as e:
+        return jsonify({"Message": f"Error: {str(e)}"}), 500
 
 
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
