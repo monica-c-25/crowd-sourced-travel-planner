@@ -83,7 +83,7 @@ const Explore = () => {
       ) : (
         <div className="experience-grid">
           {Array.isArray(experiences) && experiences.length > 0 ? (
-            experiences.map((experience, index) => (
+            experiences.reverse().map((experience, index) => (
               <Link
                 key={index}
                 to={`/experience-detail/${experience._id}`} // Navigate to details page
@@ -96,7 +96,7 @@ const Explore = () => {
                 />
                 <p className="date">{experience.eventDate}</p>
                 <p><strong>Location: </strong> {experience.location}</p>
-                <p><strong>Description: </strong>{experience.description}</p>
+                <p><strong>Description: </strong>{experience.description.slice(0, 42)}{experience.description.length > 42 && "..."}</p>
                 <p><strong>Created By: </strong>{experience.User[0]}</p>
               </Link>
             ))
