@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Assuming this context gives the user info
+import { Link } from "react-router-dom";
+import { FaCheck } from "react-icons/fa";
 import './Dashboard.css';
 import '../index.css';
 
@@ -198,8 +200,13 @@ const Dashboard = () => {
                     experiences.length === 0 ? (
                         <p>No experiences to display.</p>
                     ) : (
-                        experiences.map((experience) => (
-                            <div key={experience._id} className="experience-card">
+                        experiences.reverse().map((experience) => (
+                            <Link
+                                key={experience._id}
+                                to={`/experience-detail/${experience._id}`} // Navigate to details page
+                                className="experience-card"
+                            >
+                            {/* <div key={experience._id} className="experience-card"> */}
                                 <h4>{experience.title}</h4>
                                 <p><strong>Date:</strong> {experience.eventDate}</p>
                                 <p><strong>Location:</strong> {experience.location}</p>
@@ -209,7 +216,8 @@ const Dashboard = () => {
                                 <div className="ratings">
                                     <p><strong>Rating:</strong> {experience.rating ? `Avg: ${experience.rating.average}` : "No ratings yet"}</p>
                                 </div>
-                            </div>
+                            </Link>
+                            // </div>
                         ))
                     )
                 )}
@@ -253,13 +261,20 @@ const Dashboard = () => {
                 ) : trips.length === 0 ? (
                     <p>No trips to display.</p>
                 ) : (
-                    trips.map((trip) => (
-                        <div key={trip._id} className="trip-card">
+                    trips.reverse().map((trip) => (
+                        <Link
+                        key={trip._id}
+                        to={`/trip-data/${trip._id}`} // Navigate to details page
+                        className="trip-card"
+                        >
+                        {/* <div key={trip._id} className="trip-card"> */}
                             <h4>{trip.title}</h4>
                             <p><strong>Created on:</strong> {trip.creationDate}</p>
                             <p><strong>Event Date:</strong> {trip.eventDate ? `${trip.eventDate.start} to ${trip.eventDate.end}` : "Not set"}</p>
                             {trip.photoURL && <img src={trip.photoURL} alt="Trip" />}
-                        </div>
+                            {trip.completed && (<p><FaCheck style={{ color: 'green' }} /> Trip has been completed!</p>)}
+                        {/* </div> */}
+                        </Link>
                     ))
                 )}
             </div>
@@ -300,8 +315,12 @@ const Dashboard = () => {
                     bookmarks.length === 0 ? (
                         <p>No bookmarked experiences to display.</p>
                     ) : (
-                        bookmarks.map((bookmark) => (
-                            <div key={bookmark._id} className="bookmark-card">
+                        bookmarks.reverse().map((bookmark) => (
+                            <Link
+                                key={bookmark._id}
+                                to={`/experience-detail/${bookmark._id}`} // Navigate to details page
+                                className="bookmark-card"
+                            >
                                 <h4>{bookmark.title}</h4>
                                 <p><strong>Date:</strong> {bookmark.eventDate}</p>
                                 <p><strong>Location:</strong> {bookmark.location}</p>
@@ -311,7 +330,7 @@ const Dashboard = () => {
                                 <div className="ratings">
                                     <p><strong>Rating:</strong> {bookmark.rating ? `Avg: ${bookmark.rating.average}` : "No ratings yet"}</p>
                                 </div>
-                            </div>
+                            </Link>
                         ))
                     )
                 )}

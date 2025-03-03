@@ -15,9 +15,13 @@ function TripForm() {
         title: "",
         eventDate: { start: "", end: "" },
         selectedExperiences: [],
+        completed: false,
     });
 
     const [experiences, setExperiences] = useState([]);
+    const [userExperiences, setUserExperiences] = useState([]);
+    const [userBookmarks, setUserBookmarks] = useState([]);
+    const [filteredExperiences, setFilteredExperiences] = useState([]);
     const [filter, setFilter] = useState("all");
 
     useEffect(() => {
@@ -27,6 +31,7 @@ function TripForm() {
         } else {
             setLoading(false);
             fetchExperiences();
+            fetchUserExperiences(userID);
         }
     }, [isAuthenticated, userID, navigate]);
 
@@ -37,10 +42,10 @@ function TripForm() {
             const response = await fetch("http://127.0.0.1:8001/api/experience-data");
             if (response.ok) {
                 const data = await response.json();
-                if (Array.isArray(data)) {
-                    setExperiences(data);
+                if (Array.isArray(data.data)) {
+                    setExperiences(data.data);
                 } else {
-                    console.error("Fetched data is not an array:", data);
+                    console.error("Fetched data is not an array:", data.data);
                 }
             } else {
                 console.error("Failed to fetch experiences");
@@ -87,7 +92,8 @@ function TripForm() {
             selectedExperiences: formData.selectedExperiences.length ? formData.selectedExperiences : [],
             creationDate: today,
             eventDate: formData.eventDate,
-            user_id: userID, // Assuming userID is stored in the context
+            user_id: userID,
+            completed: formData.completed,
         };
 
         try {
@@ -105,6 +111,7 @@ function TripForm() {
                     title: "",
                     eventDate: { start: "", end: "" },
                     selectedExperiences: [],
+                    completed: false,
                 });
                 window.location.href = "/dashboard"; // Or navigate to another route if needed
             } else {
@@ -113,6 +120,45 @@ function TripForm() {
         } catch (error) {
             console.error("Error submitting form:", error);
             alert("An error occurred while submitting the form.");
+        }
+    };
+
+    // Update filtered experiences based on the selected filter
+    useEffect(() => {
+        switch (filter) {
+            case "all":
+                setFilteredExperiences(experiences); // Show all experiences
+                break;
+            case "myExperiences":
+                setFilteredExperiences(userExperiences); // Filter by user
+                break;
+            case "bookmarked":
+                // Add logic here for bookmarked experiences if needed
+                setFilteredExperiences(userBookmarks); // Example filter for bookmarked experiences
+                break;
+            default:
+                setFilteredExperiences(experiences); // Default to all if no valid filter is set
+        }
+    }, [filter, experiences, userID]);
+
+    const fetchUserExperiences = async (userID) => {
+        setLoading(true);
+        try {
+            // Fetch experiences and bookmarks
+            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userID}`);
+            const data = await response.json();
+
+            if (response.ok && Array.isArray(data.data[0])) {
+                setUserExperiences(data.data[0]);
+                setUserBookmarks(data.data[1]);
+            } else {
+                setUserExperiences([]);
+                setUserBookmarks([]);
+            }
+        } catch (error) {
+            console.error("Error fetching User experiences:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -163,11 +209,11 @@ function TripForm() {
                             Bookmarked
                         </button>
                     </div>
-                    <div className="experience-list">
-                        {experiences.map((experience) => (
+                    <div className="trip-experience-list">
+                        {filteredExperiences.map((experience) => (
                             <div
                                 key={experience._id}
-                                className={`experience-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
+                                className={`trip-experience-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
                                 onClick={() => handleExperienceSelection(experience._id)}
                             >
                                 <img src={experience.photoURL || "/default-experience.jpg"} alt={experience.title} />
@@ -188,6 +234,7 @@ function TripForm() {
                                     eventDate: e.target.checked
                                         ? { start: today, end: today }
                                         : { start: "", end: "" },
+                                    completed: !formData.completed
                                 }));
                             }}
                         />

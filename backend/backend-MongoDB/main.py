@@ -255,49 +255,81 @@ def get_user_experiences(user_id):
 
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def trip_request_handler():
-
+@app.route('/api/trip-data/<trip_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])  # Added URL for trip_id
+def trip_request_handler(trip_id=None):
     db = client["Trip"]
     user_db = client["User"]
+    experience_collection = client["Experience"]["Experience"]
+    
+    if request.method == 'POST':
+        try:
+            # Get the data for the new trip from the request body
+            trip_data = request.get_json()
 
-    try:
-        # Get the data for the new trip from the request body
-        trip_data = request.get_json()
+            # Get user ID from the trip data (assuming it's part of the trip data)
+            user_id = trip_data.get('user_id')
 
-        # Get user ID from the trip data (assuming it's part of the trip data)
-        user_id = trip_data.get('user_id')
+            # Ensure that the user exists
+            user = user_db["User"].find_one({"_id": ObjectId(user_id)})
+            if not user:
+                return jsonify({"Message": "User not found"}), 404
 
-        # Ensure that the user exists
-        user = user_db["User"].find_one({"_id": ObjectId(user_id)})
-        if not user:
-            return jsonify({"Message": "User not found"}), 404
+            # Insert the new trip into the 'Trip' collection
+            trip_data["creationDate"] = str(datetime.datetime.utcnow())  # Add creation date if necessary
+            result = db["Trip"].insert_one(trip_data)
 
-        # Insert the new trip into the 'Trip' collection
-        trip_data["creationDate"] = str(datetime.datetime.utcnow())  # Add creation date if necessary
-        result = db["Trip"].insert_one(trip_data)
+            # Get the newly inserted trip's ID
+            trip_id = result.inserted_id
 
-        # Get the newly inserted trip's ID
-        trip_id = result.inserted_id
+            # Update the user's 'Trips' field by adding the new trip's ID
+            user_db["User"].update_one(
+                {"_id": ObjectId(user_id)},
+                {"$push": {"Trips": trip_id}}
+            )
 
-        # Update the user's 'Trips' field by adding the new trip's ID
-        user_db["User"].update_one(
-            {"_id": ObjectId(user_id)},
-            {"$push": {"Trips": trip_id}}
-        )
+            return jsonify({
+                "Message": "Trip created successfully",
+                "trip_id": str(trip_id)  # Return the trip ID in the response
+            }), 201
 
-        return jsonify({
-            "Message": "Trip created successfully",
-            "trip_id": str(trip_id)  # Return the trip ID in the response
-        }), 201
+        except Exception as e:
+            return jsonify({"Message": f"Error: {str(e)}"}), 500
+    
+    # Handling the GET method for a specific trip
+    if request.method == 'GET':
+        try:
+            # If trip_id is passed, try to find the specific trip
+            if trip_id:
+                trip = db["Trip"].find_one({"_id": ObjectId(trip_id)})
+                
+                if trip:
+                    trip_ids = trip.get("selectedExperiences", [])
+                    print("SELECTED EXPERIENCES: ", trip_ids)
+                    trip_object_ids = [ObjectId(t_id) for t_id in trip_ids]
+                    experiences = list(experience_collection.find({"_id": {"$in": trip_object_ids}}))
+                    for experience in experiences:
+                        experience["_id"] = str(experience["_id"])
+                    trip["_id"] = str(trip["_id"])
+                    return jsonify({
+                        "Message": "Success",
+                        # "trip_id": str(trip["_id"]),
+                        "data": [trip, experiences]  # Add all trip data to the response
+                    }), 200
+                else:
+                    return jsonify({"Message": "Trip not found"}), 404
+            else:
+                return jsonify({"Message": "Trip ID is required"}), 400
 
-    except Exception as e:
-        return jsonify({"Message": f"Error: {str(e)}"}), 500
+        except Exception as e:
+            return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+    # Handle other methods (PUT, DELETE) here if needed
+    return jsonify({"Message": "Method Not Allowed"}), 405
 
 
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def comment_request_handler():
 
-    print(request)
     db = client["Comment"]
     collection = db["Comment"]
 
