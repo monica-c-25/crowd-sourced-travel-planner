@@ -54,6 +54,7 @@ function ExperienceForm(props) {
           creationDate: today,
           description: formData.description,
           location: formData.location, // Send lat/lon string
+          rating: {"average": 0, "total": 0},
           User: [userID]
         }),
       });
@@ -68,7 +69,8 @@ function ExperienceForm(props) {
             description: "",
             location: "",
           });
-          window.location.href = "/explore";
+          // window.location.href = "/explore";
+          window.history.back();
         } else {
           alert(result.Message || "Unable to add experience");
         }
