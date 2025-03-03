@@ -260,7 +260,7 @@ def trip_request_handler(trip_id=None):
     db = client["Trip"]
     user_db = client["User"]
     experience_collection = client["Experience"]["Experience"]
-    
+
     if request.method == 'POST':
         try:
             # Get the data for the new trip from the request body
@@ -294,14 +294,14 @@ def trip_request_handler(trip_id=None):
 
         except Exception as e:
             return jsonify({"Message": f"Error: {str(e)}"}), 500
-    
+
     # Handling the GET method for a specific trip
     if request.method == 'GET':
         try:
             # If trip_id is passed, try to find the specific trip
             if trip_id:
                 trip = db["Trip"].find_one({"_id": ObjectId(trip_id)})
-                
+
                 if trip:
                     trip_ids = trip.get("selectedExperiences", [])
                     print("SELECTED EXPERIENCES: ", trip_ids)
