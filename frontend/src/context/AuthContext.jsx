@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   // Sync with MongoDB if user is authenticated
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (!isLoading && isAuthenticated && user) {
       const loginData = {
         auth0_id: user.sub,
         email: user.email,
@@ -33,8 +33,11 @@ export const AuthProvider = ({ children }) => {
         .catch((error) => {
           console.error("Error syncing user data:", error);
         });
+    } else {
+      console.log("Waiting for authentication to complete...");
     }
-  }, [isAuthenticated, user]); // Only run when user or isAuthenticated changes
+  }, [isLoading, isAuthenticated, user]);
+
 
   return (
     <AuthContext.Provider

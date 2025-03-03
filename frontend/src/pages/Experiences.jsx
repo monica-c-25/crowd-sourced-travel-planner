@@ -15,8 +15,16 @@ const Explore = () => {
     // Fetch experiences from the backend API
     const fetchExperiences = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8001/api/experience-data",
+        const apiUrl = process.env.REACT_APP_API_URL;
+
+        // Ensure the API URL is defined
+        if (!apiUrl) {
+          console.error("API URL is not defined in the environment variables.");
+          return;
+        }
+
+        // Fetch data using the dynamic API URL
+        const response = await fetch(`${apiUrl}/api/experience-data`,
           {
             method: "GET", // Specify GET method if it's a GET request
             headers: {
@@ -75,7 +83,7 @@ const Explore = () => {
       ) : (
         <div className="experience-grid">
           {Array.isArray(experiences) && experiences.length > 0 ? (
-            experiences.map((experience, index) => (
+            experiences.reverse().map((experience, index) => (
               <Link
                 key={index}
                 to={`/experience-detail/${experience._id}`} // Navigate to details page
@@ -88,7 +96,7 @@ const Explore = () => {
                 />
                 <p className="date">{experience.eventDate}</p>
                 <p><strong>Location: </strong> {experience.location}</p>
-                <p><strong>Description: </strong>{experience.description}</p>
+                <p><strong>Description: </strong>{experience.description.slice(0, 42)}{experience.description.length > 42 && "..."}</p>
                 <p><strong>Created By: </strong>{experience.User[0]}</p>
               </Link>
             ))

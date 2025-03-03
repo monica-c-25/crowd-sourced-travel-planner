@@ -7,7 +7,7 @@ function ExperienceForm(props) {
 
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({    
+  const [formData, setFormData] = useState({
     title: "",
     eventDate: today,
     description: "",
@@ -15,7 +15,7 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
-  
+
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
 
@@ -41,7 +41,9 @@ function ExperienceForm(props) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8001/api/experience-data", {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      const response = await fetch(`${apiUrl}/api/experience-data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +53,6 @@ function ExperienceForm(props) {
           eventDate: formData.eventDate,
           creationDate: today,
           description: formData.description,
-          photoURL: "",
           location: formData.location, // Send lat/lon string
           rating: {"average": 0, "total": 0},
           User: [userID]
@@ -68,8 +69,8 @@ function ExperienceForm(props) {
             description: "",
             location: "",
           });
-
-          window.location.href = "/explore";
+          // window.location.href = "/explore";
+          window.history.back();
         } else {
           alert(result.Message || "Unable to add experience");
         }

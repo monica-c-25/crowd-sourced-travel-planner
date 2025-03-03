@@ -1,0 +1,187 @@
+/* General Styles */
+.body-content {
+    font-size: 18px;
+}
+
+.board-nav h1 {
+    font-weight: 400;
+    font-size: 45px;
+}
+
+.experience-nav h3, .trip-nav h3, .bookmark-nav h3 {
+    font-weight: 300;
+    font-size: 30px;
+    margin-bottom: 1rem;
+}
+
+.board-nav, .experience-nav, .trip-nav, .bookmark-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.left, .right {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.board-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.board-links a {
+    color: inherit;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+.board-links a:hover {
+    background-color: #e6f0f2;
+    transform: scale(1.05);
+    border-radius: 50px;
+}
+
+/* Button Styles */
+button.not-selected {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid rgb(184, 184, 184);
+    border-radius: 15px;
+}
+
+button:hover {
+    background-color: #80ccdf !important;
+    text-decoration: none !important;
+}
+
+/* Experience, Trip, and Bookmarked Experience Sections */
+.user-experiences, .user-trips, .bookmark-experiences {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* List view style */
+.user-experiences.list-view, .user-trips.list-view, .bookmark-experiences.list-view {
+    display: block; /* Change to block (stacked layout) */
+}
+
+/* Style for cards in List View */
+.user-experiences.list-view .experience-card, .user-trips.list-view .trip-card,
+.bookmark-experiences.list-view .bookmark-card {
+    width: 90%; /* Smaller width for list view */
+    margin: 1rem auto;
+    padding: 1rem; /* Reduced padding */
+    font-size: 14px; /* Smaller text size for list view */
+}
+
+/* Remove space between elements inside the card */
+.user-experiences.list-view .experience-card h4,
+.user-trips.list-view .trip-card h4,
+.bookmark-experiences.list-view .bookmark-card h4,
+.user-experiences.list-view .experience-card p,
+.user-trips.list-view .trip-card p,
+.bookmark-experiences.list-view .bookmark-card p {
+    margin: 0; /* Remove margin between text elements */
+    padding: 0; /* Remove padding if any */
+    font-size: 16px;
+    text-align: left;
+}
+
+/* General Card Styles for Experiences, Trips, and Bookmarks */
+.experience-card, .trip-card, .bookmark-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.experience-card:hover, .trip-card:hover, .bookmark-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.experience-card h4, .trip-card h4, .bookmark-card h4 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.experience-card p, .trip-card p, .bookmark-card p {
+    font-size: 16px;
+    margin-bottom: 1rem;
+}
+
+/* Images for Cards */
+.experience-card img, .trip-card img, .bookmark-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* Ratings Section */
+.ratings {
+    margin-top: 1rem;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Loading & Empty State */
+.user-experiences p, .user-trips p, .bookmark-experiences p {
+    font-size: 18px;
+    color: #888;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Specific styles for Trips */
+.user-trips .trip-card {
+    /* Custom styles for the trips card */
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.user-trips .trip-card h4 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.user-trips .trip-card p {
+    font-size: 16px;
+    margin-bottom: 1rem;
+}
+
+.user-trips .trip-card img {
+    border-radius: 8px;
+    margin-top: 1rem;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Optional: Customize the look for event date in trips */
+.user-trips .trip-card .event-date {
+    font-style: italic;
+    color: #777;
+}
+
+.trip-card {
+    display: block; /* Ensures Link behaves like a div */
+    text-decoration: none; /* Removes underline from Link */
+    color: black;
+  }
+
+.experience-card {
+    display: block; /* Ensures Link behaves like a div */
+    text-decoration: none; /* Removes underline from Link */
+    color: black;
+}
