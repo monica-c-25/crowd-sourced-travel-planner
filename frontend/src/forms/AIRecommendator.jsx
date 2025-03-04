@@ -72,7 +72,7 @@ const ChatbotForm = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8001/get_recommendations",
+        "http://localhost:46725/get_recommendations",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

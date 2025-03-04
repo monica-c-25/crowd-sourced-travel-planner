@@ -29,7 +29,7 @@ const ExperienceDetail = () => {
   useEffect(() => {
     const fetchExperience = async () => {
       try {
-        const response = await fetch(`http://localhost:8001/api/experience-data/${id}`);
+        const response = await fetch(`http://localhost:46725/api/experience-data/${id}`);
         const data = await response.json();
         if (data.Message === "Success") {
           setExperience(data.data);
@@ -47,7 +47,7 @@ const ExperienceDetail = () => {
     const fetchUserBookmarks = async () => {
       if (isAuthenticated && userID) {
         try {
-          const response = await fetch(`http://localhost:8001/api/user-data/${userID}`);
+          const response = await fetch(`http://localhost:46725/api/user-data/${userID}`);
           const data = await response.json();
           if (data.Message === "Success") {
             setBookmarks(data.data.Bookmarks || []); // Set the bookmarks from the DB
@@ -81,7 +81,7 @@ const ExperienceDetail = () => {
 
     try {
       // Update the database with the new bookmarks list
-      const response = await fetch(`http://localhost:8001/api/user-data`, {
+      const response = await fetch(`http://localhost:46725/api/user-data`, {
         method: "PUT",
         body: JSON.stringify({ 
           "mongo_id": userID, Bookmarks: updatedBookmarks 
@@ -166,7 +166,7 @@ const ExperienceDetail = () => {
   
     // Send the updated data to the server
     try {
-      const response = await fetch(`http://localhost:8001/api/experience-data`, {
+      const response = await fetch(`http://localhost:46725/api/experience-data`, {
         method: "PUT",
         body: JSON.stringify(updatedData), // Only send the updated fields
         headers: {

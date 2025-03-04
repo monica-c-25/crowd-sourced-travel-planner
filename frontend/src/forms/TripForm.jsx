@@ -39,7 +39,7 @@ function TripForm() {
     // Fetch available experiences to select for the trip
     const fetchExperiences = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8001/api/experience-data");
+            const response = await fetch("http://127.0.0.1:46725/api/experience-data");
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data.data)) {
@@ -97,7 +97,7 @@ function TripForm() {
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:8001/api/trip-data", {
+            const response = await fetch("http://127.0.0.1:46725/api/trip-data", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -145,7 +145,7 @@ function TripForm() {
         setLoading(true);
         try {
             // Fetch experiences and bookmarks
-            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userID}`);
+            const response = await fetch(`http://127.0.0.1:46725/api/user-experiences/${userID}`);
             const data = await response.json();
 
             if (response.ok && Array.isArray(data.data[0])) {

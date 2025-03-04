@@ -40,7 +40,7 @@ function ReviewForm(props) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8001/api/comment-data", {
+      const response = await fetch("http://127.0.0.1:46725/api/comment-data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
