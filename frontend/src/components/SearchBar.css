@@ -36,3 +36,34 @@
   font-size: 18px;
   padding-right: 10px;
 }
+
+.radio-group-container {
+  display: flex;
+  align-items: center; /* Centers vertically */
+  justify-content: flex-start; /* Aligns to the left */
+  padding-left: 20px; /* Adds spacing from the left */
+  height: 100%; /* Ensures it takes full height for proper centering */
+}
+
+.search-autocomplete{
+  border-radius: 0px;
+  padding-left: 1em;
+  padding-bottom: 1em;
+}
+
+.autocomplete-start{
+  padding-top: 1em;
+}
+
+.radio-buttons-group{
+  padding-left: 1em;
+  padding-top: 0.5em;
+}
+
+.location-heading {
+  padding: 8px;
+  background-color: #eeeeee;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+}

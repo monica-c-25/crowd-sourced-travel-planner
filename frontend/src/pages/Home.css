@@ -35,6 +35,6 @@
     max-width: 1200px;
     /* padding: 0.5rem; */
     background-color: rgba(255, 255, 255, 0.9); /* Subtle background for contrast */
-    border-radius: 20px; /* Round the corners */
+    border-radius: 20px 20px 0px 0px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the bar */
 }
