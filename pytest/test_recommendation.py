@@ -12,11 +12,14 @@ def test_page_content(setup, page: Page):
     form_locator = page.locator('form')
     expect(page.locator('role=heading[name="Plan Your Trip"]')).to_be_visible()
     expect(form_locator).to_be_visible()
-    expect(form_locator.locator('role=heading[name="Where would you like to go?"]')).to_be_visible()
+    expect(form_locator.locator(
+        'role=heading[name="Where would you like to go?"]')).to_be_visible()
     form_locator.locator('button:text("Next")').click()
-    expect(form_locator.locator('role=heading[name="When do you plan to go?"]')).to_be_visible()
+    expect(form_locator.locator(
+        'role=heading[name="When do you plan to go?"]')).to_be_visible()
     form_locator.locator('button:text("Next")').click()
-    expect(form_locator.locator('role=heading[name="Who are you traveling with?"]')).to_be_visible()
+    expect(form_locator.locator(
+        'role=heading[name="Who are you traveling with?"]')).to_be_visible()
     form_locator.locator('button:text("Next")').click()
     expect(form_locator.locator('label').first).to_be_visible()
 
@@ -65,11 +68,13 @@ def test_complete_submission(setup, page: Page):
         expect(checkbox_label).to_be_visible()
 
     # Click the first checkbox and verify the check mark appears
-    first_checkbox_span = page.locator('label.checkbox-label:has-text("Food") span')
+    first_checkbox_span = page.locator(
+        'label.checkbox-label:has-text("Food") span')
     first_checkbox_span.click()
 
     # add custom interest
-    custom_input_locator = page.locator('input[type="text"][placeholder="Enter other interests not listed (separated by commas)"]')
+    custom_input_locator = page.locator(
+        'input[type="text"][placeholder="Enter other interests not listed (separated by commas)"]')
     expect(custom_input_locator).to_be_visible()
     custom_input_locator.fill('Music')
     form_locator.locator('button:text("Add")').click()
@@ -83,7 +88,8 @@ def test_complete_submission(setup, page: Page):
     expect(loading_indicator_locator).to_be_visible()  # Timeout in ms
     # Optionally, assert the loading text content is correct
     expect(loading_indicator_locator).to_have_text("Loading...")
-    expect(page).to_have_url("http://localhost:3000/ai-recommendation", timeout=30000)
+    expect(page).to_have_url(
+        "http://localhost:3000/ai-recommendation", timeout=30000)
 
     # Step 3: Check if 'food' is present in the recommendations page
     food_category_locator = page.locator('div.category h3:text("Food")')
@@ -95,9 +101,13 @@ def test_complete_submission(setup, page: Page):
 
     # Optionally, check if specific items under these categories are visible
     # Check if food category contains at least one item
-    food_items_locator = food_category_locator.locator('xpath=following-sibling::ul/li')
-    expect(food_items_locator).to_have_count(3)  # Adjust count based on actual items
+    food_items_locator = food_category_locator.locator(
+        'xpath=following-sibling::ul/li')
+    expect(food_items_locator).to_have_count(
+        3)  # Adjust count based on actual items
 
     # Check if music category contains at least one item
-    music_items_locator = music_category_locator.locator('xpath=following-sibling::ul/li')
-    expect(music_items_locator).to_have_count(3)  # Adjust count based on actual items
+    music_items_locator = music_category_locator.locator(
+        'xpath=following-sibling::ul/li')
+    expect(music_items_locator).to_have_count(
+        3)  # Adjust count based on actual items
