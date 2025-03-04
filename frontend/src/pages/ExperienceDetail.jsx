@@ -6,7 +6,6 @@ import './ExperienceDetail.css';
 import { FaRegBookmark, FaBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
-
 const ExperienceDetail = () => {
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
@@ -25,6 +24,7 @@ const ExperienceDetail = () => {
     "mongo_id": id
   });
   const [bookmarks, setBookmarks] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0); // State to manage current image index
   
   useEffect(() => {
     const fetchExperience = async () => {
@@ -76,7 +76,6 @@ const ExperienceDetail = () => {
       updatedBookmarks = bookmarks.filter(bookmark => bookmark !== id);
     } else {
       updatedBookmarks = [...bookmarks, id];
-      console.log("updated Bookmarks", updatedBookmarks);
     }
 
     try {
@@ -105,6 +104,28 @@ const ExperienceDetail = () => {
 
   const isBookmarked = bookmarks.includes(id);
 
+  // Handle navigation through images
+  const handleNext = () => {
+    if (experience && experience.photo_data) {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % experience.photo_data.length);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (experience && experience.photo_data) {
+      setCurrentIndex(
+        (prevIndex) => (prevIndex - 1 + experience.photo_data.length) % experience.photo_data.length
+      );
+    }
+  };
+
+  const getPhotoUrl = (index) => {
+    if (experience && experience.photo_data && experience.photo_data.length > 0) {
+      return experience.photo_data[index].photo_url;
+    }
+    return "/images/travel-background.jpg"; // Fallback image
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!experience) return <p>Experience not found.</p>;
 
@@ -120,7 +141,7 @@ const ExperienceDetail = () => {
     if (isAuthenticated) {
       navigate(`/photo-form/${id}`);
     } else {
-      alert("You must be signed in to write a review.");
+      alert("You must be signed in to add photos.");
     }
   };
 
@@ -147,10 +168,7 @@ const ExperienceDetail = () => {
   };
 
   const handleEditSubmit = async () => {
-    // Prepare an object to store the fields that have changed
     let updated = { ...updatedData };
-  
-    // Check for changes and add them to updatedData
     if (formData.description !== experience.description) {
       updatedData.description = formData.description;
     }
@@ -165,18 +183,16 @@ const ExperienceDetail = () => {
     }
     setUpdatedData(updated);
   
-    // If no data has changed, don't send anything
     if (Object.keys(updatedData).length === 1) {
       alert("No changes detected.");
       setEditOpen(false);
       return;
     }
-  
-    // Send the updated data to the server
+
     try {
       const response = await fetch(`http://localhost:8001/api/experience-data`, {
         method: "PUT",
-        body: JSON.stringify(updatedData), // Only send the updated fields
+        body: JSON.stringify(updatedData), 
         headers: {
           "Content-Type": "application/json",
         },
@@ -184,12 +200,11 @@ const ExperienceDetail = () => {
       const data = await response.json();
 
       if (data.Message === "Success") {
-        // Update the experience object with the new data
         setExperience((prevExperience) => ({
           ...prevExperience,
-          ...updatedData, // Update only the changed fields
+          ...updatedData,
         }));
-        setEditOpen(false); // Close the modal
+        setEditOpen(false); 
       } else {
         console.error("Error updating experience.");
       }
@@ -200,139 +215,149 @@ const ExperienceDetail = () => {
 
   return (
     <>
-  <div className="search-bar experience-detail-search">
-    <SearchBar />
-  </div>
-    <div className="experience-detail">
-      <div className="header-container">
-        <div className="header-group-left">
-          <h1>{experience.title}</h1>
-          <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
-          <button className="photos-btn" onClick={handleAddPhotosClick}>Add Photos</button>
-        </div>
-        <div className="header-group-right">
-          {user && user.name === experience.User[0] && (
-            <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
-          )}
-          <button className="bookmark-btn" onClick={handleBookmarkClick}>{isBookmarked ? (
-        <>
-          <FaBookmark /> Unbookmark
-        </>
-      ) : (
-        <>
-          <FaRegBookmark /> Bookmark
-        </>
-      )}</button>
-        </div>
+      <div className="search-bar experience-detail-search">
+        <SearchBar />
       </div>
-      <div className="header-detail">
-        <div className="header-detail-left">
-          <p>Created by <a href="">{experience.User[0]}</a></p>
-          <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p>
+      <div className="experience-detail">
+        <div className="header-container">
+          <div className="header-group-left">
+            <h1>{experience.title}</h1>
+            <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
+            <button className="photos-btn" onClick={handleAddPhotosClick}>Add Photos</button>
+          </div>
+          <div className="header-group-right">
+            {user && user.name === experience.User[0] && (
+              <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
+            )}
+            <button className="bookmark-btn" onClick={handleBookmarkClick}>
+              {isBookmarked ? (
+                <>
+                  <FaBookmark /> Unbookmark
+                </>
+              ) : (
+                <>
+                  <FaRegBookmark /> Bookmark
+                </>
+              )}
+            </button>
+          </div>
         </div>
-        <div className="header-detail-right">
-          <p><strong>Event Date:</strong> {experience.eventDate}</p>
-          <p><strong>Created On:</strong> {experience.creationDate}</p>
-        </div>
-      </div>
-      
-      <img className="images" src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
-      
-      <div className="detail-container">
-        <div className="detail-left">
-          <h4>Description</h4> 
-          <p>{experience.description}</p>
-        </div>
-        <div className="detail-right">
-          <h4>Location</h4> 
-          <p>{experience.location}</p>
-        </div>
-      </div>
 
-      {editOpen && (
-        <div className="edit-overlay">
-          <div className="edit-form">
-            <h3>Edit Experience</h3>
-            <label htmlFor="title">Title:</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleInputChange}
-              placeholder="Add a title"
-              required
-            />
-            <label htmlFor="eventDate">Date of Experience:</label>
-            <input
-              type="date"
-              id="eventDate"
-              name="eventDate"
-              value={formData.eventDate}
-              onChange={handleInputChange}
-              required
-            />
-            <label htmlFor="location">Location:</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              placeholder="Add a location or Address"
-              required
-            />
-            <label htmlFor="description">Description:</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              rows="5"
-              cols="40"
-            ></textarea>
-            <div className="edit-form-actions">
-              <button onClick={handleEditSubmit}>Save</button>
-              <button onClick={handleEditCancel}>Cancel</button>
+        <div className="photo-viewer-container">
+          <button className="scroll-button" onClick={handlePrevious}>←</button>
+          <img
+            src={getPhotoUrl(currentIndex)}
+            alt="Experience"
+            className="photo-viewer"
+          />
+          <button className="scroll-button" onClick={handleNext}>→</button>
+        </div>
+
+        <div className="header-detail">
+          <div className="header-detail-left">
+            <p>Created by <a href="">{experience.User[0]}</a></p>
+            <p>Average rating: {experience.rating["average"]} (<a href="">{experience.rating["total"]} Reviews</a>)</p>
+          </div>
+          <div className="header-detail-right">
+            <p><strong>Event Date:</strong> {experience.eventDate}</p>
+            <p><strong>Created On:</strong> {experience.creationDate}</p>
+          </div>
+        </div>
+
+        <div className="detail-container">
+          <div className="detail-left">
+            <h4>Description</h4> 
+            <p>{experience.description}</p>
+          </div>
+          <div className="detail-right">
+            <h4>Location</h4> 
+            <p>{experience.location}</p>
+          </div>
+        </div>
+
+        {editOpen && (
+          <div className="edit-overlay">
+            <div className="edit-form">
+              <h3>Edit Experience</h3>
+              <label htmlFor="title">Title:</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Add a title"
+                required
+              />
+              <label htmlFor="eventDate">Date of Experience:</label>
+              <input
+                type="date"
+                id="eventDate"
+                name="eventDate"
+                value={formData.eventDate}
+                onChange={handleInputChange}
+                required
+              />
+              <label htmlFor="location">Location:</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value={formData.location}
+                onChange={handleInputChange}
+                placeholder="Add a location or Address"
+                required
+              />
+              <label htmlFor="description">Description:</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows="5"
+                cols="40"
+              ></textarea>
+              <div className="edit-form-actions">
+                <button onClick={handleEditSubmit}>Save</button>
+                <button onClick={handleEditCancel}>Cancel</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Review section with comments */}
-      <div className="review-container">
-        <h4>Latest Reviews</h4>
-        <a href="">See More Reviews</a>
-          {loading ? (
-          <p className="loading-message">Loading...</p>
-        ) : (
-          <div className="review-grid">
-            {Array.isArray(comments) && comments.length > 0 ? (
-              comments.reverse().map((comment, index) => (
-                <div className="review-card" key={index}>
-                  <div>
-                    {[1,2,3,4,5].map(star => (
-                      <span key={star}>
-                        {/* Fill star if rating is greater than or equal to the star number */}
-                        {comment[3] >= star ? (
-                          <i className="fa fa-star" style={{ color: 'gold' }}></i> // Filled star
-                        ) : (
-                          <i className="fa fa-star-o" style={{ color: 'gray' }}></i> // Empty star
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                  <h3>{comment[0]}</h3> {/* Name */}
-                  <p>{comment[1]}</p> {/* Date */}
-                  <p>{comment[2]}</p> {/* Comment */}
-                </div>
-              ))
-            ) : (
-              <p>No comments available.</p>
-            )}
-          </div>
         )}
+
+        {/* Review section with comments */}
+        <div className="review-container">
+          <h4>Latest Reviews</h4>
+          <a href="">See More Reviews</a>
+          {loading ? (
+            <p className="loading-message">Loading...</p>
+          ) : (
+            <div className="review-grid">
+              {Array.isArray(comments) && comments.length > 0 ? (
+                comments.reverse().map((comment, index) => (
+                  <div className="review-card" key={index}>
+                    <div>
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <span key={star}>
+                          {comment[3] >= star ? (
+                            <i className="fa fa-star" style={{ color: 'gold' }}></i>
+                          ) : (
+                            <i className="fa fa-star-o" style={{ color: 'gray' }}></i>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                    <h3>{comment[0]}</h3>
+                    <p>{comment[1]}</p>
+                    <p>{comment[2]}</p>
+                  </div>
+                ))
+              ) : (
+                <p>No comments available.</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 };

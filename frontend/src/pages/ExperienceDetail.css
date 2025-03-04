@@ -184,3 +184,44 @@ p {
     background-color: #007bff;
     color: white;
   }
+
+  .photo-viewer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .photo-viewer {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  .scroll-button {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 2rem;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    transition: background 0.3s ease;
+  }
+  
+  .scroll-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  .scroll-button:first-child {
+    left: 10px;
+  }
+  
+  .scroll-button:last-child {
+    right: 10px;
+  }
