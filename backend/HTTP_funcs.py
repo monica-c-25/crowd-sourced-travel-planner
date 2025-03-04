@@ -154,7 +154,7 @@ def _put(collection: object, payload: dict, id_to_update: str) -> None:
 
 def _delete(collection: object, query: str) -> None:
 
-    collection.delete_one({collection.name: query})
+    collection.delete_one({"_id": ObjectId(query)})
 
 
 def _post(collection: object, request: object) -> str:
