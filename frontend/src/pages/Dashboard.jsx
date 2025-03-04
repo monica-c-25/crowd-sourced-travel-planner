@@ -7,7 +7,7 @@ import './Dashboard.css';
 import '../index.css';
 
 const Dashboard = () => {
-    const { isAuthenticated, user, userID } = useAuth();
+    const { isAuthenticated, userID } = useAuth();
     const navigate = useNavigate();
 
     // State to track which button is selected in each section

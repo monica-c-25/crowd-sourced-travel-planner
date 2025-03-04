@@ -218,8 +218,10 @@ const ExperienceDetail = () => {
       </div>
       <div className="header-detail">
         <div className="header-detail-left">
-          <p>Created by <a href="">{experience.User[0]}</a></p>
-          <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p>
+          {/* <p>Created by <a href="">{experience.User[0]}</a></p> */} 
+          <p>Created by {experience.User[0]}</p>
+          {/* <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p> */}
+          <p>Average rating: {experience.rating["average"]}  ({experience.rating["total"]} Reviews)</p>
         </div>
         <div className="header-detail-right">
           <p><strong>Event Date:</strong> {experience.eventDate}</p>
@@ -292,7 +294,8 @@ const ExperienceDetail = () => {
       {/* Review section with comments */}
       <div className="review-container">
         <h4>Latest Reviews</h4>
-        <a href="">See More Reviews</a>
+        {/* <a href="">See More Reviews</a> */}
+        <div>See More Reviews</div>
           {loading ? (
           <p className="loading-message">Loading...</p>
         ) : (

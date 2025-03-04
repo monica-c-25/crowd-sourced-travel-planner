@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -11,7 +10,7 @@ const TripDetail = () => {
   const [trip, setTrip] = useState(null);
   const [experiences, setExperiences] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated, user, userID } = useAuth();
+  const { isAuthenticated, userID } = useAuth();
 
   useEffect(() => {
     const fetchTrip = async () => {

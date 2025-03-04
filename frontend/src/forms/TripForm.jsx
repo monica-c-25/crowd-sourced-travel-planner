@@ -139,7 +139,7 @@ function TripForm() {
             default:
                 setFilteredExperiences(experiences); // Default to all if no valid filter is set
         }
-    }, [filter, experiences, userID]);
+    }, [filter, experiences, userID, userBookmarks, userExperiences]);
 
     const fetchUserExperiences = async (userID) => {
         setLoading(true);

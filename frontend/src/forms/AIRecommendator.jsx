@@ -83,7 +83,7 @@ const ChatbotForm = () => {
       setRecommendations(data.recommendations);
       setLoading(false);
 
-      navigate("/ai-recommendation", { state: { recommendations: data.recommendations } });
+      navigate("/ai-recommendation", { state: { recommendations: recommendations } });
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       setLoading(false);
