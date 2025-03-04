@@ -14,7 +14,7 @@ function TripForm() {
     const [formData, setFormData] = useState({
         title: "",
         eventDate: { start: "", end: "" },
-        selectedExperiences: [],
+        Experience: [],
         completed: false,
     });
 
@@ -65,12 +65,12 @@ function TripForm() {
 
     const handleExperienceSelection = (experienceId) => {
         setFormData((prev) => {
-            const isSelected = prev.selectedExperiences.includes(experienceId);
+            const isSelected = prev.Experience.includes(experienceId);
             return {
                 ...prev,
-                selectedExperiences: isSelected
-                    ? prev.selectedExperiences.filter((id) => id !== experienceId)
-                    : [...prev.selectedExperiences, experienceId],
+                Experience: isSelected
+                    ? prev.Experience.filter((id) => id !== experienceId)
+                    : [...prev.Experience, experienceId],
             };
         });
     };
@@ -89,10 +89,10 @@ function TripForm() {
 
         const formPayload = {
             title: formData.title,
-            selectedExperiences: formData.selectedExperiences.length ? formData.selectedExperiences : [],
+            Experience: formData.Experience.length ? formData.Experience : [],
             creationDate: today,
             eventDate: formData.eventDate,
-            user_id: userID,
+            User: [userID],
             completed: formData.completed,
         };
 
@@ -110,7 +110,7 @@ function TripForm() {
                 setFormData({
                     title: "",
                     eventDate: { start: "", end: "" },
-                    selectedExperiences: [],
+                    Experience: [],
                     completed: false,
                 });
                 window.location.href = "/dashboard"; // Or navigate to another route if needed
@@ -213,7 +213,7 @@ function TripForm() {
                         {filteredExperiences.map((experience) => (
                             <div
                                 key={experience._id}
-                                className={`trip-experience-card ${formData.selectedExperiences.includes(experience._id) ? "selected" : ""}`}
+                                className={`trip-experience-card ${formData.Experience.includes(experience._id) ? "selected" : ""}`}
                                 onClick={() => handleExperienceSelection(experience._id)}
                             >
                                 <img src={experience.photoURL || "/default-experience.jpg"} alt={experience.title} />
@@ -298,7 +298,7 @@ function TripForm() {
                             onClick={() => setFormData({
                                 title: "",
                                 eventDate: { start: "", end: "" },
-                                selectedExperiences: [],
+                                Experience: [],
                             })}
                         >
                             Reset
