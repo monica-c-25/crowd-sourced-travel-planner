@@ -77,7 +77,7 @@ function PhotoForm(props) {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // You can show a loading spinner or any other placeholder
+    return <div>Loading...</div>;
   }
 
   return (
