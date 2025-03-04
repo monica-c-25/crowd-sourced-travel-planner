@@ -40,28 +40,26 @@ def _search_for_experience(collection: object, request_body: dict):
 
 def _linked_update(collections: dict, collection_name: str,
                    cross_id: str) -> None:
-
-    for name, _id in collections.items():
-
-        print(f"{name}: {_id}")
+    for name, ids in collections.items():
         collection = client[name][name]
-        update_query = collection.find_one(
-            {"_id": ObjectId(_id[0])}
-        )
-        if collection_name in update_query:
-            collection_update_query = {
-                collection_name: update_query[collection_name]
-            }
-        else:
-            collection_update_query = {
-                collection_name: []
-            }
+        for _id in ids:
+            update_query = collection.find_one(
+                {"_id": ObjectId(_id)}
+            )
+            if collection_name in update_query:
+                collection_update_query = {
+                    collection_name: update_query[collection_name]
+                }
+            else:
+                collection_update_query = {
+                    collection_name: []
+                }
 
-        collection_update_query[collection_name].append(cross_id)
-        collection.update_one(
-            {"_id": update_query["_id"]},
-            {"$set": collection_update_query}
-        )
+            collection_update_query[collection_name].append(cross_id)
+            collection.update_one(
+                {"_id": update_query["_id"]},
+                {"$set": collection_update_query}
+            )
 
 
 def _get(request_body: dict, collection: object) -> object:
@@ -69,7 +67,6 @@ def _get(request_body: dict, collection: object) -> object:
         cursor = collection.find()
         result = [item for item in cursor]
     elif "_id" in request_body:
-        print("_id is", request_body)
         result = collection.find_one({"_id": ObjectId(request_body["_id"])})
     else:
         result = collection.find_one(request_body)
@@ -87,7 +84,7 @@ def _get(request_body: dict, collection: object) -> object:
         if not request_body:
             collections_to_loop = ["User", "Photo"]
         else:
-            collections_to_loop = ["User", "Photo", "Comment"]
+            collections_to_loop = ["User", "Photo", "Comment", "Trip"]
     elif collection.name == "Photo":
         collections_to_loop = ["User"]
     elif collection.name == "Comment":
@@ -112,8 +109,6 @@ def _get(request_body: dict, collection: object) -> object:
 def decode(collection: str, result: dict) -> None:
 
     for i in range(len(result[collection])):
-        print(result[collection][i])
-
         if collection == "Comment":
             comments = client["Comment"]["Comment"]
             users = client["User"]["User"]
@@ -222,7 +217,7 @@ def _post(collection: object, request: object) -> str:
             if value in request:
                 collections[value] = request[value]
 
-        _linked_update(collections, collection_name, trip_id)
+        _linked_update(collections, collection.name, trip_id)
         return trip_id
 
     else:

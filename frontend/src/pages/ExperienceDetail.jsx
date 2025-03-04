@@ -29,7 +29,7 @@ const ExperienceDetail = () => {
   useEffect(() => {
     const fetchExperience = async () => {
       try {
-        const response = await fetch(`http://localhost:8001/api/experience-data/${id}`);
+        const response = await fetch(`http://localhost:46725/api/experience-data/${id}`);
         const data = await response.json();
         if (data.Message === "Success") {
           setExperience(data.data);
@@ -47,7 +47,7 @@ const ExperienceDetail = () => {
     const fetchUserBookmarks = async () => {
       if (isAuthenticated && userID) {
         try {
-          const response = await fetch(`http://localhost:8001/api/user-data/${userID}`);
+          const response = await fetch(`http://localhost:46725/api/user-data/${userID}`);
           const data = await response.json();
           if (data.Message === "Success") {
             setBookmarks(data.data.Bookmarks || []); // Set the bookmarks from the DB
@@ -81,7 +81,7 @@ const ExperienceDetail = () => {
 
     try {
       // Update the database with the new bookmarks list
-      const response = await fetch(`http://localhost:8001/api/user-data`, {
+      const response = await fetch(`http://localhost:46725/api/user-data`, {
         method: "PUT",
         body: JSON.stringify({ 
           "mongo_id": userID, Bookmarks: updatedBookmarks 
@@ -166,7 +166,7 @@ const ExperienceDetail = () => {
   
     // Send the updated data to the server
     try {
-      const response = await fetch(`http://localhost:8001/api/experience-data`, {
+      const response = await fetch(`http://localhost:46725/api/experience-data`, {
         method: "PUT",
         body: JSON.stringify(updatedData), // Only send the updated fields
         headers: {
@@ -218,8 +218,10 @@ const ExperienceDetail = () => {
       </div>
       <div className="header-detail">
         <div className="header-detail-left">
-          <p>Created by <a href="">{experience.User[0]}</a></p>
-          <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p>
+          {/* <p>Created by <a href="">{experience.User[0]}</a></p> */} 
+          <p>Created by {experience.User[0]}</p>
+          {/* <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p> */}
+          <p>Average rating: {experience.rating["average"]}  ({experience.rating["total"]} Reviews)</p>
         </div>
         <div className="header-detail-right">
           <p><strong>Event Date:</strong> {experience.eventDate}</p>
@@ -292,7 +294,8 @@ const ExperienceDetail = () => {
       {/* Review section with comments */}
       <div className="review-container">
         <h4>Latest Reviews</h4>
-        <a href="">See More Reviews</a>
+        {/* <a href="">See More Reviews</a> */}
+        <div>See More Reviews</div>
           {loading ? (
           <p className="loading-message">Loading...</p>
         ) : (

@@ -13,7 +13,7 @@ export function SearchBar() {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8001/api/search", {
+        const response = await fetch("http://127.0.0.1:46725/api/search", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',  

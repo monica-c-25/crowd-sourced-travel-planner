@@ -7,7 +7,7 @@ import './Dashboard.css';
 import '../index.css';
 
 const Dashboard = () => {
-    const { isAuthenticated, user, userID } = useAuth();
+    const { isAuthenticated, userID } = useAuth();
     const navigate = useNavigate();
 
     // State to track which button is selected in each section
@@ -113,7 +113,7 @@ const Dashboard = () => {
         setLoading(true);
         try {
             // Fetch experiences and bookmarks
-            const response = await fetch(`http://127.0.0.1:8001/api/user-experiences/${userID}`);
+            const response = await fetch(`http://127.0.0.1:46725/api/user-experiences/${userID}`);
             const data = await response.json();
 
             if (response.ok && Array.isArray(data.data[0])) {
@@ -127,7 +127,7 @@ const Dashboard = () => {
             }
 
             // Fetch trips
-            const tripResponse = await fetch(`http://127.0.0.1:8001/api/user-trips/${userID}`);
+            const tripResponse = await fetch(`http://127.0.0.1:46725/api/user-trips/${userID}`);
             const tripData = await tripResponse.json();
 
             if (tripResponse.ok && Array.isArray(tripData.data)) {
