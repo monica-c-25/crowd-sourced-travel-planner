@@ -116,6 +116,14 @@ const ExperienceDetail = () => {
     }
   };
 
+  const handleAddPhotosClick = () => {
+    if (isAuthenticated) {
+      navigate(`/photo-form/${id}`);
+    } else {
+      alert("You must be signed in to write a review.");
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -200,6 +208,7 @@ const ExperienceDetail = () => {
         <div className="header-group-left">
           <h1>{experience.title}</h1>
           <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
+          <button className="photos-btn" onClick={handleAddPhotosClick}>Add Photos</button>
         </div>
         <div className="header-group-right">
           {user && user.name === experience.User[0] && (
