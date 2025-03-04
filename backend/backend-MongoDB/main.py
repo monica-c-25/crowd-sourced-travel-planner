@@ -106,7 +106,9 @@ def search_for_experience():
     collection = db["Experience"]
 
     if request.method == 'POST':
-        return _search_for_experience(collection, request.json)
+        return _search_for_experience(
+            collection, request.json, client["User"]["User"]
+            )
 
 
 # GETS EXPERIENCE DETAILS
@@ -203,7 +205,6 @@ def trip_request_handler():
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def comment_request_handler():
 
-    print(request)
     db = client["Comment"]
     collection = db["Comment"]
 
@@ -252,7 +253,6 @@ def get_recommendations():
         return jsonify({"recommendations": recommendations})
 
     except Exception as e:
-        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -438,9 +438,8 @@ def filter_experiences():
 
         return jsonify(experiences_list)
 
-    except Exception as e:
+    except Exception:
         # Print the exception to the server log for debugging
-        print(f"Error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
 
 

@@ -6,6 +6,7 @@ import Home from './pages/Home.jsx';
 import About from './pages/About.jsx';
 import Explore from './pages/Experiences.jsx';
 import ExperienceForm from './forms/ExperienceForm.jsx';
+import LocationExperienceSelect from './pages/ExperienceLocationSelect.jsx';
 import ExperienceDetail from './pages/ExperienceDetail.jsx';
 import ReviewForm from './forms/ReviewForm.jsx';
 import ChatbotForm from './forms/AIRecommendator.jsx';
@@ -22,6 +23,7 @@ const App = () => {
                         <ScrollToTop />
                         <NavBar />
                         <Routes>
+                            <Route path="/select-experience/:location" element={<LocationExperienceSelect />}/>
                             <Route path="/" element={<Home />} />
                             <Route path="/about" element={<About />} />
                             <Route path="/explore" element={<Explore />} />
