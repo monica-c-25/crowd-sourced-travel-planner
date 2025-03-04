@@ -1,3 +1,4 @@
+import datetime
 from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -22,6 +23,7 @@ uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
     "retryWrites=true&w=majority&appName=Capstone"
 )
+
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
     api_key=getenv('OPENAI_API_KEY')
@@ -150,9 +152,42 @@ def get_experience_by_id(experience_id):
     return jsonify(response)
 
 
+@app.route('/api/user-trips/<user_id>', methods=['GET'])
+def get_user_trips(user_id):
+    db = client["User"]
+    user_collection = db["User"]
+    trip_collection = client["Trip"]["Trip"]
+
+    try:
+        # Ensure user_id is a valid ObjectId
+        mongo_user_id = ObjectId(user_id)
+
+        # Fetch user document by MongoDB _id
+        user = user_collection.find_one({"_id": mongo_user_id})
+        if not user:
+            return jsonify({"Message": "User not found", "data": []}), 404
+
+        # Extract trip IDs (stored as strings)
+        trip_ids = user.get("Trips", [])
+
+        # Convert trip IDs to ObjectId format
+        trip_object_ids = [ObjectId(trip_id) for trip_id in trip_ids]
+
+        # Fetch trips from the Trip collection
+        trips = list(trip_collection.find({"_id": {"$in": trip_object_ids}}))
+
+        # Convert ObjectId to string for frontend compatibility
+        for trip in trips:
+            trip["_id"] = str(trip["_id"])
+
+        return jsonify({"Message": "Success", "data": trips})
+
+    except Exception as e:
+        return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+
 @app.route('/api/experience-data', methods=['POST', 'GET', 'DELETE', 'PUT'])
 def experience_request_handler():
-
     db = client["Experience"]
     collection = db["Experience"]
 
@@ -193,13 +228,116 @@ def user_request_handler_by_ID(user_id):
     return jsonify(response)
 
 
+@app.route('/api/user-experiences/<user_id>', methods=['GET'])
+def get_user_experiences(user_id):
+    db = client["User"]
+    user_collection = db["User"]
+    experience_collection = client["Experience"]["Experience"]
+
+    try:
+        # Ensure user_id is a valid ObjectId
+        mongo_user_id = ObjectId(user_id)
+
+        # Fetch user document by MongoDB _id
+        user = user_collection.find_one({"_id": mongo_user_id})
+        if not user:
+            return jsonify({"Message": "User not found", "data": []}), 404
+
+        # Extract experience IDs (stored as strings)
+        experience_ids = user.get("Experience", [])
+        bookmark_ids = user.get("Bookmarks", [])
+
+        # Convert experience IDs to ObjectId format
+        experience_object_ids = [ObjectId(exp_id) for exp_id in experience_ids]
+        bookmark_object_ids = [ObjectId(bm_id) for bm_id in bookmark_ids]
+
+        # Fetch experiences from the Experience collection
+        experiences = list(experience_collection.find({"_id": {"$in": experience_object_ids}}))
+        bookmarks = list(experience_collection.find({"_id": {"$in": bookmark_object_ids}}))
+
+        # Convert ObjectId to string for frontend compatibility
+        for experience in experiences:
+            experience["_id"] = str(experience["_id"])
+        for bookmark in bookmarks:
+            bookmark["_id"] = str(bookmark["_id"])
+
+        return jsonify({"Message": "Success", "data": [experiences, bookmarks]})
+
+    except Exception as e:
+        return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def trip_request_handler():
-
+@app.route('/api/trip-data/<trip_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])  # Added URL for trip_id
+def trip_request_handler(trip_id=None):
     db = client["Trip"]
-    collection = db["Trip"]
+    user_db = client["User"]
+    experience_collection = client["Experience"]["Experience"]
 
-    return general_request(request, collection)
+    if request.method == 'POST':
+        try:
+            # Get the data for the new trip from the request body
+            trip_data = request.get_json()
+
+            # Get user ID from the trip data (assuming it's part of the trip data)
+            user_id = trip_data.get('user_id')
+
+            # Ensure that the user exists
+            user = user_db["User"].find_one({"_id": ObjectId(user_id)})
+            if not user:
+                return jsonify({"Message": "User not found"}), 404
+
+            # Insert the new trip into the 'Trip' collection
+            trip_data["creationDate"] = str(datetime.datetime.utcnow())  # Add creation date if necessary
+            result = db["Trip"].insert_one(trip_data)
+
+            # Get the newly inserted trip's ID
+            trip_id = result.inserted_id
+
+            # Update the user's 'Trips' field by adding the new trip's ID
+            user_db["User"].update_one(
+                {"_id": ObjectId(user_id)},
+                {"$push": {"Trips": trip_id}}
+            )
+
+            return jsonify({
+                "Message": "Trip created successfully",
+                "trip_id": str(trip_id)  # Return the trip ID in the response
+            }), 201
+
+        except Exception as e:
+            return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+    # Handling the GET method for a specific trip
+    if request.method == 'GET':
+        try:
+            # If trip_id is passed, try to find the specific trip
+            if trip_id:
+                trip = db["Trip"].find_one({"_id": ObjectId(trip_id)})
+
+                if trip:
+                    trip_ids = trip.get("selectedExperiences", [])
+                    print("SELECTED EXPERIENCES: ", trip_ids)
+                    trip_object_ids = [ObjectId(t_id) for t_id in trip_ids]
+                    experiences = list(experience_collection.find({"_id": {"$in": trip_object_ids}}))
+                    for experience in experiences:
+                        experience["_id"] = str(experience["_id"])
+                    trip["_id"] = str(trip["_id"])
+                    return jsonify({
+                        "Message": "Success",
+                        # "trip_id": str(trip["_id"]),
+                        "data": [trip, experiences]  # Add all trip data to the response
+                    }), 200
+                else:
+                    return jsonify({"Message": "Trip not found"}), 404
+            else:
+                return jsonify({"Message": "Trip ID is required"}), 400
+
+        except Exception as e:
+            return jsonify({"Message": f"Error: {str(e)}"}), 500
+
+    # Handle other methods (PUT, DELETE) here if needed
+    return jsonify({"Message": "Method Not Allowed"}), 405
 
 
 @app.route('/api/comment-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -402,30 +540,32 @@ def photo_request_handler(experience_id):
 
 @app.route("/api/filter-experiences", methods=["GET"])
 def filter_experiences():
-    """Filter experiences by creation date."""
+    """Filter experiences by creation date and user ID."""
     db = client["Experience"]
     experiences_collection = db["Experience"]
 
     try:
-        # Get date parameters from query string (e.g., from frontend)
+        # Get query parameters from frontend (user_id, start_date, end_date)
+        user_id = request.args.get("user_id", None)  # Assuming user_id is passed as a query param
         start_date_str = request.args.get("start_date", None)
         end_date_str = request.args.get("end_date", None)
 
-        # Prepare date filters
-        date_filter = {}
+        # Prepare the base filter
+        filters = {}
 
-        # Check if the start_date and end_date are provided
+        # If a user_id is provided, filter by user_id
+        if user_id:
+            filters["user_id"] = user_id
+
+        # Prepare date filters if provided
         if start_date_str:
-            date_filter["creationDate"] = {"$gte": start_date_str}
+            filters["creationDate"] = {"$gte": start_date_str}
         if end_date_str:
-            date_filter["creationDate"] = date_filter.get("creationDate", {})
-            date_filter["creationDate"]["$lte"] = end_date_str
+            filters["creationDate"] = filters.get("creationDate", {})
+            filters["creationDate"]["$lte"] = end_date_str
 
-        # Query the database based on whether the filter exists
-        if date_filter:
-            experiences = experiences_collection.find(date_filter)
-        else:
-            experiences = experiences_collection.find()
+        # Query the database based on the filters
+        experiences = experiences_collection.find(filters)
 
         # Sort by creationDate in descending order (newest first)
         experiences = experiences.sort("creationDate", -1)
@@ -433,7 +573,7 @@ def filter_experiences():
         # Serialize the results
         experiences_list = []
         for experience in experiences:
-            experience["_id"] = str(experience["_id"])
+            experience["_id"] = str(experience["_id"])  # Convert ObjectId to string
             experiences_list.append(experience)
 
         return jsonify(experiences_list)

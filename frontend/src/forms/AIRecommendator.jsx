@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AIRecommendator.css";
+import '../index.css';
 
 
 const ChatbotForm = () => {
@@ -13,9 +14,9 @@ const ChatbotForm = () => {
   });
   const [customInterest, setCustomInterest] = useState(""); // Stores user-inputted custom interests
   const [recommendations, setRecommendations] = useState("");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   const interestOptions = [
     "Food",
@@ -98,7 +99,7 @@ const ChatbotForm = () => {
   return (
     <div className="container">
       <h2>Plan Your Trip</h2>
-      <p>Note to Developers:</p> 
+      <p>Note to Developers:</p>
       <p>Please test sparingly. This is a paid API!</p><br></br>
       <form onSubmit={handleSubmit}>
         {step === 1 && (
@@ -220,7 +221,7 @@ const ChatbotForm = () => {
           </div>
         )}
       </form>
-      
+
       {loading && <div className="loading-indicator">Loading...</div>}
     </div>
   );

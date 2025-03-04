@@ -7,7 +7,7 @@ function ExperienceForm(props) {
 
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const [formData, setFormData] = useState({    
+  const [formData, setFormData] = useState({
     title: "",
     eventDate: today,
     description: "",
@@ -15,19 +15,26 @@ function ExperienceForm(props) {
     user: [props.user],
     location: ""
   });
-  
+
   const [loading, setLoading] = useState(true); // Loading state to prevent rendering content before check
   const { isAuthenticated, userID } = useAuth();
 
   // Redirect user if not authenticated or while loading
   useEffect(() => {
+    if (loading) return; // Skip the check while loading
+
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
       navigate(-1); // Redirect to previous page
-    } else {
-      setLoading(false); // Only render content when authentication is verified
     }
-  }, [isAuthenticated,  navigate]);
+  }, [isAuthenticated, loading, navigate]);
+
+  useEffect(() => {
+    // After the component mounts, we check if user is authenticated
+    if (isAuthenticated) {
+      setLoading(false); // Set loading to false only once authentication is confirmed
+    }
+  }, [isAuthenticated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +48,9 @@ function ExperienceForm(props) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8001/api/experience-data", {
+      const apiUrl = process.env.REACT_APP_API_URL;
+
+      const response = await fetch(`${apiUrl}/api/experience-data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +60,6 @@ function ExperienceForm(props) {
           eventDate: formData.eventDate,
           creationDate: today,
           description: formData.description,
-          photoURL: "",
           location: formData.location, // Send lat/lon string
           rating: {"average": 0, "total": 0},
           User: [userID]
@@ -68,8 +76,8 @@ function ExperienceForm(props) {
             description: "",
             location: "",
           });
-
-          window.location.href = "/explore";
+          // window.location.href = "/explore";
+          window.history.back();
         } else {
           alert(result.Message || "Unable to add experience");
         }

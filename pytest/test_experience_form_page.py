@@ -42,4 +42,4 @@ def test_complete_submission(setup_experience_form, page: Page):
     page.fill('#description', 'pytest description')
     page.fill('#location', 'Eiffel Tower')
     page.locator('button[type="submit"]').click()
-    expect(page.locator('role=heading[name="Explore Experiences"]')).to_be_visible()
+    expect(page.locator('role=heading[name="Your destination awaits."]')).to_be_visible()

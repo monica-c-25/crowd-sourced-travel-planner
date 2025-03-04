@@ -1,0 +1,77 @@
+/* Experience list container */
+.experience-list {
+    list-style-type: none; /* Remove any default list styles */
+    padding: 0; /* Remove padding for the list container */
+    margin: 50px;
+  }
+  
+  /* Each experience card styled as a list item */
+/* Container for each experience item */
+.experience-item {
+    display: flex; /* Enable flexbox for the layout */
+    justify-content: space-between; /* Space out the left and right sections */
+    align-items: flex-start; /* Align items at the top */
+    margin-bottom: 16px; /* Add some space between experience items */
+    padding:10px 16px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-decoration: none; /* Remove underline from the link */
+    color: inherit; /* Ensure text color matches the parent */
+  }
+  
+.list-right {
+    margin-top: 25px;
+}
+
+  /* Style for the left side of the experience item */
+  .list-left {
+    flex: 1; /* Take up remaining space on the left side */
+    margin-right: 16px; /* Space between left and right sections */
+  }
+
+  /* Style for the image */
+.list-left img {
+    /* max-width: 150px; Set the maximum width of the image */
+    max-height: 150px; /* Maintain aspect ratio */
+    border-radius: 4px; /* Optional: round corners of the image */
+  }
+
+  .list-left h3 {
+    margin-top: 0;
+  }
+  
+  /* Style for the right side of the experience item */
+  .list-right {
+    flex: 2; /* Take up more space on the right side */
+    display: flex;
+    flex-direction: column; /* Align the content vertically */
+    justify-content: flex-start; /* Align the content to the top */
+  }
+  
+  /* Optional: Style for experience item image */
+  .list-left img {
+    max-width: 100%; /* Ensure image takes up full width of the left side */
+    height: auto;
+    border-radius: 4px; /* Optional: round corners of the image */
+  }
+  
+  /* Optional: Style for experience item details (location, date, description) */
+  .experience-item p {
+    margin-bottom: 8px;
+  }
+  
+  .experience-item .date {
+    font-size: 0.875rem;
+    color: #888;
+  }
+  
+  /* Style for experience item heading */
+  .experience-item h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+  
+
+
+  

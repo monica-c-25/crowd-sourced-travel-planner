@@ -298,7 +298,7 @@ const ExperienceDetail = () => {
         ) : (
           <div className="review-grid">
             {Array.isArray(comments) && comments.length > 0 ? (
-              comments.map((comment, index) => (
+              comments.reverse().map((comment, index) => (
                 <div className="review-card" key={index}>
                   <div>
                     {[1,2,3,4,5].map(star => (
