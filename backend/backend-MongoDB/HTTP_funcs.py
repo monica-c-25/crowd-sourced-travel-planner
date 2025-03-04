@@ -131,7 +131,9 @@ def decode(collection: str, result: dict) -> None:
                 "_id": ObjectId(user_comment)
             })["name"]
 
-            result[collection][i] = (user_comment, comment_date, comment_comment, rating)
+            result[collection][i] = (
+                user_comment, comment_date, comment_comment, rating
+            )
 
         elif collection == "User":
             users = client["User"]["User"]
@@ -239,7 +241,9 @@ def _update_id(input_data: object) -> None:
 
 
 def _update_rating(value: str, request: object):
-    experience = client[value][value].find_one({"_id": ObjectId(request[value][0])})
+    experience = client[value][value].find_one(
+        {"_id": ObjectId(request[value][0])}
+        )
     total_reviews = experience.get("rating", {}).get("total", 0)
     current_avg = experience.get("rating", {}).get("average", 0)
 

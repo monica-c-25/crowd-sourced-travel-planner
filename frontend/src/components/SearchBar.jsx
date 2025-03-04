@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
 import './SearchBar.css';
 import 'font-awesome/css/font-awesome.min.css';
-import { FormControlLabel, RadioGroup, Radio, Autocomplete, TextField, Stack, Typography } from '@mui/material';
+import { Autocomplete, TextField, Stack, Typography } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
 export function SearchBar() {
 
   const [searchInput, setSearchInput] = useState('');
   const [resultantInputs, setResultantInputs] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [keywordOrLocation, setKeywordOrLocation] = useState('title');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      setLoading(true);
       try {
         const response = await fetch("http://127.0.0.1:8001/api/search", {
           method: 'POST',
@@ -22,7 +19,7 @@ export function SearchBar() {
             'Content-Type': 'application/json',  
           },
           body: JSON.stringify({
-            type: keywordOrLocation,
+            type: 'title',
             input: searchInput
           })
         });
@@ -37,7 +34,7 @@ export function SearchBar() {
 
     if (searchInput !== '') fetchSearchResults();
     else setResultantInputs([]); 
-  }, [searchInput, keywordOrLocation]);
+  }, [searchInput]);
 
   const handleSelect = (selectedTitle) => {
     const selectedExperience = resultantInputs.find(exp => exp.title === selectedTitle);

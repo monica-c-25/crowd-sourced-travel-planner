@@ -7,7 +7,6 @@ import { FaRegBookmark, FaBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 
-
 const ExperienceDetail = () => {
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
@@ -193,9 +192,9 @@ const ExperienceDetail = () => {
 
   return (
     <>
-    <div className="search-bar">
-      <div><SearchBar /></div>
-    </div>
+  <div className="search-bar experience-detail-search">
+    <SearchBar />
+  </div>
     <div className="experience-detail">
       <div className="header-container">
         <div className="header-group-left">
