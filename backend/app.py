@@ -214,8 +214,8 @@ def search_for_experience():
 
 
 # GETS EXPERIENCE DETAILS
-@app.route('/api/experience-data/<experience_id>', methods=['GET', 'PUT'])
-def get_experience_by_id(experience_id):
+@app.route('/api/experience-data/<experience_id>', methods=['GET', 'PUT', 'DELETE'])
+def get_experience_by_id(experience_id=None):
     db = client["Experience"]
     collection = db["Experience"]
 
@@ -243,6 +243,19 @@ def get_experience_by_id(experience_id):
                 }
         elif request.method == 'PUT':
             return general_request(request, collection)
+        elif request.method == 'DELETE':
+            try:
+                print("EXP ID: ", experience_id)
+                print("DELETING FROM: ", collection)
+                _delete(collection, experience_id)
+                response = {
+                    "Message": "Success"
+                }
+            except Exception as exception:
+                response = {
+                    'Message': f"Failed: '{exception}' raised"
+                }
+            return jsonify(response)
 
     except Exception as e:
         response = {

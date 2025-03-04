@@ -150,7 +150,7 @@ const ExperienceDetail = () => {
           label: 'Yes',
           onClick: async () => {
             try {
-              const response = await fetch(`http://localhost:8001/api/experience-data/${id}`, {
+              const response = await fetch(`http://localhost:46725/api/experience-data/${id}`, {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",
