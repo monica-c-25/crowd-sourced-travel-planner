@@ -17,7 +17,7 @@ const TripDetail = () => {
       if (isAuthenticated && userID) {
         try {
           const response = await fetch(
-            `http://localhost:8001/api/trip-data/${id}`
+            `http://localhost:46725/api/trip-data/${id}`
           );
           const data = await response.json();
           if (data.Message === "Success") {

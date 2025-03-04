@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-from os import getenv
+import os
 from dotenv import load_dotenv
 from HTTP_funcs import (
     _get, _put, _post, _delete, _set_payload, _search_for_experience
@@ -16,8 +16,8 @@ app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
 load_dotenv()
-USER = getenv('MONGO_USER')
-PASSWORD = getenv('PASSWORD')
+USER = os.environ.get('MONGO_USER')
+PASSWORD = os.environ.get('PASSWORD')
 uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
     "retryWrites=true&w=majority&appName=Capstone"
@@ -25,7 +25,7 @@ uri = (
 
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
-    api_key=getenv('OPENAI_API_KEY')
+    api_key=os.environ.get('OPENAI_API_KEY')
 )
 
 
