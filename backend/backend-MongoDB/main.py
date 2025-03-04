@@ -1,4 +1,3 @@
-import datetime
 from flask import Flask, request, jsonify
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -269,7 +268,6 @@ def get_user_experiences(user_id):
 @app.route('/api/trip-data/<trip_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])  # Added URL for trip_id
 def trip_request_handler(trip_id=None):
     db = client["Trip"]
-    user_db = client["User"]
     experience_collection = client["Experience"]["Experience"]
 
     if request.method == 'POST':
