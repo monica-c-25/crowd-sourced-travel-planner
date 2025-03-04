@@ -113,10 +113,21 @@ p {
     font-size: 15px;
 }
   /* Search bar wrapper for positioning */
-.search-bar {
-    display: flex;
-    justify-content: flex-end;
-    padding-right: 30px;
+  
+.experience-detail .search-bar {
+  width: 700px !important; /* Set width explicitly */
+  max-width: 700px;
+  margin: 0 auto; /* Center it */
+}
+
+.experience-detail .css-1tlcqt-MuiAutocomplete-root .MuiAutocomplete-inputRoot .MuiAutocomplete-input {
+  min-width: 700px !important;
+}
+
+.experience-detail-search {
+  width: 700px !important;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 /* Modal overlay to cover the page */

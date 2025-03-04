@@ -103,7 +103,14 @@
   }
   
   .search-bar-container {
-    margin-bottom: 20px; /* Adjust as needed */
-    width: 100%; /* Optional: to ensure it spans the container */
-    max-width: 800px; /* Optional: control width */
+    position: absolute; /* Position relative to the .image-container */
+    top: 12%; /* Center vertically within the image */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for exact centering */
+    width: 90%; /* Adjust width of search bar */
+    max-width: 1200px;
+    /* padding: 0.5rem; */
+    background-color: rgba(255, 255, 255, 0.9); /* Subtle background for contrast */
+    border-radius: 20px 20px 0px 0px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the bar */
   }

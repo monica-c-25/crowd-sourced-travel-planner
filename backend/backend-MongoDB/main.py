@@ -4,7 +4,9 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from os import getenv
 from dotenv import load_dotenv
-from HTTP_funcs import _get, _put, _post, _delete, _set_payload
+from HTTP_funcs import (
+    _get, _put, _post, _delete, _set_payload, _search_for_experience
+)
 from flask_cors import CORS
 from google.cloud import storage
 from bson.objectid import ObjectId
@@ -98,6 +100,15 @@ def general_request(request: object, collection: object) -> None:
             }
 
         return jsonify(response)
+
+
+@app.route('/api/search', methods=['POST'])
+def search_for_experience():
+    db = client["Experience"]
+    collection = db["Experience"]
+
+    if request.method == 'POST':
+        return _search_for_experience(collection, request.json)
 
 
 # GETS EXPERIENCE DETAILS
@@ -386,7 +397,10 @@ def get_recommendations():
 # PHOTO_BUCKET = 'cs467-crowd-sourced-travel-planner-images'
 
 
-@app.route('/api/experience-data/<experience_id>/photos', methods=['POST', 'GET', 'DELETE'])
+@app.route(
+        '/api/experience-data/<experience_id>/photos',
+        methods=['POST', 'GET', 'DELETE']
+        )
 def photo_request_handler(experience_id):
     db = client["Experience"]
     collection = db["Experience"]
@@ -425,7 +439,10 @@ def photo_request_handler(experience_id):
                     {"_id": ObjectId(experience_id)},
                     {"$push": {"photo_data": {"$each": photo_data_list}}}
                 )
-                return jsonify({"Message": "Success", "photo_data": photo_data_list})
+                return jsonify({
+                    "Message": "Success",
+                    "photo_data": photo_data_list}
+                )
             else:
                 return jsonify({'Error': 'Experience Not Found'}), 404
 
@@ -476,7 +493,9 @@ def photo_request_handler(experience_id):
 
             # Check if both experience_id and photo_url are provided
             if not experience_id or not photo_url_to_delete:
-                return jsonify({"Error": "Experience_id and Photo_url are required."}), 400
+                return jsonify({
+                    "Error": "Experience_id and Photo_url are required."
+                }), 400
 
             # Extract the file name from the photo_url
             file_name = photo_url_to_delete.split('/')[-1]
@@ -486,7 +505,9 @@ def photo_request_handler(experience_id):
 
             blob = bucket.blob(file_name)
             if not blob.exists():
-                return jsonify({'error': "File not found in Cloud Storage"}), 404
+                return jsonify({
+                    'error': "File not found in Cloud Storage"
+                }), 404
 
             blob.delete()
 
@@ -505,7 +526,10 @@ def photo_request_handler(experience_id):
                 }
                 return jsonify(response), 200
             else:
-                return jsonify({'Error': "Experience Not Found or Photo URL not in database"}), 404
+                return jsonify({
+                    'Error':
+                    "Experience Not Found or Photo URL not in database"
+                }), 404
 
         except Exception as e:
             return jsonify({"Error": str(e)}), 500

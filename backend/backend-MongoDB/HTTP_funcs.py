@@ -15,6 +15,29 @@ uri = (
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
+def _search_for_experience(collection: object, request_body: dict):
+    results = []
+
+    if request_body["type"] == "Name":
+        queried_results = collection.find({
+            "title": {"$regex": request_body["input"], "$options": "i"}
+        })
+
+    else:
+        queried_results = collection.find({
+            "title": {"$regex": request_body["input"], "$options": "i"}
+        })
+
+    if not queried_results:
+        return {"Message": "Unsuccessful"}
+
+    for item in queried_results:
+        item["_id"] = str(item["_id"])
+        results.append(item)
+
+    return {"message": "success", "data": results}
+
+
 def _linked_update(collections: dict, collection_name: str,
                    cross_id: str) -> None:
 
@@ -108,7 +131,9 @@ def decode(collection: str, result: dict) -> None:
                 "_id": ObjectId(user_comment)
             })["name"]
 
-            result[collection][i] = (user_comment, comment_date, comment_comment, rating)
+            result[collection][i] = (
+                user_comment, comment_date, comment_comment, rating
+            )
 
         elif collection == "User":
             users = client["User"]["User"]
@@ -216,7 +241,9 @@ def _update_id(input_data: object) -> None:
 
 
 def _update_rating(value: str, request: object):
-    experience = client[value][value].find_one({"_id": ObjectId(request[value][0])})
+    experience = client[value][value].find_one(
+        {"_id": ObjectId(request[value][0])}
+        )
     total_reviews = experience.get("rating", {}).get("total", 0)
     current_avg = experience.get("rating", {}).get("average", 0)
 
