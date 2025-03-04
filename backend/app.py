@@ -14,7 +14,6 @@ if ENV_FILE:
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "your-default-secret-key")
-app.config.from_object("config.Config")
 
 # Initialize CORS for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
