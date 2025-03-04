@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "./PhotoForm.css";
 
 function PhotoForm(props) {
   const { isAuthenticated, userID } = useAuth();
@@ -8,7 +9,9 @@ function PhotoForm(props) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]); // Change to an array for multiple files
+  const [filePreviews, setFilePreviews] = useState([]); // Store file previews here
   const [errorMessage, setErrorMessage] = useState("");
+  const [uploading, setUploading] = useState(false); // Track upload status
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -22,6 +25,12 @@ function PhotoForm(props) {
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convert FileList to an array
     setFiles(selectedFiles); // Update state to hold an array of files
+
+    // Generate file previews
+    const previews = selectedFiles.map((file) => {
+      return URL.createObjectURL(file); // Create a preview URL for each selected file
+    });
+    setFilePreviews(previews); // Update the state with preview URLs
   };
 
   const handleSubmit = async (e) => {
@@ -31,6 +40,8 @@ function PhotoForm(props) {
       setErrorMessage("Please select at least one file to upload.");
       return;
     }
+
+    setUploading(true); // Set uploading state to true when the upload starts
 
     const formData = new FormData();
     files.forEach((file) => {
@@ -48,6 +59,7 @@ function PhotoForm(props) {
         if (result.Message === "Success") {
           alert("Photos uploaded successfully!");
           setFiles([]); // Reset files array after successful upload
+          setFilePreviews([]); // Clear the previews as well
           navigate(-1); // Go back to the previous page
         } else {
           alert(result.Message || "Unable to upload photos");
@@ -59,6 +71,8 @@ function PhotoForm(props) {
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("An error occurred while submitting the form.");
+    } finally {
+      setUploading(false); // Set uploading state to false once the upload is complete
     }
   };
 
@@ -70,6 +84,7 @@ function PhotoForm(props) {
     <form onSubmit={handleSubmit} className="photo-upload-form">
       <h1>Upload Photos</h1>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
+
       <div className="form-group">
         <label htmlFor="file">Choose Photos:</label>
         <input
@@ -82,14 +97,53 @@ function PhotoForm(props) {
           required
         />
       </div>
+
+      {/* Display selected file names */}
+      {files.length > 0 && (
+        <div className="selected-files">
+          <h3>Selected Files:</h3>
+          <ul>
+            {files.map((file, index) => (
+              <li key={index}>{file.name}</li> // Display file name
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Display image previews */}
+      {filePreviews.length > 0 && (
+        <div className="image-previews">
+          <h3>Image Previews:</h3>
+          <div className="preview-container">
+            {filePreviews.map((preview, index) => (
+              <img
+                key={index}
+                src={preview}
+                alt={`preview-${index}`}
+                className="preview-image"
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Display Loading Spinner if uploading */}
+      {uploading && (
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Uploading...</p>
+        </div>
+      )}
+
       <div className="form-actions">
-        <button type="submit" className="submit-button">
-          Upload
+        <button type="submit" className="submit-button" disabled={uploading}>
+          {uploading ? "Uploading..." : "Upload"}
         </button>
         <button
           type="button"
           className="cancel-button"
           onClick={() => navigate(-1)}
+          disabled={uploading} // Disable the cancel button during the upload
         >
           Cancel
         </button>
