@@ -5,6 +5,8 @@ import SearchBar from "../components/SearchBar";
 import './ExperienceDetail.css';
 import { FaRegBookmark, FaBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 const ExperienceDetail = () => {
@@ -138,6 +140,44 @@ const ExperienceDetail = () => {
     setEditOpen(false);
   };
 
+  const handleDelete = async (id) => {
+    setEditOpen(false);
+    confirmAlert({
+      title: 'Confirm Delete',
+      message: 'Are you sure you want to delete this item? This cannot be undone.',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: async () => {
+            try {
+              const response = await fetch(`http://localhost:8001/api/experience-data/${id}`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+
+              if (response.ok) {
+                console.log("Item deleted successfully.");
+                navigate('/explore');
+              } else {
+                console.error("Error deleting experience. Status:", response.status);
+              }
+            } catch (error) {
+              console.error("Error deleting experience:", error);
+            }
+          },
+        },
+        {
+          label: 'No',
+          onClick: () => {
+            console.log("Delete action canceled.");
+          },
+        },
+      ],
+    });
+  };
+
   const handleEditSubmit = async () => {
     // Prepare an object to store the fields that have changed
     let updated = { ...updatedData };
@@ -246,6 +286,7 @@ const ExperienceDetail = () => {
         <div className="edit-overlay">
           <div className="edit-form">
             <h3>Edit Experience</h3>
+            <button onClick={() => handleDelete(id)}>Delete</button>
             <label htmlFor="title">Title:</label>
             <input
               type="text"
