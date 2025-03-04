@@ -32,6 +32,17 @@
     /* margin-bottom: 15px; */
 }
 
+.photos-btn{
+  /* height: 40px; */
+  /* font-size: 0.75rem; */
+  font-weight: bold;
+  background-color: #3398B2;
+  padding: .5rem 1.5rem;
+  color: white;
+  border-radius: .5rem;
+  /* margin-bottom: 15px; */
+}
+
 .bookmark-btn, .edit-btn {
     display: flex;
     align-items: center;
