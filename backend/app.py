@@ -129,7 +129,7 @@ def sync_user():
 
 
 ######################################################################
-#main.py
+# main.py
 
 
 def general_request(request: object, collection: object) -> None:
@@ -653,6 +653,7 @@ def filter_experiences():
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"error": "An error occurred."}), 500
+
 
 if __name__ == '__main__':
     app.run(port=46725, debug=True)
