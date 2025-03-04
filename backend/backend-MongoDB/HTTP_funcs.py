@@ -69,6 +69,7 @@ def _get(request_body: dict, collection: object) -> object:
         cursor = collection.find()
         result = [item for item in cursor]
     elif "_id" in request_body:
+        print("_id is", request_body)
         result = collection.find_one({"_id": ObjectId(request_body["_id"])})
     else:
         result = collection.find_one(request_body)
@@ -83,7 +84,10 @@ def _get(request_body: dict, collection: object) -> object:
     if collection.name == "Trip":
         collections_to_loop = ["User", "Experience", "Photos"]
     elif collection.name == "Experience":
-        collections_to_loop = ["User", "Photo", "Comment"]
+        if not request_body:
+            collections_to_loop = ["User", "Photo"]
+        else:
+            collections_to_loop = ["User", "Photo", "Comment"]
     elif collection.name == "Photo":
         collections_to_loop = ["User"]
     elif collection.name == "Comment":
@@ -91,10 +95,17 @@ def _get(request_body: dict, collection: object) -> object:
     else:
         return result
 
-    for collection in collections_to_loop:
-        if collection in result:
-            decode(collection, result)
-
+    # Handle case where result is a list of dictionaries
+    if isinstance(result, list):
+        for doc in result:
+            for collection_name in collections_to_loop:
+                if collection_name in doc:
+                    decode(collection_name, doc)  # Decode each dictionary item
+    # Handle case where result is a single dictionary
+    elif isinstance(result, dict):
+        for collection_name in collections_to_loop:
+            if collection_name in result:
+                decode(collection_name, result)  # Decode the single document
     return result
 
 
@@ -113,12 +124,14 @@ def decode(collection: str, result: dict) -> None:
             })
             comment_comment = comment["Comment"]
             user_comment = comment["User"][0]
+            comment_date = comment["commentDate"]
+            rating = comment["rating"]
 
             user_comment = users.find_one({
                 "_id": ObjectId(user_comment)
             })["name"]
 
-            result[collection][i] = (user_comment, comment_comment)
+            result[collection][i] = (user_comment, comment_date, comment_comment, rating)
 
         elif collection == "User":
             users = client["User"]["User"]
@@ -135,10 +148,9 @@ def decode(collection: str, result: dict) -> None:
         # TODO Add photos
 
 
-def _put(collection: object, payload: dict, prev_name: str) -> None:
-
+def _put(collection: object, payload: dict, id_to_update: str) -> None:
     collection.update_one(
-        {collection.name: prev_name},
+        {"_id": ObjectId(id_to_update)},
         payload
     )
 
@@ -193,6 +205,9 @@ def _post(collection: object, request: object) -> str:
         for value in ["User", "Experience"]:
             if value in request:
                 collections[value] = request[value]
+                # Update rating avg/total
+                if value == "Experience":
+                    _update_rating(value, request)
 
         _linked_update(collections, collection.name, comment_id)
         return comment_id
@@ -221,6 +236,29 @@ def _update_id(input_data: object) -> None:
     # If input_data is a single document (dictionary)
     elif isinstance(input_data, dict):
         input_data['_id'] = str(input_data['_id'])
+
+
+def _update_rating(value: str, request: object):
+    experience = client[value][value].find_one({"_id": ObjectId(request[value][0])})
+    total_reviews = experience.get("rating", {}).get("total", 0)
+    current_avg = experience.get("rating", {}).get("average", 0)
+
+    new_total_reviews = total_reviews + 1
+    new_total = current_avg * total_reviews + request["rating"]
+
+    # Step 3: Calculate the new average rating
+    new_average_rating = new_total / new_total_reviews
+
+    # Step 4: Update the experience with the new ratings
+    client[value][value].update_one(
+        {"_id": experience["_id"]},
+        {
+            "$set": {"rating": {
+                "total": new_total_reviews,
+                "average": new_average_rating
+            }}
+        }
+    )
 
 
 def _set_payload(input_data: object, payload: dict) -> None:

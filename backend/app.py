@@ -5,6 +5,7 @@ from authlib.integrations.flask_client import OAuth
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
 
+
 # Load environment variables
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -35,8 +36,10 @@ oauth.register(
 mongo_uri = os.getenv("MONGO_URI")
 client = MongoClient(mongo_uri)
 
+
 users_db = client["User"]
 users_collection = users_db["User"]
+
 
 # ------------------- AUTH0 LOGIN -------------------
 
