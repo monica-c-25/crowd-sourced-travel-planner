@@ -213,6 +213,59 @@ const ExperienceDetail = () => {
     }
   };
 
+  // Function to handle deleting a photo
+  const handleDeletePhoto = async (index) => {
+    if (!isAuthenticated) {
+      alert("You must be signed in to delete a photo.");
+      return;
+    }
+  
+    // Ensure the photo exists and has a photo_url
+    const photo = experience.photo_data[index];
+    if (!photo || !photo.photo_url) {
+      console.error("Photo URL not found.");
+      return;
+    }
+  
+    const photoUrl = photo.photo_url; // Get the photo URL to delete
+    const experienceId = experience._id; // Get the experience ID
+  
+    // Confirm the action with the user
+    const confirmDelete = window.confirm("Are you sure you want to delete this photo?");
+    if (!confirmDelete) return;
+  
+    try {
+      // Send DELETE request to the backend to delete the photo
+      const response = await fetch(`http://localhost:8001/api/experience-data/${experienceId}/photos`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          experience_id: experienceId,
+          photo_url: photoUrl, // Send the photo URL to the backend
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.message === "Success: Photo URL Removed") {
+        // Update the experience data to remove the deleted photo from the UI
+        const updatedExperience = {
+          ...experience,
+          photo_data: experience.photo_data.filter((_, idx) => idx !== index), // Remove photo at index
+        };
+        setExperience(updatedExperience); // Update the state with the new photo data
+        setCurrentIndex(0); // Reset the photo index after deletion
+      } else {
+        console.error("Error deleting photo:", data.Error || data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+    }
+  };
+  
+
   return (
     <>
       <div className="search-bar experience-detail-search">
@@ -245,11 +298,14 @@ const ExperienceDetail = () => {
 
         <div className="photo-viewer-container">
           <button className="scroll-button" onClick={handlePrevious}>←</button>
-          <img
-            src={getPhotoUrl(currentIndex)}
-            alt="Experience"
-            className="photo-viewer"
-          />
+          <div className="photo-container">
+            <img
+              src={getPhotoUrl(currentIndex)}
+              alt="Experience"
+              className="photo-viewer"
+            />
+            <button className="delete-photo-btn" onClick={() => handleDeletePhoto(currentIndex)}>Delete Photo</button>
+          </div>
           <button className="scroll-button" onClick={handleNext}>→</button>
         </div>
 
