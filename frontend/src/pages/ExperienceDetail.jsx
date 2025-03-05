@@ -375,6 +375,7 @@ const ExperienceDetail = () => {
           <div className="edit-overlay">
             <div className="edit-form">
               <h3>Edit Experience</h3>
+              <button onClick={() => handleDelete(id)}>Delete</button>
               <label htmlFor="title">Title:</label>
               <input
                 type="text"
