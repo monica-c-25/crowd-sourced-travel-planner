@@ -25,7 +25,7 @@ const ExperienceDetail = () => {
   });
   const [bookmarks, setBookmarks] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0); // State to manage current image index
-  
+
   useEffect(() => {
     const fetchExperience = async () => {
       try {
@@ -182,7 +182,7 @@ const ExperienceDetail = () => {
       updatedData.location = formData.location;
     }
     setUpdatedData(updated);
-  
+
     if (Object.keys(updatedData).length === 1) {
       alert("No changes detected.");
       setEditOpen(false);
