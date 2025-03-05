@@ -141,7 +141,7 @@ def decode(collection: str, result: dict) -> None:
             result[collection][i] = experiences.find_one({
                 "_id": ObjectId(result[collection][i])
             })
-        
+
         elif collection == "Trip":
             trips = client["Trip"]["Trip"]
             result[collection][i] = trips.find_one({
