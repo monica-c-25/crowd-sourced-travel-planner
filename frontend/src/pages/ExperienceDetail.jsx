@@ -29,7 +29,7 @@ const ExperienceDetail = () => {
   useEffect(() => {
     const fetchExperience = async () => {
       try {
-        const response = await fetch(`http://localhost:46725/api/experience-data/${id}`);
+        const response = await fetch(`http://localhost:8001/api/experience-data/${id}`);
         const data = await response.json();
         if (data.Message === "Success") {
           setExperience(data.data);
@@ -47,7 +47,7 @@ const ExperienceDetail = () => {
     const fetchUserBookmarks = async () => {
       if (isAuthenticated && userID) {
         try {
-          const response = await fetch(`http://localhost:46725/api/user-data/${userID}`);
+          const response = await fetch(`http://localhost:8001/api/user-data/${userID}`);
           const data = await response.json();
           if (data.Message === "Success") {
             setBookmarks(data.data.Bookmarks || []); // Set the bookmarks from the DB
