@@ -8,7 +8,6 @@ import { useAuth } from "../context/AuthContext";
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-
 const ExperienceDetail = () => {
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
@@ -27,6 +26,7 @@ const ExperienceDetail = () => {
     "mongo_id": id
   });
   const [bookmarks, setBookmarks] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0); // State to manage current image index
   
   useEffect(() => {
     const fetchExperience = async () => {
@@ -78,7 +78,6 @@ const ExperienceDetail = () => {
       updatedBookmarks = bookmarks.filter(bookmark => bookmark !== id);
     } else {
       updatedBookmarks = [...bookmarks, id];
-      console.log("updated Bookmarks", updatedBookmarks);
     }
 
     try {
@@ -107,6 +106,28 @@ const ExperienceDetail = () => {
 
   const isBookmarked = bookmarks.includes(id);
 
+  // Handle navigation through images
+  const handleNext = () => {
+    if (experience && experience.photo_data) {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % experience.photo_data.length);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (experience && experience.photo_data) {
+      setCurrentIndex(
+        (prevIndex) => (prevIndex - 1 + experience.photo_data.length) % experience.photo_data.length
+      );
+    }
+  };
+
+  const getPhotoUrl = (index) => {
+    if (experience && experience.photo_data && experience.photo_data.length > 0) {
+      return experience.photo_data[index].photo_url;
+    }
+    return "/images/travel-background.jpg"; // Fallback image
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!experience) return <p>Experience not found.</p>;
 
@@ -115,6 +136,14 @@ const ExperienceDetail = () => {
       navigate(`/review-form/${id}`);
     } else {
       alert("You must be signed in to write a review.");
+    }
+  };
+
+  const handleAddPhotosClick = () => {
+    if (isAuthenticated) {
+      navigate(`/photo-form/${id}`);
+    } else {
+      alert("You must be signed in to add photos.");
     }
   };
 
@@ -179,10 +208,7 @@ const ExperienceDetail = () => {
   };
 
   const handleEditSubmit = async () => {
-    // Prepare an object to store the fields that have changed
     let updated = { ...updatedData };
-  
-    // Check for changes and add them to updatedData
     if (formData.description !== experience.description) {
       updatedData.description = formData.description;
     }
@@ -197,18 +223,16 @@ const ExperienceDetail = () => {
     }
     setUpdatedData(updated);
   
-    // If no data has changed, don't send anything
     if (Object.keys(updatedData).length === 1) {
       alert("No changes detected.");
       setEditOpen(false);
       return;
     }
-  
-    // Send the updated data to the server
+
     try {
       const response = await fetch(`http://localhost:46725/api/experience-data`, {
         method: "PUT",
-        body: JSON.stringify(updatedData), // Only send the updated fields
+        body: JSON.stringify(updatedData), 
         headers: {
           "Content-Type": "application/json",
         },
@@ -216,12 +240,11 @@ const ExperienceDetail = () => {
       const data = await response.json();
 
       if (data.Message === "Success") {
-        // Update the experience object with the new data
         setExperience((prevExperience) => ({
           ...prevExperience,
-          ...updatedData, // Update only the changed fields
+          ...updatedData,
         }));
-        setEditOpen(false); // Close the modal
+        setEditOpen(false); 
       } else {
         console.error("Error updating experience.");
       }
@@ -230,32 +253,87 @@ const ExperienceDetail = () => {
     }
   };
 
+  // Function to handle deleting a photo
+  const handleDeletePhoto = async (index) => {
+    if (!isAuthenticated) {
+      alert("You must be signed in to delete a photo.");
+      return;
+    }
+  
+    // Ensure the photo exists and has a photo_url
+    const photo = experience.photo_data[index];
+    if (!photo || !photo.photo_url) {
+      console.error("Photo URL not found.");
+      return;
+    }
+  
+    const photoUrl = photo.photo_url; // Get the photo URL to delete
+    const experienceId = experience._id; // Get the experience ID
+  
+    // Confirm the action with the user
+    const confirmDelete = window.confirm("Are you sure you want to delete this photo?");
+    if (!confirmDelete) return;
+  
+    try {
+      // Send DELETE request to the backend to delete the photo
+      const response = await fetch(`http://localhost:8001/api/experience-data/${experienceId}/photos`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          experience_id: experienceId,
+          photo_url: photoUrl, // Send the photo URL to the backend
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.message === "Success: Photo URL Removed") {
+        // Update the experience data to remove the deleted photo from the UI
+        const updatedExperience = {
+          ...experience,
+          photo_data: experience.photo_data.filter((_, idx) => idx !== index), // Remove photo at index
+        };
+        setExperience(updatedExperience); // Update the state with the new photo data
+        setCurrentIndex(0); // Reset the photo index after deletion
+      } else {
+        console.error("Error deleting photo:", data.Error || data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting photo:", error);
+    }
+  };
+  
+
   return (
     <>
-  <div className="search-bar experience-detail-search">
-    <SearchBar />
-  </div>
-    <div className="experience-detail">
-      <div className="header-container">
-        <div className="header-group-left">
-          <h1>{experience.title}</h1>
-          <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
-        </div>
-        <div className="header-group-right">
-          {user && user.name === experience.User[0] && (
-            <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
-          )}
-          <button className="bookmark-btn" onClick={handleBookmarkClick}>{isBookmarked ? (
-        <>
-          <FaBookmark /> Unbookmark
-        </>
-      ) : (
-        <>
-          <FaRegBookmark /> Bookmark
-        </>
-      )}</button>
-        </div>
+      <div className="search-bar experience-detail-search">
+        <SearchBar />
       </div>
+      <div className="experience-detail">
+        <div className="header-container">
+          <div className="header-group-left">
+            <h1>{experience.title}</h1>
+            <button className="review-btn" onClick={handleWriteReviewClick}>Write a Review</button>
+            <button className="photos-btn" onClick={handleAddPhotosClick}>Add Photos</button>
+          </div>
+          <div className="header-group-right">
+            {user && user.name === experience.User[0] && (
+              <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
+            )}
+            <button className="bookmark-btn" onClick={handleBookmarkClick}>
+              {isBookmarked ? (
+                <>
+                  <FaBookmark /> Unbookmark
+                </>
+              ) : (
+                <>
+                  <FaRegBookmark /> Bookmark
+                </>
+              )}
+            </button>
+          </div>
       <div className="header-detail">
         <div className="header-detail-left">
           {/* <p>Created by <a href="">{experience.User[0]}</a></p> */} 
@@ -263,24 +341,41 @@ const ExperienceDetail = () => {
           {/* <p>Average rating: {experience.rating["average"]}  (<a href="">{experience.rating["total"]} Reviews</a>)</p> */}
           <p>Average rating: {experience.rating["average"]}  ({experience.rating["total"]} Reviews)</p>
         </div>
-        <div className="header-detail-right">
-          <p><strong>Event Date:</strong> {experience.eventDate}</p>
-          <p><strong>Created On:</strong> {experience.creationDate}</p>
+
+        <div className="photo-viewer-container">
+          <button className="scroll-button" onClick={handlePrevious}>←</button>
+          <div className="photo-container">
+            <img
+              src={getPhotoUrl(currentIndex)}
+              alt="Experience"
+              className="photo-viewer"
+            />
+            <button className="delete-photo-btn" onClick={() => handleDeletePhoto(currentIndex)}>Delete Photo</button>
+          </div>
+          <button className="scroll-button" onClick={handleNext}>→</button>
         </div>
-      </div>
-      
-      <img className="images" src={experience.Photos || "/images/travel-background.jpg"} alt="No Img Available" />
-      
-      <div className="detail-container">
-        <div className="detail-left">
-          <h4>Description</h4> 
-          <p>{experience.description}</p>
+
+        <div className="header-detail">
+          <div className="header-detail-left">
+            <p>Created by <a href="">{experience.User[0]}</a></p>
+            <p>Average rating: {experience.rating["average"]} (<a href="">{experience.rating["total"]} Reviews</a>)</p>
+          </div>
+          <div className="header-detail-right">
+            <p><strong>Event Date:</strong> {experience.eventDate}</p>
+            <p><strong>Created On:</strong> {experience.creationDate}</p>
+          </div>
         </div>
-        <div className="detail-right">
-          <h4>Location</h4> 
-          <p>{experience.location}</p>
+
+        <div className="detail-container">
+          <div className="detail-left">
+            <h4>Description</h4> 
+            <p>{experience.description}</p>
+          </div>
+          <div className="detail-right">
+            <h4>Location</h4> 
+            <p>{experience.location}</p>
+          </div>
         </div>
-      </div>
 
       {editOpen && (
         <div className="edit-overlay">
@@ -329,8 +424,7 @@ const ExperienceDetail = () => {
               <button onClick={handleEditCancel}>Cancel</button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Review section with comments */}
       <div className="review-container">
@@ -338,36 +432,35 @@ const ExperienceDetail = () => {
         {/* <a href="">See More Reviews</a> */}
         <div>See More Reviews</div>
           {loading ? (
-          <p className="loading-message">Loading...</p>
-        ) : (
-          <div className="review-grid">
-            {Array.isArray(comments) && comments.length > 0 ? (
-              comments.reverse().map((comment, index) => (
-                <div className="review-card" key={index}>
-                  <div>
-                    {[1,2,3,4,5].map(star => (
-                      <span key={star}>
-                        {/* Fill star if rating is greater than or equal to the star number */}
-                        {comment[3] >= star ? (
-                          <i className="fa fa-star" style={{ color: 'gold' }}></i> // Filled star
-                        ) : (
-                          <i className="fa fa-star-o" style={{ color: 'gray' }}></i> // Empty star
-                        )}
-                      </span>
-                    ))}
+            <p className="loading-message">Loading...</p>
+          ) : (
+            <div className="review-grid">
+              {Array.isArray(comments) && comments.length > 0 ? (
+                comments.reverse().map((comment, index) => (
+                  <div className="review-card" key={index}>
+                    <div>
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <span key={star}>
+                          {comment[3] >= star ? (
+                            <i className="fa fa-star" style={{ color: 'gold' }}></i>
+                          ) : (
+                            <i className="fa fa-star-o" style={{ color: 'gray' }}></i>
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                    <h3>{comment[0]}</h3>
+                    <p>{comment[1]}</p>
+                    <p>{comment[2]}</p>
                   </div>
-                  <h3>{comment[0]}</h3> {/* Name */}
-                  <p>{comment[1]}</p> {/* Date */}
-                  <p>{comment[2]}</p> {/* Comment */}
-                </div>
-              ))
-            ) : (
-              <p>No comments available.</p>
-            )}
-          </div>
-        )}
+                ))
+              ) : (
+                <p>No comments available.</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 };
