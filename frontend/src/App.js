@@ -8,6 +8,7 @@ import Explore from './pages/Experiences.jsx';
 import ExperienceForm from './forms/ExperienceForm.jsx';
 import ExperienceDetail from './pages/ExperienceDetail.jsx';
 import ReviewForm from './forms/ReviewForm.jsx';
+import PhotoForm from './forms/PhotoForm.jsx';
 import ChatbotForm from './forms/AIRecommendator.jsx';
 import { AuthProvider } from "./context/AuthContext";
 import AIRecommendations from "./pages/AIRecommendation.jsx";
@@ -31,6 +32,7 @@ const App = () => {
                             <Route path="/experience-detail/:id" element={<ExperienceDetail />} />
                             <Route path="/experience-form" element={<ExperienceForm />} />
                             <Route path="/review-form/:id" element={<ReviewForm />} />
+                            <Route path="/photo-form/:id" element={<PhotoForm />} />
                             <Route path="/ai-recommendator" element={<ChatbotForm />} />
                             <Route path="/ai-recommendation" element={<AIRecommendations />} />
                             <Route path="/dashboard" element={<Dashboard />} />
