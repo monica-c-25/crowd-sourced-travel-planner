@@ -13,6 +13,8 @@ function PhotoForm(props) {
   const [errorMessage, setErrorMessage] = useState("");
   const [uploading, setUploading] = useState(false); // Track upload status
 
+  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB in bytes
+
   useEffect(() => {
     if (!isAuthenticated) {
       alert("You must be signed in to access this page");
@@ -24,10 +26,29 @@ function PhotoForm(props) {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files); // Convert FileList to an array
-    setFiles(selectedFiles); // Update state to hold an array of files
 
-    // Generate file previews
-    const previews = selectedFiles.map((file) => {
+    // Check if any selected file exceeds the max size limit (1MB)
+    const invalidFiles = selectedFiles.filter((file) => file.size > MAX_FILE_SIZE);
+
+    if (invalidFiles.length > 0) {
+      // Show popup if files exceed the size limit
+      window.alert("One or more files exceed the 1MB size limit. Select another photo or hit cancel.");
+    }
+
+    // Filter out files that exceed the max size limit
+    const validFiles = selectedFiles.filter((file) => file.size <= MAX_FILE_SIZE);
+
+    // Set error message if there are invalid files
+    if (invalidFiles.length > 0) {
+      setErrorMessage("One or more files exceed the 1MB size limit.");
+    } else {
+      setErrorMessage(""); // Clear error message if all files are valid
+    }
+
+    setFiles(validFiles); // Update state to hold valid files only
+
+    // Generate file previews for valid files
+    const previews = validFiles.map((file) => {
       return URL.createObjectURL(file); // Create a preview URL for each selected file
     });
     setFilePreviews(previews); // Update the state with preview URLs
