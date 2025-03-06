@@ -7,7 +7,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv, find_dotenv
 from HTTP_funcs import (
-    _get, _put, _post, _delete, _set_payload, _search_for_experience
+    _get, _put, _post, _delete, _set_payload, _search_for_experience, decode
 )
 from google.cloud import storage
 from bson.objectid import ObjectId
@@ -407,6 +407,7 @@ def trip_request_handler(trip_id=None):
                     for experience in experiences:
                         experience["_id"] = str(experience["_id"])
                     trip["_id"] = str(trip["_id"])
+                    decode("User", trip)
                     return jsonify({
                         "Message": "Success",
                         # "trip_id": str(trip["_id"]),
@@ -421,6 +422,9 @@ def trip_request_handler(trip_id=None):
             return jsonify({"Message": f"Error: {str(e)}"}), 500
 
     # Handle other methods (PUT, DELETE) here if needed
+    else:
+        print("REQUEST IS :",request)
+        return general_request(request, db["Trip"])
     return jsonify({"Message": "Method Not Allowed"}), 405
 
 

@@ -134,9 +134,7 @@ const TripDetail = () => {
             <strong>Trip Date:</strong> Trip not completed yet.
             </p>
         )}
-        {console.log("USER: ", user)}
-        {console.log("USER.NAME: ", user.name)}
-        {console.log("TRIP.USER[0]: ", trip.User[0])}
+
         {user && user.name === trip.User[0] && (
           <button className="edit-btn" onClick={handleEditButtonClick}><FaRegEdit />Edit</button>
         )}
