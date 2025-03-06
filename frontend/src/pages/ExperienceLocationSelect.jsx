@@ -19,7 +19,7 @@ const LocationExperienceSelect = () => {
       const fetchExperiences = async () => {
         try {
           const response = await fetch(
-            "http://127.0.0.1:8001/api/search",
+            "http://127.0.0.1:46725/api/search",
             {
               method: "POST", // Specify GET method if it's a GET request
               headers: {

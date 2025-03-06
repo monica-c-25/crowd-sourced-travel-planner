@@ -20,6 +20,11 @@
     color: inherit; /* Ensure text color matches the parent */
   }
   
+button.complete-btn {
+  background-color: white;
+  color: black;
+}
+
 .list-right {
     margin-top: 25px;
 }
@@ -71,7 +76,3 @@
     font-size: 1.25rem;
     margin-bottom: 8px;
   }
-  
-
-
-  

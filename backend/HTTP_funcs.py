@@ -78,6 +78,7 @@ def _get(request_body: dict, collection: object) -> object:
         result = [item for item in cursor]
     elif "_id" in request_body:
         result = collection.find_one({"_id": ObjectId(request_body["_id"])})
+        print("RESULT:", result)
     else:
         result = collection.find_one(request_body)
 
@@ -94,7 +95,7 @@ def _get(request_body: dict, collection: object) -> object:
         if not request_body:
             collections_to_loop = ["User", "Photo"]
         else:
-            collections_to_loop = ["User", "Photo", "Comment", "Trip"]
+            collections_to_loop = ["User", "Photo", "Comment"]
     elif collection.name == "Photo":
         collections_to_loop = ["User"]
     elif collection.name == "Comment":
@@ -149,6 +150,12 @@ def decode(collection: str, result: dict) -> None:
         elif collection == "Experience":
             experiences = client["Experience"]["Experience"]
             result[collection][i] = experiences.find_one({
+                "_id": ObjectId(result[collection][i])
+            })
+
+        elif collection == "Trip":
+            trips = client["Trip"]["Trip"]
+            result[collection][i] = trips.find_one({
                 "_id": ObjectId(result[collection][i])
             })
 

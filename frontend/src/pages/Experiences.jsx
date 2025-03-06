@@ -37,7 +37,7 @@ const Explore = () => {
         const data = await response.json();
         console.log("Response Data:", data);
         if (data.Message === "Success") {
-          setExperiences(data.data);
+          setExperiences(data.data.reverse());
         } else {
           console.error("No experiences found.");
         }
@@ -100,7 +100,7 @@ const Explore = () => {
       ) : (
         <div className="experience-grid">
           {Array.isArray(experiences) && experiences.length > 0 ? (
-            experiences.reverse().map((experience, index) => (
+            experiences.map((experience, index) => (
               <Link
                 key={index}
                 to={`/experience-detail/${experience._id}`} // Navigate to details page
