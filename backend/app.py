@@ -216,7 +216,7 @@ def search_for_experience():
 
 # GETS EXPERIENCE DETAILS
 @app.route(
-        '/api/experience-data/<experience_id>', 
+        '/api/experience-data/<experience_id>',
         methods=['GET', 'PUT', 'DELETE'])
 def get_experience_by_id(experience_id=None):
     db = client["Experience"]
@@ -677,9 +677,9 @@ def filter_experiences():
 
         return jsonify(experiences_list)
 
-    except Exception as e:
+    except Exception as error:
         # Print the exception to the server log for debugging
-        return jsonify({"error": "An error occurred."}), 500
+        return jsonify({"error": error}), 500
 
 
 if __name__ == '__main__':
