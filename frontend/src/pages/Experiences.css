@@ -103,14 +103,25 @@
   }
   
   .search-bar-container {
-    position: absolute; /* Position relative to the .image-container */
-    top: 12%; /* Center vertically within the image */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Adjust for exact centering */
-    width: 90%; /* Adjust width of search bar */
+    justify-items: center;
     max-width: 1200px;
-    /* padding: 0.5rem; */
+    padding-bottom: 1rem;
     background-color: rgba(255, 255, 255, 0.9); /* Subtle background for contrast */
-    border-radius: 20px 20px 0px 0px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for the bar */
+  }
+  
+  .search-bar {
+    width: 700px !important; /* Set width explicitly */
+    max-width: 700px;
+    margin: 0 auto; /* Center it */
+    padding-bottom: 1rem;
+  }
+  
+  .css-1tlcqt-MuiAutocomplete-root .MuiAutocomplete-inputRoot .MuiAutocomplete-input {
+    min-width: 700px !important;
+  }
+  
+  .experience-detail-search {
+    width: 700px !important;
+    max-width: 700px;
+    margin: 0 auto;
   }

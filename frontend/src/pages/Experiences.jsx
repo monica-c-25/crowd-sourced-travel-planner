@@ -92,7 +92,7 @@ const Explore = () => {
           Use AI to plan a trip!
         </button>
       </div>
-      <div className="search-bar-container">
+      <div className="search-bar">
         <SearchBar />
       </div>
       {loading ? (
