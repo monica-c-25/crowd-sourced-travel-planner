@@ -117,9 +117,9 @@ const Dashboard = () => {
             const data = await response.json();
 
             if (response.ok && Array.isArray(data.data[0])) {
-                setExperiences(data.data[0]);
+                setExperiences(data.data[0].reverse());
                 setOriginalExperiences(data.data[0]); // Store original experiences data
-                setBookmarks(data.data[1]);
+                setBookmarks(data.data[1].reverse());
                 setOriginalBookmarks(data.data[1]); // Store original bookmarks data
             } else {
                 setExperiences([]);
@@ -131,7 +131,7 @@ const Dashboard = () => {
             const tripData = await tripResponse.json();
 
             if (tripResponse.ok && Array.isArray(tripData.data)) {
-                setTrips(tripData.data);
+                setTrips(tripData.data.reverse());
                 setOriginalTrips(tripData.data); // Store original trips data
             } else {
                 setTrips([]);
@@ -200,7 +200,7 @@ const Dashboard = () => {
                     experiences.length === 0 ? (
                         <p>No experiences to display.</p>
                     ) : (
-                        experiences.reverse().map((experience) => (
+                        experiences.map((experience) => (
                             <Link
                                 key={experience._id}
                                 to={`/experience-detail/${experience._id}`} // Navigate to details page
@@ -261,7 +261,7 @@ const Dashboard = () => {
                 ) : trips.length === 0 ? (
                     <p>No trips to display.</p>
                 ) : (
-                    trips.reverse().map((trip) => (
+                    trips.map((trip) => (
                         <Link
                         key={trip._id}
                         to={`/trip-data/${trip._id}`} // Navigate to details page
@@ -315,7 +315,7 @@ const Dashboard = () => {
                     bookmarks.length === 0 ? (
                         <p>No bookmarked experiences to display.</p>
                     ) : (
-                        bookmarks.reverse().map((bookmark) => (
+                        bookmarks.map((bookmark) => (
                             <Link
                                 key={bookmark._id}
                                 to={`/experience-detail/${bookmark._id}`} // Navigate to details page
