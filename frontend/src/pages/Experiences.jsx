@@ -24,14 +24,12 @@ const Explore = () => {
         }
 
         // Fetch data using the dynamic API URL
-        const response = await fetch(`${apiUrl}/api/experience-data`,
-          {
-            method: "GET", // Specify GET method if it's a GET request
-            headers: {
-              Accept: "application/json", // The response is expected in JSON
-            },
-          }
-        );
+        const response = await fetch(`${apiUrl}/api/experience-data`, {
+          method: "GET", // Specify GET method if it's a GET request
+          headers: {
+            Accept: "application/json", // The response is expected in JSON
+          },
+        });
         if (!response.ok) {
           console.error("Server responded with error:", response.status);
           return;
@@ -59,6 +57,25 @@ const Explore = () => {
     } else {
       alert("You must be signed in to add an experience.");
     }
+  };
+
+  // const getFirstPhotoUrl = (experience) => {
+  //   if (experience && experience.photo_data && experience.photo_data.length > 0) {
+  //     // Return the URL of the first photo in the array
+  //     return experience.photo_data[0].photo_url;
+  //   }
+  //   // Fallback to default image if no photos are available
+  //   return "/images/travel-background.jpg";
+  // };
+
+  const getRandomPhotoUrl = (experience) => {
+    if (experience && experience.photo_data && experience.photo_data.length > 0) {
+      // Get a random index from the photo_data array
+      const randomIndex = Math.floor(Math.random() * experience.photo_data.length);
+      return experience.photo_data[randomIndex].photo_url;
+    }
+    // Fallback to default image if no photos are available
+    return "/images/travel-background.jpg";
   };
 
   return (
@@ -91,8 +108,9 @@ const Explore = () => {
               >
                 <h3>{experience.title}</h3>
                 <img
-                  src={experience.Photos || "/images/travel-background.jpg"}
-                  alt="No Img Available"
+                  src={getRandomPhotoUrl(experience)} // Use helper function to get a random photo
+                  // src={getFirstPhotoUrl(experience)} // Use helper function to get first photo uploaded to the experience
+                  alt="Experience"
                 />
                 <p className="date">{experience.eventDate}</p>
                 <p><strong>Location: </strong> {experience.location}</p>

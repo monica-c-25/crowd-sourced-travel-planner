@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import "./AIRecommendator.css";
 import '../index.css';
 
@@ -71,7 +72,7 @@ const ChatbotForm = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8001/get_recommendations",
+        "http://localhost:46725/get_recommendations",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -83,12 +84,17 @@ const ChatbotForm = () => {
       setRecommendations(data.recommendations);
       setLoading(false);
 
-      navigate("/ai-recommendation", { state: { recommendations: data.recommendations } });
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (recommendations) {
+      navigate("/ai-recommendation", { state: { recommendations: recommendations } });
+    }
+  }, [recommendations, navigate]);
 
   const isFormComplete =
     formData.location.trim() !== "" &&

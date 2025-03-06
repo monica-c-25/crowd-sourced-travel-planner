@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -11,14 +10,14 @@ const TripDetail = () => {
   const [trip, setTrip] = useState(null);
   const [experiences, setExperiences] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated, user, userID } = useAuth();
+  const { isAuthenticated, userID } = useAuth();
 
   useEffect(() => {
     const fetchTrip = async () => {
       if (isAuthenticated && userID) {
         try {
           const response = await fetch(
-            `http://localhost:8001/api/trip-data/${id}`
+            `http://localhost:46725/api/trip-data/${id}`
           );
           const data = await response.json();
           if (data.Message === "Success") {
