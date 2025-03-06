@@ -423,7 +423,6 @@ def trip_request_handler(trip_id=None):
 
     # Handle other methods (PUT, DELETE) here if needed
     else:
-        print("REQUEST IS :",request)
         return general_request(request, db["Trip"])
     return jsonify({"Message": "Method Not Allowed"}), 405
 
