@@ -210,11 +210,14 @@ def search_for_experience():
     collection = db["Experience"]
 
     if request.method == 'POST':
-        return _search_for_experience(collection, request.json)
+        return _search_for_experience(
+            collection, request.json, client["User"]["User"])
 
 
 # GETS EXPERIENCE DETAILS
-@app.route('/api/experience-data/<experience_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route(
+        '/api/experience-data/<experience_id>', 
+        methods=['GET', 'PUT', 'DELETE'])
 def get_experience_by_id(experience_id=None):
     db = client["Experience"]
     collection = db["Experience"]
@@ -365,8 +368,12 @@ def get_user_experiences(user_id):
         bookmark_object_ids = [ObjectId(bm_id) for bm_id in bookmark_ids]
 
         # Fetch experiences from the Experience collection
-        experiences = list(experience_collection.find({"_id": {"$in": experience_object_ids}}))
-        bookmarks = list(experience_collection.find({"_id": {"$in": bookmark_object_ids}}))
+        experiences = list(experience_collection.find(
+            {"_id": {"$in": experience_object_ids}})
+            )
+        bookmarks = list(experience_collection.find(
+            {"_id": {"$in": bookmark_object_ids}})
+            )
 
         # Convert ObjectId to string for frontend compatibility
         for experience in experiences:
@@ -374,14 +381,18 @@ def get_user_experiences(user_id):
         for bookmark in bookmarks:
             bookmark["_id"] = str(bookmark["_id"])
 
-        return jsonify({"Message": "Success", "data": [experiences, bookmarks]})
+        return jsonify(
+            {"Message": "Success", "data": [experiences, bookmarks]}
+            )
 
     except Exception as e:
         return jsonify({"Message": f"Error: {str(e)}"}), 500
 
 
 @app.route('/api/trip-data', methods=['GET', 'POST', 'PUT', 'DELETE'])
-@app.route('/api/trip-data/<trip_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])  # Added URL for trip_id
+@app.route(
+    '/api/trip-data/<trip_id>', methods=['GET', 'POST', 'PUT', 'DELETE']
+    )  # Added URL for trip_id
 def trip_request_handler(trip_id=None):
     db = client["Trip"]
     experience_collection = client["Experience"]["Experience"]
@@ -403,7 +414,9 @@ def trip_request_handler(trip_id=None):
                 if trip:
                     trip_ids = trip.get("Experience", [])
                     trip_object_ids = [ObjectId(t_id) for t_id in trip_ids]
-                    experiences = list(experience_collection.find({"_id": {"$in": trip_object_ids}}))
+                    experiences = list(experience_collection.find(
+                        {"_id": {"$in": trip_object_ids}})
+                        )
                     for experience in experiences:
                         experience["_id"] = str(experience["_id"])
                     trip["_id"] = str(trip["_id"])
@@ -411,7 +424,7 @@ def trip_request_handler(trip_id=None):
                     return jsonify({
                         "Message": "Success",
                         # "trip_id": str(trip["_id"]),
-                        "data": [trip, experiences]  # Add all trip data to the response
+                        "data": [trip, experiences]
                     }), 200
                 else:
                     return jsonify({"Message": "Trip not found"}), 404
@@ -477,7 +490,6 @@ def get_recommendations():
         return jsonify({"recommendations": recommendations})
 
     except Exception as e:
-        print(f"Error: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -633,7 +645,7 @@ def filter_experiences():
 
     try:
         # Get query parameters from frontend (user_id, start_date, end_date)
-        user_id = request.args.get("User", None)  # Assuming user_id is passed as a query param
+        user_id = request.args.get("User", None)
         start_date_str = request.args.get("start_date", None)
         end_date_str = request.args.get("end_date", None)
 
@@ -660,13 +672,13 @@ def filter_experiences():
         # Serialize the results
         experiences_list = []
         for experience in experiences:
-            experience["_id"] = str(experience["_id"])  # Convert ObjectId to string
+            experience["_id"] = str(experience["_id"])
             experiences_list.append(experience)
 
         return jsonify(experiences_list)
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        # Print the exception to the server log for debugging
         return jsonify({"error": "An error occurred."}), 500
 
 

@@ -15,14 +15,19 @@ uri = (
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 
-def _search_for_experience(collection: object, request_body: dict):
+def _search_for_experience(
+        collection: object, request_body: dict, user_collection: object
+        ) -> None:
     results = []
 
     if request_body["type"] == "Name":
         queried_results = collection.find({
             "title": {"$regex": request_body["input"], "$options": "i"}
         })
-
+    elif request_body["type"] == "Location":
+        queried_results = collection.find({
+            "location": {"$regex": request_body["input"], "$options": "i"}
+        })
     else:
         queried_results = collection.find({
             "title": {"$regex": request_body["input"], "$options": "i"}
@@ -33,6 +38,11 @@ def _search_for_experience(collection: object, request_body: dict):
 
     for item in queried_results:
         item["_id"] = str(item["_id"])
+        user = user_collection.find_one({
+            "_id": ObjectId(item["User"][0])
+            }
+        )
+        item["User"][0] = user["name"]
         results.append(item)
 
     return {"message": "success", "data": results}
