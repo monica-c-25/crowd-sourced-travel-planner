@@ -36,7 +36,6 @@ def _search_for_experience(
     if not queried_results:
         return {"Message": "Unsuccessful"}
 
-    print(queried_results)
     for item in queried_results:
         item["_id"] = str(item["_id"])
         user = user_collection.find_one({
