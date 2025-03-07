@@ -407,7 +407,6 @@ def photo_request_handler(experience_id):
             files = request.files.getlist('file')
             if not files:
                 return jsonify({'Error': 'No files sent in request'}), 400
-            
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(PHOTO_BUCKET)
             photo_data_list = []
