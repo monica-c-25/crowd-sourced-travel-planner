@@ -3,3 +3,5 @@
 .env
 __pycache__/
 /test-results/
+service-account-key.json
+.venv

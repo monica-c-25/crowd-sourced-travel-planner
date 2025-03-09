@@ -35,7 +35,6 @@ const Explore = () => {
           return;
         }
         const data = await response.json();
-        console.log("Response Data:", data);
         if (data.Message === "Success") {
           setExperiences(data.data);
         } else {

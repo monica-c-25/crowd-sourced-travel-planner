@@ -15,14 +15,12 @@ load_dotenv()
 app = Flask(__name__)
 # Initialize CORS (Cross-Origin Resource Sharing) for React frontend
 CORS(app, origins="http://localhost:3000", supports_credentials=True)
-load_dotenv()
 USER = os.environ.get('MONGO_USER')
 PASSWORD = os.environ.get('PASSWORD')
 uri = (
     f"mongodb+srv://{USER}:{PASSWORD}@capstone.fw3b6.mongodb.net/?"
     "retryWrites=true&w=majority&appName=Capstone"
 )
-
 client = MongoClient(uri, server_api=ServerApi('1'))
 openaiclient = OpenAI(
     api_key=os.environ.get('OPENAI_API_KEY')
@@ -148,8 +146,6 @@ def get_experience_by_id(experience_id=None):
             return general_request(request, collection)
         elif request.method == 'DELETE':
             try:
-                print("EXP ID: ", experience_id)
-                print("DELETING FROM: ", collection)
                 _delete(collection, experience_id)
                 response = {
                     "Message": "Success"
@@ -411,7 +407,6 @@ def photo_request_handler(experience_id):
             files = request.files.getlist('file')
             if not files:
                 return jsonify({'Error': 'No files sent in request'}), 400
-
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(PHOTO_BUCKET)
             photo_data_list = []
@@ -576,7 +571,6 @@ def filter_experiences():
         return jsonify(experiences_list)
 
     except Exception:
-        # Print the exception to the server log for debugging
         return jsonify({"error": "An error occurred."}), 500
 
 

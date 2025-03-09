@@ -28,13 +28,10 @@ export const AuthProvider = ({ children }) => {
         .then((response) => response.json())
         .then((data) => {
           setUserID(data.userID);
-          console.log("User data synced with MongoDB:", data);
         })
         .catch((error) => {
-          console.error("Error syncing user data:", error);
         });
     } else {
-      console.log("Waiting for authentication to complete...");
     }
   }, [isLoading, isAuthenticated, user]);
 

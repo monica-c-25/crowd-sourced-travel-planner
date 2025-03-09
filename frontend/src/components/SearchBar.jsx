@@ -56,7 +56,6 @@ export function SearchBar() {
         if (data.message === "success") {
           let dupeData = new Set();
           for (const experience of data.data) {
-            console.log(experience.location)
             if (!dupeData.has(experience)) {
               dupeData.add(experience.location);
             }
@@ -67,7 +66,6 @@ export function SearchBar() {
         alert(`${exception} raised`);
       }
     };
-    console.log(locationResults)
     if (locationInput !== '') fetchSearchResults();
     else setLocationResults([]);
   }, [locationInput])
@@ -75,7 +73,6 @@ export function SearchBar() {
   const handleSelect = (selectedTitle) => {
     const selectedExperience = resultantInputs.find(exp => exp.title === selectedTitle);
     if (selectedExperience) {
-      console.log("Selected Experience:", selectedExperience);
       navigate(`/experience-detail/${selectedExperience._id}`);
     }
   };
@@ -89,10 +86,7 @@ export function SearchBar() {
 
   const handleChange = (event) => {
     setKeywordOrLocation(event.target.value)
-    console.log(keywordOrLocation)
   }
-
-  console.log(locationResults)
   return (
     <Stack>
       <RadioGroup
