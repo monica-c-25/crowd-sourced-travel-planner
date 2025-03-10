@@ -6,6 +6,7 @@ import '../index.css';
 
 function TripForm() {
     const navigate = useNavigate();
+    const REACT_APP_AUTH_URL = process.env.REACT_APP_AUTH_URL;
     const { isAuthenticated, userID } = useAuth();
 
     const today = new Date().toISOString().split("T")[0];
@@ -39,7 +40,7 @@ function TripForm() {
     // Fetch available experiences to select for the trip
     const fetchExperiences = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:46725/api/experience-data");
+            const response = await fetch(`${REACT_APP_AUTH_URL}/api/experience-data`);
             if (response.ok) {
                 const data = await response.json();
                 if (Array.isArray(data.data)) {
@@ -97,7 +98,7 @@ function TripForm() {
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:46725/api/trip-data", {
+            const response = await fetch(`${REACT_APP_AUTH_URL}/api/trip-data`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -145,7 +146,7 @@ function TripForm() {
         setLoading(true);
         try {
             // Fetch experiences and bookmarks
-            const response = await fetch(`http://127.0.0.1:46725/api/user-experiences/${userID}`);
+            const response = await fetch(`${REACT_APP_AUTH_URL}/api/user-experiences/${userID}`);
             const data = await response.json();
 
             if (response.ok && Array.isArray(data.data[0])) {

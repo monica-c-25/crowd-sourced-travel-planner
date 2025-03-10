@@ -70,7 +70,8 @@ function PhotoForm(props) {
     });
 
     try {
-      const response = await fetch(`http://localhost:8001/api/experience-data/${id}/photos`, {
+      const apiUrl = process.env.REACT_APP_API_URL;
+      const response = await fetch(`${apiUrl}/api/experience-data/${id}/photos`, {
         method: "POST",
         body: formData,
       });

@@ -4,4 +4,7 @@
 __pycache__/
 /test-results/
 service-account-key.json
+*.pdf
 .venv
+*.pdf
+Final Report Capstone.pdf

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import './SearchBar.css';
 import 'font-awesome/css/font-awesome.min.css';
 import { Autocomplete, TextField, Stack, Typography, RadioGroup, FormControlLabel, Radio } from '@mui/material';
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function SearchBar() {
-
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [searchInput, setSearchInput] = useState('');
   const [resultantInputs, setResultantInputs] = useState([]);
   const [locationInput, setLocationInput] = useState('');
@@ -16,7 +16,7 @@ export function SearchBar() {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await fetch("http://localhost:8001/api/search", {
+        const response = await fetch(`${apiUrl}/api/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',  
@@ -42,7 +42,7 @@ export function SearchBar() {
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
-        const response = await fetch("http://localhost:8001/api/search", {
+        const response = await fetch(`${apiUrl}/api/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',  
