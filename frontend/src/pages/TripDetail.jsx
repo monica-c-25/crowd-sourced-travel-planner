@@ -16,8 +16,9 @@ const TripDetail = () => {
     const fetchTrip = async () => {
       if (isAuthenticated && userID) {
         try {
+          const REACT_APP_AUTH_URL = process.env.REACT_APP_AUTH_URL
           const response = await fetch(
-            `http://localhost:46725/api/trip-data/${id}`
+            `${REACT_APP_AUTH_URL}/api/trip-data/${id}`
           );
           const data = await response.json();
           if (data.Message === "Success") {

@@ -7,6 +7,7 @@ import { FaRegBookmark, FaBookmark, FaRegEdit } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 const ExperienceDetail = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
   const { id } = useParams(); // Get experience ID from URL
   const [experience, setExperience] = useState(null);
   const [comments, setComments] = useState(null);
@@ -29,7 +30,7 @@ const ExperienceDetail = () => {
   useEffect(() => {
     const fetchExperience = async () => {
       try {
-        const response = await fetch(`http://localhost:8001/api/experience-data/${id}`);
+        const response = await fetch(`${apiUrl}/api/experience-data/${id}`);
         const data = await response.json();
         if (data.Message === "Success") {
           setExperience(data.data);
@@ -47,7 +48,7 @@ const ExperienceDetail = () => {
     const fetchUserBookmarks = async () => {
       if (isAuthenticated && userID) {
         try {
-          const response = await fetch(`http://localhost:8001/api/user-data/${userID}`);
+          const response = await fetch(`${apiUrl}/api/user-data/${userID}`);
           const data = await response.json();
           if (data.Message === "Success") {
             setBookmarks(data.data.Bookmarks || []); // Set the bookmarks from the DB
@@ -80,7 +81,7 @@ const ExperienceDetail = () => {
 
     try {
       // Update the database with the new bookmarks list
-      const response = await fetch(`http://localhost:8001/api/user-data`, {
+      const response = await fetch(`${apiUrl}/api/user-data`, {
         method: "PUT",
         body: JSON.stringify({ 
           "mongo_id": userID, Bookmarks: updatedBookmarks 
@@ -190,7 +191,7 @@ const ExperienceDetail = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8001/api/experience-data`, {
+      const response = await fetch(`${apiUrl}/api/experience-data`, {
         method: "PUT",
         body: JSON.stringify(updatedData), 
         headers: {
@@ -236,7 +237,7 @@ const ExperienceDetail = () => {
   
     try {
       // Send DELETE request to the backend to delete the photo
-      const response = await fetch(`http://localhost:8001/api/experience-data/${experienceId}/photos`, {
+      const response = await fetch(`${apiUrl}/api/experience-data/${experienceId}/photos`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

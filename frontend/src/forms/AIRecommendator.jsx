@@ -71,8 +71,9 @@ const ChatbotForm = () => {
     setLoading(true);
 
     try {
+      const REACT_APP_AUTH_URL = process.env.REACT_APP_AUTH_URL;
       const response = await fetch(
-        "http://localhost:46725/get_recommendations",
+        `${REACT_APP_AUTH_URL}/get_recommendations`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
