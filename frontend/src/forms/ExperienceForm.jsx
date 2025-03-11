@@ -49,7 +49,6 @@ function ExperienceForm(props) {
 
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
-
       const response = await fetch(`${apiUrl}/api/experience-data`, {
         method: "POST",
         headers: {

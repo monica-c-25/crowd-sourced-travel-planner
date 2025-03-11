@@ -18,8 +18,9 @@ const LocationExperienceSelect = () => {
       // Fetch experiences from the backend API
       const fetchExperiences = async () => {
         try {
+          const apiUrl = process.env.REACT_APP_API_URL;
           const response = await fetch(
-            "http://127.0.0.1:8001/api/search",
+            `${apiUrl}/api/search`,
             {
               method: "POST", // Specify GET method if it's a GET request
               headers: {

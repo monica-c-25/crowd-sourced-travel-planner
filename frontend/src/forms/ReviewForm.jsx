@@ -40,7 +40,8 @@ function ReviewForm(props) {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:46725/api/comment-data", {
+      const REACT_APP_AUTH_URL = process.env.REACT_APP_AUTH_URL;
+      const response = await fetch(`${REACT_APP_AUTH_URL}/api/comment-data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

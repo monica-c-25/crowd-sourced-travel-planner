@@ -18,7 +18,8 @@ export const AuthProvider = ({ children }) => {
       };
 
       // Send user data to Flask backend to sync with MongoDB
-      fetch("http://localhost:46725/api/sync-user", {
+      const REACT_APP_AUTH_URL = process.env.REACT_APP_AUTH_URL;
+      fetch(`${REACT_APP_AUTH_URL}/api/sync-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,13 +29,10 @@ export const AuthProvider = ({ children }) => {
         .then((response) => response.json())
         .then((data) => {
           setUserID(data.userID);
-          console.log("User data synced with MongoDB:", data);
         })
         .catch((error) => {
-          console.error("Error syncing user data:", error);
         });
     } else {
-      console.log("Waiting for authentication to complete...");
     }
   }, [isLoading, isAuthenticated, user]);
 
